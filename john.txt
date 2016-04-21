@@ -1,3 +1,0 @@
-This is a test file, added by John G and pushed to the master branch.
-
-Going forward, all pushes will be to my own branch.
