@@ -66,7 +66,7 @@ var generateIncompleteAddresses = function(userId) {
 		});
 	});
 
-	return ret;
+    return ret;
 };
 
 var generateNewAddress = function(userId) {
@@ -91,13 +91,16 @@ describe('Address model', function () {
     var newAddressOut;
     var dupeError;
     var requireTestAddresses;
+    var sampleUser1;
+    var sampleUser2;
+    var badState = {error: 'bad'};
     
     beforeEach('Establish DB connection', function (done) {
         if (!mongoose.connection.db)// return done();
         	mongoose.connect(dbURI);
 
-        var sampleUser1 = generateNewUser();
-        var sampleUser2 = generatePotus();
+        sampleUser1 = generateNewUser();
+        sampleUser2 = generatePotus();
         var requiredKeys;
         var requiredPromises;
             
@@ -127,10 +130,17 @@ describe('Address model', function () {
         })
         .then(function(savedAddress) {
         	newAddressOut = savedAddress;
-            done();
+            
+            var badStateAddress = generateNewAddress(sampleUser2._id);
+            badStateAddress.state = 'XX';
+            return badStateAddress.save();
+        })
+        .then(function(badStateAddress) {
+            badState.error = undefined;   
         })
         .catch(function(err) {
-            console.log("*********** CAUGHT ERROR: ",err);
+            if(!err.errors.state)
+                console.log("*********** CAUGHT ERROR: ",err);
             done();
         });
     });
@@ -150,7 +160,10 @@ describe('Address model', function () {
 		describe('userId', function () {
 			it('should exist', function () {
             	expect(newAddressOut.userId).to.exist;
-        	});				
+        	});	
+            it('should be a user id', function () {
+                expect(newAddressOut.userId).to.equal(sampleUser2._id);
+            });             
 		});	
 
 		describe('label', function () {
@@ -158,8 +171,8 @@ describe('Address model', function () {
             	expect(newAddressOut.label).to.exist;
         	});				
         	it('should be a string', function () {
-            	expect(newAddressOut.label).to.equal(newAddressIn.label);
-        	});	
+                expect(newAddressOut.label).to.equal(newAddressIn.label);
+            }); 
 		});	
 
 		describe('name', function () {
@@ -215,9 +228,11 @@ describe('Address model', function () {
             	expect(newAddressOut.state).to.equal(newAddressIn.state);
         	});
         	it('is required', function () {
-            	expect(requireTestAddresses['state'].error).to.equal('Path `state` is required.');
-        	});				
-        					
+                expect(requireTestAddresses['state'].error).to.equal('Path `state` is required.');
+            });             
+            it('is must be a valid state abbr', function () {
+                expect(badState.error).to.exist;
+            });             
 		});	
 
 		describe('zip', function () {
