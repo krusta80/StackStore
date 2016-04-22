@@ -22,8 +22,7 @@ var schema = new mongoose.Schema({
         required: true
     },
     middleName: {
-        type: String,
-        required: true
+        type: String
     },
     lastName: {
         type: String,
