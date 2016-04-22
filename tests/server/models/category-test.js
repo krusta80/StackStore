@@ -37,6 +37,7 @@ describe('Categories', function(){
 			expect(savedCategory.description).to.equal('Great description');
 			expect(savedCategory.active).to.equal(true);
 			expect(savedCategory.origId).to.equal('112233');
+			done();
 		});
 	});
 
@@ -53,7 +54,8 @@ describe('Categories', function(){
 			expect(savedCategory.description).to.equal('Great description');
 			expect(savedCategory.active).to.equal(true);
 			expect(savedCategory.origId).to.equal('112233');
-		})
+			done();
+		});
 	});
 
 	it('has dateCreated and dateModified', function(done){
@@ -64,6 +66,7 @@ describe('Categories', function(){
 		category.save().then(function(savedCategory){
 			expect(savedCategory.dateCreated).to.be.an.instanceOf(Date);
 			expect(savedCategory.dateModified).to.exist;
-		})
+			done();
+		});
 	});
 });
