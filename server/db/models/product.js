@@ -8,7 +8,7 @@ var productSchema = new mongoose.Schema({
 	description: String,
 	imageUrls: [String],
 	categories: {
-		type: [ {type: Schema.Types.ObjectId, ref: 'Category'} ],
+		type: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Category'} ],
 		validate: {
 			validator: function(val){
 				return val.length > 0;
@@ -16,7 +16,6 @@ var productSchema = new mongoose.Schema({
 			message: 'at least one category required'
 		}
 	},
-	reviews: [{type: Schema.Types.ObjectId, ref: 'Review'}],
 	price: {
 		type: Number,
 		required: true,
@@ -30,10 +29,13 @@ var productSchema = new mongoose.Schema({
 	},
 	active: {
 		type: Boolean,
-		required: true
+		required: true,
+		//I think default is necessary
+		//not sure value is true or false
+		default: true 
 	},
 	origId: {
-		type: Schema.Types.ObjectId,
+		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Product'
 	},
 	dateCreated: {
@@ -46,9 +48,7 @@ var productSchema = new mongoose.Schema({
 
 });
 
-var Product = mongoose.model('Product', productSchema);
-
-module.exports = Product;
+module.exports = mongoose.model('Product', productSchema);
 
 
 
