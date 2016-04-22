@@ -40,8 +40,22 @@ var generateIncompleteUsers = function() {
 };
 
 var generateNewUser = function() {
-	return new User({
+    return new User({
             email: 'jag47@cornell.edu',
+            password: 'potus',
+            firstName: 'John',
+            lastName: 'Gruska',
+            middleName: 'Anthony',
+            role: 'Admin',
+            active: true,
+            pendingPasswordReset: false,
+            dateCreated: Date.now()
+        });
+}
+
+var generatePotus = function() {
+    return new User({
+            email: 'obama@gmail.com',
             password: 'potus',
             firstName: 'John',
             lastName: 'Gruska',
@@ -72,7 +86,7 @@ describe('User model', function () {
         	var i = 0;
         	results.forEach(function(result) {
         		if(result.isRejected()) {
-        			requireTestUsers[requiredKeys[i]].error = result.reason().errors[requiredKeys[i]].message;
+                    requireTestUsers[requiredKeys[i]].error = result.reason().errors[requiredKeys[i]].message;
         		}
         		i++;
         	})
@@ -87,7 +101,6 @@ describe('User model', function () {
         })
         .catch(function(error) {
         	dupeError = error.message;
-        	console.log(dupeError);
         	done();
         });
     });
@@ -175,10 +188,6 @@ describe('User model', function () {
         	it('should be a boolean', function () {
             	expect(newUserOut.active).to.equal(newUserIn.active);
         	});
-        	it('is required', function () {
-            	expect(requireTestUsers['active'].error).to.equal('Path `active` is required.');
-        	});				
-        					
 		});	
 
 		describe('pendingPasswordReset', function () {
@@ -187,9 +196,6 @@ describe('User model', function () {
         	});				
         	it('should be a boolean', function () {
             	expect(newUserOut.pendingPasswordReset).to.equal(newUserIn.pendingPasswordReset);
-        	});				
-        	it('is required', function () {
-            	expect(requireTestUsers['pendingPasswordReset'].error).to.equal('Path `pendingPasswordReset` is required.');
         	});				
 		});	
 
@@ -200,7 +206,6 @@ describe('User model', function () {
         	it('should be a date', function () {
             	expect(newUserOut.dateCreated).to.equal(newUserIn.dateCreated);
         	});				
-        	it('')
 		});	
 
 		describe('dateModified', function () {
@@ -210,7 +215,7 @@ describe('User model', function () {
 		});
     });
 
-    describe('3.  Password Encryption', function () {
+    describe('Password Encryption', function () {
 
         describe('generateSalt method', function () {
 
@@ -288,7 +293,7 @@ describe('User model', function () {
             var saltSpy;
 
             var createUser = function () {
-                return User.create({ email: 'obama@gmail.com', password: 'potus' });
+                return generatePotus().save();//User.create({ email: 'obama@gmail.com', password: 'potus' });
             };
 
             beforeEach(function () {
@@ -330,7 +335,7 @@ describe('User model', function () {
         describe('sanitize method', function () {
 
             var createUser = function () {
-                return User.create({ email: 'obama@gmail.com', password: 'potus' });
+                return generatePotus().save();//User.create({ email: 'obama@gmail.com', password: 'potus' });
             };
 
             it('should remove sensitive information from a user object', function () {
