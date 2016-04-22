@@ -2,14 +2,13 @@ var expect = require('chai').expect;
 var Product = require('../server/db/models/product');
 
 describe('Products', function(){
-	it('has title, categories, price, inventoryQty, active and origId required', function(done){
+	it('has title, categories, price and inventoryQty and active required', function(done){
 		var product = new Product({
 			title: 'Cool Thing',
 			categories: ['cheap'] ,
 			price: 2,
 			inventoryQty: 50,
-			active: true,
-			origId: 12345
+			active: true
 		});
 
 		product.save().then(function(savedProduct){
@@ -18,7 +17,6 @@ describe('Products', function(){
 			expect(savedProduct.price).to.equal(2);
 			expect(savedProduct.inventoryQty).to.equal(50);
 			expect(savedProduct.active).to.equal(true);
-			expect(savedProduct.origId).to.equal(12345);
 			done();
 		}).then(null, done);
 	});
@@ -74,23 +72,6 @@ describe('Products', function(){
 		}).then(null, done);
 	});
 
-	it('requires price', function(done){
-		var product = new Product({
-			title: 'Cool Thing',
-			categories: ['cheap'] ,
-			// price: 2,
-			inventoryQty: 50,
-			active: true,
-			origId: 12345
-		});
-
-		product.validate(function(err){
-			expect(err).to.be.an('object');
-			expect(err.message).to.exist;
-			done();
-		}).then(null, done);
-	});
-
 	it('requires inventoryQty', function(done){
 		var product = new Product({
 			title: 'Cool Thing',
@@ -99,23 +80,6 @@ describe('Products', function(){
 			// inventoryQty: 50,
 			active: true,
 			origId: 12345
-		});
-
-		product.validate(function(err){
-			expect(err).to.be.an('object');
-			expect(err.message).to.exist;
-			done();
-		}).then(null, done);
-	});
-
-	it('requires origId', function(done){
-		var product = new Product({
-			title: 'Cool Thing',
-			categories: ['cheap'] ,
-			price: 2,
-			inventoryQty: 50,
-			active: true
-			// origId: 12345
 		});
 
 		product.validate(function(err){
