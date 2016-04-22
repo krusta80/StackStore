@@ -47,4 +47,4 @@ var schema = new mongoose.Schema({
     }
 });
 
-mongoose.model('Address', schema);
+module.exports = mongoose.model('Address', schema);
