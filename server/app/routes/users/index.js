@@ -24,7 +24,6 @@ router.get('/:id', function(req, res, next){
 })
 
 router.post('/', function(req, res, next){
-	console.log("PARAMS", req.body);
 	User.create(req.body)
 	.then(function(newUser){
 		res.send(newUser);
@@ -43,8 +42,8 @@ router.put('/:id', function(req, res, next){
 
 router.delete('/:id', function(req, res, next){
 	User.findByIdAndRemove(req.params.id)
-	.then(function(){
-		res.redirect('/');
+	.then(function(deletedUser){
+		res.send(deletedUser);
 	})
 	.then(null, next);
 })

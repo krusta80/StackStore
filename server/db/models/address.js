@@ -11,7 +11,7 @@ var schema = new mongoose.Schema({
         type: String,
         required: true
     },
-    address1: {
+    address: {
         type: String,
         required: true
     },
@@ -36,8 +36,7 @@ var schema = new mongoose.Schema({
     },
     origId: {
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User',
-        required: true
+        ref: 'User'
     },
     dateCreated: {
         type: Date
