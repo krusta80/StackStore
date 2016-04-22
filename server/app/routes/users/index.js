@@ -4,6 +4,8 @@ var models = require('../../../db/models');
 var User = models.User;
 module.exports = router;
 
+//Note - Still need to implement access control!
+
 router.get('/', function (req, res, next) {
 	User.find({})
 	.then(function(users){
