@@ -5,14 +5,59 @@ var _ = require('lodash');
 
 var schema = new mongoose.Schema({
     email: {
-        type: String
+        type: String,
+        required: true,
+        unique: true
     },
     password: {
-        type: String
+        type: String,
+        required: true
+        // select: false (Looks like sanitize method takes care of this)
     },
     salt: {
         type: String
     },
+    firstName: {
+        type: String,
+        required: true
+    },
+    middleName: {
+        type: String,
+        required: true
+    },
+    lastName: {
+        type: String,
+        required: true
+    },
+    role: {
+        type: String
+        //Why is this required?
+    },
+    active: {
+        type: Boolean,
+        required: true,
+        default: true //Not in spec, but I feel like this makes sense.
+    },
+    origId: {
+        type: mongoose.Schema.Types.ObjectId, ref: 'User',
+        required: true
+    },
+    pendingPasswordReset: {
+        type: Boolean,
+        required: true,
+        default: false //Not in spec, but I feel like this makes sense.
+    },
+    dateCreated: {
+        type: Date,
+    },
+    dateModified: {
+        type: Date
+    }
+
+    /* These don't seem to be used anywhere in our application. 
+       Also, we have no plans (that I'm aware of) to allow users to authenticate via oAuth, right?
+       We can probably get rid of this (just want to double check and make sure it won't break anything - it shouldn't).
+
     twitter: {
         id: String,
         username: String,
@@ -25,6 +70,7 @@ var schema = new mongoose.Schema({
     google: {
         id: String
     }
+    */
 });
 
 // method to remove sensitive information from user objects before sending them out
