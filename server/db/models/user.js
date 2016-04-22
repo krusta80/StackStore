@@ -30,8 +30,9 @@ var schema = new mongoose.Schema({
         required: true
     },
     role: {
-        type: String
-        //Why is this required? The spec suggests it should be.
+        type: String,
+        enum: ['User', 'Admin'],
+        required: true
     },
     active: {
         type: Boolean,
@@ -40,8 +41,7 @@ var schema = new mongoose.Schema({
     },
     origId: {
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User',
-        required: true
+        ref: 'User'
     },
     pendingPasswordReset: {
         type: Boolean,
