@@ -1,4 +1,4 @@
-var mongoose - require('mongoose');
+var mongoose = require('mongoose');
 require('../../../server/db/models');
 var Product = mongoose.model('Product');
 
