@@ -7,6 +7,7 @@ module.exports = router;
 // router.use('/orders', require('./orders'));
 router.use('/users', require('./users'));
 router.use('/addresses', require('./addresses'));
+router.use('/orders', require('./orders'));
 
 // Make sure this is after all of
 // the registered routes!
