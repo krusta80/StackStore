@@ -31,7 +31,7 @@ var schema = new mongoose.Schema({
     },
     role: {
         type: String
-        //Why is this required?
+        //Why is this required? The spec suggests it should be.
     },
     active: {
         type: Boolean,
@@ -39,7 +39,8 @@ var schema = new mongoose.Schema({
         default: true //Not in spec, but I feel like this makes sense.
     },
     origId: {
-        type: mongoose.Schema.Types.ObjectId, ref: 'User',
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User',
         required: true
     },
     pendingPasswordReset: {
