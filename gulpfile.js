@@ -16,6 +16,7 @@ var mocha = require('gulp-mocha');
 var karma = require('karma').server;
 var istanbul = require('gulp-istanbul');
 var notify = require('gulp-notify');
+var argv = require('yargs').argv;
 
 // Development tasks
 // --------------------------------------------------------------
@@ -55,7 +56,18 @@ gulp.task('buildJS', ['lintJS'], function () {
 
 gulp.task('testServerJS', function () {
     require('babel-register');
-    return gulp.src('./tests/server/**/*.js', {
+    
+    var dirName = "**";
+    var fileName = "*.js";
+
+    if(argv.routes)
+    	dirName = 'routes';
+    if(argv.models)
+    	dirName = 'models';
+    if(argv.model)
+    	fileName = argv.model.toLowerCase()+"-test.js";
+
+    return gulp.src('./tests/server/'+dirName+'/'+fileName, {
 		read: false
 	}).pipe(mocha({ reporter: 'spec' }));
 });
