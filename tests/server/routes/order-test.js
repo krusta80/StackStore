@@ -1,6 +1,10 @@
 // Instantiate all models
 var mongoose = require('mongoose');
 require('../../../server/db/models');
+
+var Category = mongoose.model('Category');
+var Product = mongoose.model('Product');
+var Order = mongoose.model('Order');
 var User = mongoose.model('User');
 
 var expect = require('chai').expect;
@@ -11,17 +15,17 @@ var clearDB = require('mocha-mongoose')(dbURI);
 var supertest = require('supertest');
 var app = require('../../../server/app');
 
-var cloneUserFields = function(user) {
+var cloneOrderFields = function(order) {
 	return {
-		email: user.email,
-		password: user.password,
-		firstName: user.firstName,
-		middleName: user.middleName,
-		lastName: user.lastName,
-		role: user.role,
-		active: user.active,
-		pendingPasswordReset: user.pendingPasswordReset,
-		dateCreated: user.dateCreated
+		userId: order.userId,
+		sessionId: order.sessionId,
+		email: order.email,
+		lineItems: order.lineItems.map(function(lineItem){return lineItem;}),
+		invoiceNumber: order.invoiceNumber,
+		shippingAddress: order.shippingAddress,
+		billingAddress: order.billingAddress,
+		status: order.status,
+		dateCreated: order.dateCreated
 	};
 };
 
@@ -38,37 +42,77 @@ var seedUsers = function () {
             active: true,
             pendingPasswordReset: false,
             dateCreated: Date.now()
-        },
-        {
-            email: 'krusta80@aol.com',
-            password: 'yougotmail',
-            firstName: 'Jay',
-            lastName: 'Ginsta',
-            role: 'User',
-            active: true,
-            pendingPasswordReset: false,
-            dateCreated: Date.now()
-        },
-        {
-            email: 'david@yahoo.com',
-            password: 'ohhhbaby',
-            firstName: 'David',
-            lastName: 'Yang',
-            role: 'User',
-            active: true,
-            pendingPasswordReset: false,
-            dateCreated: Date.now(),
-            dateModified:  Date.now()
         }
     ];
 
     return User.create(users);
 };
 
-var loggedInAgent;
-var testUsers;
+var seedCategories = function () {
 
-describe('Users Route', function () {
+    var categories = [
+        {
+            name: 'Test Category',
+            dateCreated: Date.now()
+        }
+    ];
+
+    return Category.create(categories);
+};
+
+var seedProducts = function (categoryId) {
+
+    var products = [
+        {
+            title: 'Test Product',
+            categories: [categoryId],
+            price: 5,
+            inventoryQty: 10,
+            active: true,
+            dateCreated: Date.now()
+        }
+    ];
+
+    return Product.create(products);
+};
+
+var seedOrders = function (product) {
+
+    var orders = [
+        {
+            sessionId: '123',
+			email: 'krusta80@aol.com',
+            lineItems: [{prod_id: product._id, qty: product.inventoryQty, price: product.price}],
+			invoiceNumber: 'INV#00001',
+			status: 'Ordered',
+			dateCreated: Date.now()
+        },
+        {
+            sessionId: '321',
+			email: 'jag47@cornell',
+            lineItems: [{prod_id: product._id, qty: product.inventoryQty, price: product.price}],
+			invoiceNumber: 'INV#00002',
+			status: 'Shipped',
+			dateCreated: Date.now()
+        },
+        {
+            sessionId: '231',
+			email: 'johngruska@gmail.com',
+            lineItems: [{prod_id: product._id, qty: product.inventoryQty, price: product.price}],
+			invoiceNumber: 'INV#00003',
+			status: 'Canceled',
+			dateCreated: Date.now()
+        }
+    ];
+
+    return Order.create(orders);
+};
+
+var loggedInAgent;
+var testOrders;
+var testProduct;
+
+describe('Orders Route', function () {
 
 	beforeEach('Establish DB connection', function (done) {
 		if (!mongoose.connection.db) 
@@ -76,11 +120,16 @@ describe('Users Route', function () {
 
 		//	seed the db
 		seedUsers()
-		.then(function() {
-			return User.find({dateModified : {$exists : false }})
+		.then(seedCategories)
+		.then(function(categories) {
+			return seedProducts(categories[0]._id);
 		})
-		.then(function(users) {
-			testUsers = users;
+		.then(function(products) {
+			testProduct = products[0];
+			return seedOrders(testProduct);
+		})
+		.then(function(orders) {
+			testOrders = orders;
 			
 			// log in 
 			loggedInAgent = supertest.agent(app);
@@ -97,7 +146,7 @@ describe('Users Route', function () {
 			var response;
 
 			beforeEach('Execute get request', function (done) {
-				loggedInAgent.get('/api/users')
+				loggedInAgent.get('/api/orders')
 				.end(function(err, res) {
 					response = res;
 					done();
@@ -109,27 +158,19 @@ describe('Users Route', function () {
 				done();
 			});
 
-			it('should respond with an array of length 2', function (done) {
-				expect(response.body.length).to.equal(2);
-				done();
-			});
-
-			it('it should exclude users with dateModified', function (done) {
-				var filteredForDM = response.body.filter(function(user) {
-					return !user.dateModified;
-				});
-				expect(filteredForDM.length).to.equal(response.body.length);
+			it('should respond with an array of length 3', function (done) {
+				expect(response.body.length).to.equal(3);
 				done();
 			});
 		});
 
 		describe('- by ID', function () {
 			var response;
-			var testUser;
+			var testOrder;
 
 			beforeEach('Execute get request', function (done) {
-				testUser = testUsers[0];
-				loggedInAgent.get('/api/users/'+testUser._id)
+				testOrder = testOrders[0];
+				loggedInAgent.get('/api/orders/'+testOrder._id)
 				.end(function(err, res) {
 					response = res;
 					done();
@@ -142,7 +183,7 @@ describe('Users Route', function () {
 			});
 
 			it('should respond with the correct user', function (done) {
-				expect(response.body).to.deep.equal(testUser);
+				expect(response.body).to.deep.equal(testOrder);
 				done();
 			});
 		});
@@ -150,19 +191,18 @@ describe('Users Route', function () {
 
 	describe('/post', function () {	
 		var response;
-		var newUser = {
-            email: 'noob@hotmail.com',
-            password: 'n00b4evah',
-            firstName: 'Green',
-            lastName: 'Behindears',
-            role: 'User',
-            active: true,
-            pendingPasswordReset: false,
-            dateCreated: Date.now()
-        };
+		var newOrder;
 
 		beforeEach('Execute post request', function (done) {
-			loggedInAgent.post('/api/users', newUser)
+			newOrder = {
+		        sessionId: '999',
+				email: 'david@yang.org',
+		        lineItems: [{prod_id: testProduct._id, qty: testProduct.inventoryQty, price: testProduct.price}],
+				status: 'Cart',
+				dateCreated: Date.now()
+		    };
+
+			loggedInAgent.post('/api/orders', newOrder)
 			.end(function(err, res) {
 				response = res;
 				done();
@@ -174,39 +214,30 @@ describe('Users Route', function () {
 			done();
 		});
 
-		it('should create and respond with the new user', function (done) {
-			var isGood = Object.keys(newUser).reduce(function(bool, field) {
-				return bool && (response.body[field] === newUser[field]);
+		it('should create and respond with the new order', function (done) {
+			var isGood = Object.keys(newOrder).reduce(function(bool, field) {
+				return bool && (response.body[field] === newOrder[field]);
 			}, true);
 			expect(isGood && response.body._id).to.equal(true);
-			done();
-		});
-
-		it('should have its origId equal its _id', function (done) {
-			expect(response.body._id).to.equal(response.body.origId);
 			done();
 		});
 	});
 
 	describe('/put', function () {	
 		var response;
-		var origUserDocPrePut, origUserDocPostPut, modifiedUser;
-		var userFields;
+		var origOrder, modifiedOrder;
+		var orderFields;
 		
 		beforeEach('Execute put request', function (done) {
-			origUserDocPrePut = testUsers[1];
-			modifiedUser = cloneUserFields(origUserDocPrePut);
-			modifiedUser.middleName = 'Maximus';
+			origOrder = testOrders[1];
+			modifiedOrder = cloneOrderFields(origOrder);
+			modifiedOrder.status = 'Delivered';
 
-			userFields = Object.keys(modifiedUser);
+			orderFields = Object.keys(modifiedOrder);
 			
-			loggedInAgent.put('/api/users/'+origUserDocPrePut._id, modifiedUser)
+			loggedInAgent.put('/api/orders/'+origOrder._id, modifiedOrder)
 			.end(function(err, res) {
 				response = res;
-				User.findById(origUserDocPrePut._id)
-				.then(function(origUser) {
-					origUserDocPostPut = origUser;
-				});
 				done();
 			});
 		});
@@ -216,47 +247,43 @@ describe('Users Route', function () {
 			done();
 		});
 
-		it('should create a new user and respond with it', function (done) {
-			expect(response.body._id).to.not.equal(origUserDocPrePut._id);
+		it('should update the existing order', function (done) {
+			expect(response.body._id).to.equal(origOrder._id);
 			done();
 		});
 
 		it('should respond with the modified details', function (done) {
-			var isGood = userFields.reduce(function(bool, field) {
-				return bool && (response.body[field] === modifiedUser[field]);
+			var isGood = orderFields.reduce(function(bool, field) {
+				return bool && (response.body[field] === modifiedOrder[field]);
 			}, true);
-			expect(isGood && !response.body.dateModified).to.equal(true);
-			done();
-		});
-
-		it('should ONLY add a modified date to the original document', function (done) {
-			var isGood = userFields.reduce(function(bool, field) {
-				return bool && (origUserDocPrePut[field] === origUserDocPostPut[field]);
-			}, true);
-			expect(isGood && origUserDocPostPut.dateModified).to.equal(true);
-			done();
-		});
-
-		it('should have its origId equal the original _id', function (done) {
-			expect(response.body.origId).to.equal(origUserDocPrePut._id);
+			expect(isGood).to.equal(true);
 			done();
 		});
 	});
 
 	describe('/delete', function () {	
 		var response;
-		var origUserDoc;
-		var userFields;
-		
+		var origOrder;
+		var orderFields;
+		var wasDeleted;
+
 		beforeEach('Execute delete request', function (done) {
-			origUserDoc = testUsers[1];
-			var deletedUser = cloneUserFields(origUserDoc);
-			userFields = Object.keys(deletedUser);
+			origOrder = testOrders[1];
+			var deletedOrder = cloneOrderFields(origOrder);
+			orderFields = Object.keys(deletedOrder);
 			
-			loggedInAgent.delete('/api/users/'+origUserDoc._id)
+			loggedInAgent.delete('/api/orders/'+origOrder._id)
 			.end(function(err, res) {
 				response = res;
-				done();
+				Order.findById(origOrder._id)
+				.then(function(order) {
+					wasDeleted = false;
+					done();
+				})
+				.catch(function(err) {
+					wasDeleted = true;
+					done();
+				});
 			});
 		});
 
@@ -265,16 +292,13 @@ describe('Users Route', function () {
 			done();
 		});
 
-		it('should respond with the original doc id', function (done) {
-			expect(response.body._id).to.equal(origUserDoc._id);
+		it('should respond with the deleted id', function (done) {
+			expect(response.body._id).to.equal(origOrder._id);
 			done();
 		});
 
-		it('should ONLY add a modified date to the original document', function (done) {
-			var isGood = userFields.reduce(function(bool, field) {
-				return bool && (origUserDoc[field] === response.body[field]);
-			}, true);
-			expect(isGood && response.body.dateModified).to.equal(true);
+		it('should no longer exist in the db', function (done) {
+			expect(wasDeleted).to.equal(true);
 			done();
 		});
 	});
