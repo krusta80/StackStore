@@ -8,6 +8,7 @@ module.exports = router;
 //Note - Still need to implement access control!
 
 router.get('/', function (req, res, next) {
+	console.log(models, "models")
 	User.find({})
 	.then(function(users){
 		res.send(users);
