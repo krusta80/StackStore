@@ -57,6 +57,8 @@ gulp.task('buildJS', ['lintJS'], function () {
 gulp.task('testServerJS', function () {
     require('babel-register');
     
+    process.env.TESTING = true;
+
     var dirName = "**";
     var fileName = "*.js";
 
