@@ -98,6 +98,11 @@ schema.pre('save', function (next) {
         this.password = this.constructor.encryptPassword(this.password, this.salt);
     }
 
+    if(this.isNew){
+        console.log("NEW ITEM");
+        this.dateCreated = Date.now();
+    }
+
     next();
 
 });
