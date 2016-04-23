@@ -20,7 +20,6 @@ var cloneUserFields = function(user) {
 		lastName: user.lastName,
 		role: user.role,
 		active: user.active,
-		origId: user.origId,
 		pendingPasswordReset: user.pendingPasswordReset,
 		dateCreated: user.dateCreated
 	};
@@ -182,6 +181,11 @@ describe('Users Route', function () {
 			expect(isGood && response.body._id).to.equal(true);
 			done();
 		});
+
+		it('should have its origId equal its _id', function (done) {
+			expect(response.body._id).to.equal(response.body.origId);
+			done();
+		});
 	});
 
 	describe('/put', function () {	
@@ -230,6 +234,11 @@ describe('Users Route', function () {
 				return bool && (origUserDocPrePut[field] === origUserDocPostPut[field]);
 			}, true);
 			expect(isGood && origUserDocPostPut.dateModified).to.equal(true);
+			done();
+		});
+
+		it('should have its origId equal the original _id', function (done) {
+			expect(response.body.origId).to.equal(origUserDocPrePut._id);
 			done();
 		});
 	});
