@@ -27,7 +27,9 @@ var schema = new mongoose.Schema({
     },
     zip: {
         type: String,
-        required: true
+        required: true,
+        minimum: 5,
+        maximum: 10
     },
     active: {
         type: Boolean,
@@ -44,6 +46,17 @@ var schema = new mongoose.Schema({
     dateModified: {
         type: Date
     }
+});
+
+schema.pre('save', function (next) {
+    if(this.isNew){
+        this.dateCreated = Date.now();
+        if(!this.origId){
+            this.origId = this._id;
+        }
+    }
+    
+    next();
 });
 
 module.exports = mongoose.model('Address', schema);

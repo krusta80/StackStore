@@ -25,12 +25,26 @@ router.post('/', function(req, res, next){
 })
 
 
+//To-do: Need to DELETE certain fields and configure access control.
 router.put('/:id', function(req, res, next){
-    Address.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now()})
-    .then(function(originalAddress){ 
-        var newAddress = req.body; 
-        newAddress.origId = originalAddress.origId; 
-        return newAddress.save(); 
+    Address.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
+    .then(function(originalAddress){
+        var newAddress = {};
+        var originalAddressObj = originalAddress.toObject();
+        for(var key in originalAddressObj){
+            if(key != '_id'){
+                newAddress[key] = originalAddress[key];
+            }
+        }
+        for(var key in req.body){
+            newAddress[key] = req.body[key];
+        }
+
+        //Save to backend and return
+        return Address.create(newAddress)
+        .then(function(newAddress){
+            return newAddress.save();
+        });
     })
     .then(function(updatedAddress) {
         res.send(updatedAddress);
@@ -39,7 +53,7 @@ router.put('/:id', function(req, res, next){
 });
 
 router.delete('/:id', function(req, res, next){
-    Address.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now()}, {new: true})
+    Address.findByIdAndUpdate(req.params.id, {dateModified: Date.now()}, {new: true})
     .then(function(deletedAddress) {
         res.send(deletedAddress);
     })

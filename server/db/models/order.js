@@ -8,7 +8,10 @@ var schema = new mongoose.Schema({
     },
     sessionId: String,
     email: String,
-    lineItems: [{prod_id: String, quantity: Number, price: Number}], //To-do: Replace lineItems.prod_id with reference to "Product" 
+    lineItems: [{
+        prod_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Product'}, 
+        quantity: Number,
+        price: Number}], //To-do: Replace lineItems.prod_id with reference to "Product" 
     invoiceNumber: String,
     shippingAddress: {
         type: mongoose.Schema.Types.ObjectId, 
@@ -31,10 +34,21 @@ var schema = new mongoose.Schema({
     dateCanceled: Date
 });
 
-schema.methods.timestampStatus = function(status){
+schema.methods.timestampStatus = function(){
     //Test - What happens if field doesn't exist on model?
-    var field = "date" + status.charAt(0).toUpperCase() + status.slice(1);
+    var field = "date" + this.status.charAt(0).toUpperCase() + this.status.slice(1);
     this[field] = Date.now();
+    return this;
 }
+
+schema.pre('save', function (next) {
+
+    if(this.isNew){
+        this.dateCreated = Date.now();
+    }
+
+    next();
+
+});
 
 module.exports = mongoose.model('Order', schema);
