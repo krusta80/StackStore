@@ -156,7 +156,7 @@ var seedReviews = function(reps, products, users){
     var reviews = [];
 
     for(var i = 0; i < reps; i++)
-        products.push(generateRandomReview(products[Math.floor(Math.random()*products.length)], users[Math.floor(Math.random()*users.length)]));
+        reviews.push(generateRandomReview(products[Math.floor(Math.random()*products.length)], users[Math.floor(Math.random()*users.length)]));
 
     return Review.create(reviews);
 }
