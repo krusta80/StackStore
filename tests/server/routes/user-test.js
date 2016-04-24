@@ -142,7 +142,12 @@ describe('Users Route', function () {
 			});
 
 			it('should respond with the correct user', function (done) {
-				expect(response.body).to.deep.equal(testUser);
+				var isGood = Object.keys(response.body).reduce(function(bool, field) {
+					if(field === 'dateCreated')
+						return true;
+					return bool && (response.body[field] == testUser[field])
+				}, true);
+				expect(isGood).to.equal(true);
 				done();
 			});
 		});
@@ -151,6 +156,17 @@ describe('Users Route', function () {
 	describe('/post', function () {	
 		var response;
 		var newUser = {
+            email: 'noob@hotmail.com',
+            password: 'n00b4evah',
+            firstName: 'Green',
+            lastName: 'Behindears',
+            role: 'User',
+            active: true,
+            pendingPasswordReset: false,
+            dateCreated: Date.now()
+        };
+
+        var newUser2 = {
             email: 'noob@hotmail.com',
             password: 'n00b4evah',
             firstName: 'Green',
@@ -176,7 +192,9 @@ describe('Users Route', function () {
 
 		it('should create and respond with the new user', function (done) {
 			var isGood = Object.keys(newUser).reduce(function(bool, field) {
-				return bool && (response.body[field] === newUser[field]);
+				if(field === 'dateCreated')
+					return true;
+				return bool && (response.body[field] == newUser[field]);
 			}, true);
 			expect(isGood && response.body._id).to.equal(true);
 			done();
@@ -185,6 +203,14 @@ describe('Users Route', function () {
 		it('should have its origId equal its _id', function (done) {
 			expect(response.body._id).to.equal(response.body.origId);
 			done();
+		});
+
+		it('should not allow a duplicate email on live records', function(done) {
+			loggedInAgent.post('/api/users', newUser2)
+			.end(function(err,res) {
+				expect(res.statusCode).to.not.equal(200);
+				done();
+			});
 		});
 	});
 
@@ -223,7 +249,9 @@ describe('Users Route', function () {
 
 		it('should respond with the modified details', function (done) {
 			var isGood = userFields.reduce(function(bool, field) {
-				return bool && (response.body[field] === modifiedUser[field]);
+				if(field === 'dateCreated')
+					return true;
+				return bool && (response.body[field] == modifiedUser[field]);
 			}, true);
 			expect(isGood && !response.body.dateModified).to.equal(true);
 			done();
@@ -231,14 +259,16 @@ describe('Users Route', function () {
 
 		it('should ONLY add a modified date to the original document', function (done) {
 			var isGood = userFields.reduce(function(bool, field) {
-				return bool && (origUserDocPrePut[field] === origUserDocPostPut[field]);
+				if(field === 'dateCreated')
+					return true;
+				return bool && (origUserDocPrePut[field] == origUserDocPostPut[field]);
 			}, true);
 			expect(isGood && origUserDocPostPut.dateModified).to.equal(true);
 			done();
 		});
 
-		it('should have its origId equal the original _id', function (done) {
-			expect(response.body.origId).to.equal(origUserDocPrePut._id);
+		it('should have its origId equal the original origId', function (done) {
+			expect(response.body.origId).to.equal(origUserDocPrePut.origId);
 			done();
 		});
 	});
@@ -272,7 +302,9 @@ describe('Users Route', function () {
 
 		it('should ONLY add a modified date to the original document', function (done) {
 			var isGood = userFields.reduce(function(bool, field) {
-				return bool && (origUserDoc[field] === response.body[field]);
+				if(field === 'dateCreated')
+					return true;
+				return bool && (origUserDoc[field] == response.body[field]);
 			}, true);
 			expect(isGood && response.body.dateModified).to.equal(true);
 			done();
