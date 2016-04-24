@@ -182,10 +182,33 @@ describe('Orders Route', function () {
 				done();
 			});
 
-			it('should respond with the correct user', function (done) {
+			it('should respond with the correct order', function (done) {
 				var isGood = Object.keys(response.body).reduce(function(bool, field) {
 					if(field === 'dateCreated')
 						return true;
+					if(field === 'lineItems'){
+						var responseLineItemsArr = response.body['lineItems'];
+						var testLineItemsArr = testOrder['lineItems'];
+
+						if(responseLineItemsArr.length !== testLineItemsArr.length){
+							return false;
+						}
+
+						for(var i = 0; i < responseLineItemsArr.length; i++){
+
+							var responseLineItem = responseLineItemsArr[i];
+							var testLineItem = testLineItemsArr[i];
+
+							for(var key in responseLineItem){
+								if(String(responseLineItem[key]) !== String(testLineItem[key])){
+									return false;
+								}
+							}
+
+						}
+
+						return true;
+					}
 					return bool && (response.body[field] == testOrder[field])
 				}, true);
 				expect(isGood).to.equal(true);
