@@ -142,7 +142,12 @@ describe('Users Route', function () {
 			});
 
 			it('should respond with the correct user', function (done) {
-				expect(response.body).to.deep.equal(testUser);
+				var isGood = Object.keys(response.body).reduce(function(bool, field) {
+					if(field === 'dateCreated')
+						return true;
+					return bool && (response.body[field] === testUser[field])
+				}, true);
+				expect(isGood).to.equal(true);
 				done();
 			});
 		});
@@ -176,7 +181,9 @@ describe('Users Route', function () {
 
 		it('should create and respond with the new user', function (done) {
 			var isGood = Object.keys(newUser).reduce(function(bool, field) {
-				return bool && (response.body[field] === newUser[field]);
+				if(field === 'dateCreated')
+					return true;
+				return bool && (response.body[field] == newUser[field]);
 			}, true);
 			expect(isGood && response.body._id).to.equal(true);
 			done();
@@ -223,7 +230,9 @@ describe('Users Route', function () {
 
 		it('should respond with the modified details', function (done) {
 			var isGood = userFields.reduce(function(bool, field) {
-				return bool && (response.body[field] === modifiedUser[field]);
+				if(field === 'dateCreated')
+					return true;
+				return bool && (response.body[field] == modifiedUser[field]);
 			}, true);
 			expect(isGood && !response.body.dateModified).to.equal(true);
 			done();
@@ -231,6 +240,8 @@ describe('Users Route', function () {
 
 		it('should ONLY add a modified date to the original document', function (done) {
 			var isGood = userFields.reduce(function(bool, field) {
+				if(field === 'dateCreated')
+					return true;
 				return bool && (origUserDocPrePut[field] === origUserDocPostPut[field]);
 			}, true);
 			expect(isGood && origUserDocPostPut.dateModified).to.equal(true);
@@ -272,7 +283,9 @@ describe('Users Route', function () {
 
 		it('should ONLY add a modified date to the original document', function (done) {
 			var isGood = userFields.reduce(function(bool, field) {
-				return bool && (origUserDoc[field] === response.body[field]);
+				if(field === 'dateCreated')
+					return true;
+				return bool && (origUserDoc[field] == response.body[field]);
 			}, true);
 			expect(isGood && response.body.dateModified).to.equal(true);
 			done();
