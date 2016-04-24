@@ -19,7 +19,7 @@ var generateNewOrder = function(userId, product, addressId) {
     return new Order({
         userId: userId,
         email: 'jag47@cornell.edu',
-        lineItems: [{prod_id: product._id, qty: product.inventoryQty, price: product.price}],
+        lineItems: [{prod_id: product._id, quantity: product.inventoryQty, price: product.price}],
         invoiceNumber: 'JG000001',
         shippingAddress: addressId,
         billingAddress: addressId,
@@ -35,7 +35,7 @@ var generateIncompleteOrders = function(userId, product, addressId) {
     var fieldVals = {
         userId: userId,
         email: 'gforman@boxing.org',
-        lineItems: [{prod_id: product._id, qty: product.inventoryQty, price: product.price}],
+        lineItems: [{prod_id: product._id, quantity: product.inventoryQty, price: product.price}],
         invoiceNumber: 'JG000001',
         shippingAddress: addressId,
         billingAddress: addressId,
@@ -335,7 +335,7 @@ describe('Order model', function () {
                 expect(newOrderOut.subtotal).to.exist;
             });
             it('should total up lineItems', function() {
-                expect(newOrderOut.subtotal).to.equal(newOrderOut.lineItems.reduce(function(total, lineItem) {return total + lineItem.price*lineItem.qty;}, 0));
+                expect(newOrderOut.subtotal).to.equal(100000 * 5);
             });
         });
 
