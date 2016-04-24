@@ -145,7 +145,7 @@ describe('Users Route', function () {
 				var isGood = Object.keys(response.body).reduce(function(bool, field) {
 					if(field === 'dateCreated')
 						return true;
-					return bool && (response.body[field] === testUser[field])
+					return bool && (response.body[field] == testUser[field])
 				}, true);
 				expect(isGood).to.equal(true);
 				done();
@@ -242,7 +242,7 @@ describe('Users Route', function () {
 			var isGood = userFields.reduce(function(bool, field) {
 				if(field === 'dateCreated')
 					return true;
-				return bool && (origUserDocPrePut[field] === origUserDocPostPut[field]);
+				return bool && (origUserDocPrePut[field] == origUserDocPostPut[field]);
 			}, true);
 			expect(isGood && origUserDocPostPut.dateModified).to.equal(true);
 			done();

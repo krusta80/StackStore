@@ -183,7 +183,12 @@ describe('Orders Route', function () {
 			});
 
 			it('should respond with the correct user', function (done) {
-				expect(response.body).to.deep.equal(testOrder);
+				var isGood = Object.keys(response.body).reduce(function(bool, field) {
+					if(field === 'dateCreated')
+						return true;
+					return bool && (response.body[field] == testOrder[field])
+				}, true);
+				expect(isGood).to.equal(true);
 				done();
 			});
 		});
@@ -216,7 +221,9 @@ describe('Orders Route', function () {
 
 		it('should create and respond with the new order', function (done) {
 			var isGood = Object.keys(newOrder).reduce(function(bool, field) {
-				return bool && (response.body[field] === newOrder[field]);
+				if(field === 'dateCreated')
+					return true;
+				return bool && (response.body[field] == newOrder[field]);
 			}, true);
 			expect(isGood && response.body._id).to.equal(true);
 			done();
@@ -254,7 +261,9 @@ describe('Orders Route', function () {
 
 		it('should respond with the modified details', function (done) {
 			var isGood = orderFields.reduce(function(bool, field) {
-				return bool && (response.body[field] === modifiedOrder[field]);
+				if(field === 'dateCreated')
+					return true;
+				return bool && (response.body[field] == modifiedOrder[field]);
 			}, true);
 			expect(isGood).to.equal(true);
 			done();

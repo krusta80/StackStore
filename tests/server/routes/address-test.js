@@ -178,7 +178,7 @@ describe('Addresses Route', function () {
 				var isGood = Object.keys(response.body).reduce(function(bool, field) {
 					if(field === 'dateCreated')
 						return true;
-					return bool && (response.body[field] === testAddress[field])
+					return bool && (response.body[field] == testAddress[field])
 				}, true);
 				expect(isGood).to.equal(true);
 				done();
