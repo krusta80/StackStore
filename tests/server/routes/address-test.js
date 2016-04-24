@@ -203,7 +203,7 @@ describe('Addresses Route', function () {
 	            dateCreated: Date.now()
 	        };
 		
-			loggedInAgent.post('/api/addresses', newAddress)
+			loggedInAgent.post('/api/addresses').send(newAddress)
 			.end(function(err, res) {
 				response = res;
 				done();
@@ -243,7 +243,7 @@ describe('Addresses Route', function () {
 
 			addressFields = Object.keys(modifiedAddress);
 			
-			loggedInAgent.put('/api/addresses/'+origAddressDocPrePut._id, modifiedAddress)
+			loggedInAgent.put('/api/addresses/'+origAddressDocPrePut._id).send(modifiedAddress)
 			.end(function(err, res) {
 				response = res;
 				Address.findById(origAddressDocPrePut._id)

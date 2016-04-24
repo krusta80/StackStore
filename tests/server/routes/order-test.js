@@ -207,7 +207,7 @@ describe('Orders Route', function () {
 				dateCreated: Date.now()
 		    };
 
-			loggedInAgent.post('/api/orders', newOrder)
+			loggedInAgent.post('/api/orders').send(newOrder)
 			.end(function(err, res) {
 				response = res;
 				done();
@@ -242,7 +242,7 @@ describe('Orders Route', function () {
 
 			orderFields = Object.keys(modifiedOrder);
 			
-			loggedInAgent.put('/api/orders/'+origOrder._id, modifiedOrder)
+			loggedInAgent.put('/api/orders/'+origOrder._id).send(modifiedOrder)
 			.end(function(err, res) {
 				response = res;
 				done();

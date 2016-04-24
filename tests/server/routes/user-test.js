@@ -178,7 +178,7 @@ describe('Users Route', function () {
         };
 
 		beforeEach('Execute post request', function (done) {
-			loggedInAgent.post('/api/users', newUser)
+			loggedInAgent.post('/api/users').send(newUser)
 			.end(function(err, res) {
 				response = res;
 				done();
@@ -206,7 +206,7 @@ describe('Users Route', function () {
 		});
 
 		it('should not allow a duplicate email on live records', function(done) {
-			loggedInAgent.post('/api/users', newUser2)
+			loggedInAgent.post('/api/users').send(newUser2)
 			.end(function(err,res) {
 				expect(res.statusCode).to.not.equal(200);
 				done();
@@ -226,7 +226,7 @@ describe('Users Route', function () {
 
 			userFields = Object.keys(modifiedUser);
 			
-			loggedInAgent.put('/api/users/'+origUserDocPrePut._id, modifiedUser)
+			loggedInAgent.put('/api/users/'+origUserDocPrePut._id).send(modifiedUser)
 			.end(function(err, res) {
 				response = res;
 				User.findById(origUserDocPrePut._id)
