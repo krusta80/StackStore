@@ -8,7 +8,6 @@ module.exports = router;
 //Note - Still need to implement access control!
 
 router.get('/', function (req, res, next) {
-	console.log(models, "models")
 	User.find({})
 	.then(function(users){
 		res.send(users);
@@ -36,12 +35,28 @@ router.post('/', function(req, res, next){
 //To-do: Need to DELETE certain fields and configure access control.
 router.put('/:id', function(req, res, next){
 	//Find user by ID, add dateModified timestamp, but return ORIGINAL User object
-    User.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now()})
+    User.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
     .then(function(originalUser){
-    	//Create new User object with properties of old object, sans timestamp.  
-        var newUser = req.body; 
-        newUser.origId = originalUser.origId; //New ID automatically generated, but store original ID.
-        return newUser.save(); //Save and return the new user object.
+    	;
+    	//Create new User object from old object properties + submitted changes
+    	var newUser = {};
+    	var originalUserObj = originalUser.toObject();
+    	for(var key in originalUserObj){
+    		if(key != '_id'){
+    			newUser[key] = originalUser[key];
+    		}
+    	}
+    	for(var key in req.body){
+    		newUser[key] = req.body[key];
+        }
+        console.log("newUser", newUser)
+
+        //Save to backend and return
+        return User.create(newUser)
+        .then(function(newUser){
+        	// console.log("newUser", newUser)
+        	return newUser.save();
+        });
     })
     .then(function(updatedUser) {
         res.send(updatedUser);

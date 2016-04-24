@@ -6,8 +6,8 @@ var _ = require('lodash');
 var schema = new mongoose.Schema({
     email: {
         type: String,
-        required: true,
-        unique: true
+        required: true
+        // unique: true (Need to enforce this with custom validation. Interferes with PUT route) 
     },
     password: {
         type: String,
@@ -78,6 +78,7 @@ schema.methods.sanitize = function () {
     return _.omit(this.toJSON(), ['password', 'salt']);
 };
 
+
 // generateSalt, encryptPassword and the pre 'save' and 'correctPassword' operations
 // are all used for local authentication security.
 var generateSalt = function () {
@@ -99,8 +100,11 @@ schema.pre('save', function (next) {
     }
 
     if(this.isNew){
-        console.log("NEW ITEM");
         this.dateCreated = Date.now();
+        if(!this.origId){
+            this.origId = this._id;
+        }
+        
     }
 
     next();
