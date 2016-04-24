@@ -166,6 +166,17 @@ describe('Users Route', function () {
             dateCreated: Date.now()
         };
 
+        var newUser2 = {
+            email: 'noob@hotmail.com',
+            password: 'n00b4evah',
+            firstName: 'Green',
+            lastName: 'Behindears',
+            role: 'User',
+            active: true,
+            pendingPasswordReset: false,
+            dateCreated: Date.now()
+        };
+
 		beforeEach('Execute post request', function (done) {
 			loggedInAgent.post('/api/users', newUser)
 			.end(function(err, res) {
@@ -192,6 +203,14 @@ describe('Users Route', function () {
 		it('should have its origId equal its _id', function (done) {
 			expect(response.body._id).to.equal(response.body.origId);
 			done();
+		});
+
+		it('should not allow a duplicate email on live records', function(done) {
+			loggedInAgent.post('/api/users', newUser2)
+			.end(function(err,res) {
+				expect(res.statusCode).to.not.equal(200);
+				done();
+			});
 		});
 	});
 
