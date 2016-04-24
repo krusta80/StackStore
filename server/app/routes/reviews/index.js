@@ -35,7 +35,9 @@ router.get('/user/:userId', function(req, res, next){
 });
 
 router.post('/', function(req, res, next){
-	Review.create(req.body)
+	var newReview = new Review(req.body);
+	newReview.origId = newReview._id;
+	newReview.save()
 		.then(function(review){
 			res.send(review);
 		})
@@ -47,7 +49,7 @@ router.put('/:id', function(req, res, next){
 	Review.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now})
 		.then(function(origReview){
 			var newReview = new Review(req.body);
-			newReview.origId = origReview._id;
+			newReview.origId = origReview.origId;
 			return newReview.save();
 		})
 		.then(function(newReview){

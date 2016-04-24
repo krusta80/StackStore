@@ -33,9 +33,11 @@ router.get('/:id', function(req, res, next){
 });
 
 router.post('/', function(req, res, next){
-	Product.create(req.body)
-		.then(function(newProduct){
-			res.send(newProduct);
+	var newProduct = new Product(req.body);
+	newProduct.origId = newProduct._id;
+	newProduct.save()
+		.then(function(product){
+			res.send(product);
 		})
 		.then(null, next);
 });
@@ -45,7 +47,7 @@ router.put('/:id', function(req, res, next){
 	Product.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now})
 		.then(function(origProduct){
 			var newProduct = new Product(req.body);
-			newProduct.origId = origProduct._id;
+			newProduct.origId = origProduct.origId;
 			return newProduct.save();
 		})
 		.then(function(newProduct){
