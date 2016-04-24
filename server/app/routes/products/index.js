@@ -3,7 +3,7 @@ var router = require('express').Router();
 var mongoose = require('mongoose');
 var Product = mongoose.model('Product');
 
-module.exports = router.
+module.exports = router;
 
 //get all products, which might be unnecessary
 router.get('/', function(req, res, next){
