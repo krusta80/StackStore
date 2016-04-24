@@ -187,27 +187,7 @@ describe('Orders Route', function () {
 					if(field === 'dateCreated')
 						return true;
 					if(field === 'lineItems'){
-						var responseLineItemsArr = response.body['lineItems'];
-						var testLineItemsArr = testOrder['lineItems'];
-
-						if(responseLineItemsArr.length !== testLineItemsArr.length){
-							return false;
-						}
-
-						for(var i = 0; i < responseLineItemsArr.length; i++){
-
-							var responseLineItem = responseLineItemsArr[i];
-							var testLineItem = testLineItemsArr[i];
-
-							for(var key in responseLineItem){
-								if(String(responseLineItem[key]) !== String(testLineItem[key])){
-									return false;
-								}
-							}
-
-						}
-
-						return true;
+						return compareLineItems(response.body, testOrder);
 					}
 					return bool && (response.body[field] == testOrder[field])
 				}, true);
@@ -246,9 +226,12 @@ describe('Orders Route', function () {
 			var isGood = Object.keys(newOrder).reduce(function(bool, field) {
 				if(field === 'dateCreated')
 					return true;
+				if(field === 'lineItems'){
+					return compareLineItems(response.body, newOrder);
+				}
 				return bool && (response.body[field] == newOrder[field]);
 			}, true);
-			expect(isGood && response.body._id).to.equal(true);
+			expect(isGood && !!response.body._id).to.equal(true);
 			done();
 		});
 	});
@@ -278,7 +261,7 @@ describe('Orders Route', function () {
 		});
 
 		it('should update the existing order', function (done) {
-			expect(response.body._id).to.equal(origOrder._id);
+			expect(String(response.body._id)).to.equal(String(origOrder._id));
 			done();
 		});
 
@@ -286,6 +269,9 @@ describe('Orders Route', function () {
 			var isGood = orderFields.reduce(function(bool, field) {
 				if(field === 'dateCreated')
 					return true;
+				if(field == 'lineItems'){
+					compareLineItems(response.body, modifiedOrder);
+				}
 				return bool && (response.body[field] == modifiedOrder[field]);
 			}, true);
 			expect(isGood).to.equal(true);
@@ -309,13 +295,13 @@ describe('Orders Route', function () {
 				response = res;
 				Order.findById(origOrder._id)
 				.then(function(order) {
-					wasDeleted = false;
+					if(!!order){
+						wasDeleted = false;
+					}else{
+						wasDeleted = true;
+					}
 					done();
 				})
-				.catch(function(err) {
-					wasDeleted = true;
-					done();
-				});
 			});
 		});
 
@@ -325,7 +311,7 @@ describe('Orders Route', function () {
 		});
 
 		it('should respond with the deleted id', function (done) {
-			expect(response.body._id).to.equal(origOrder._id);
+			expect(String(response.body._id)).to.equal(String(origOrder._id));
 			done();
 		});
 
@@ -335,3 +321,28 @@ describe('Orders Route', function () {
 		});
 	});
 });
+
+//Helper
+function compareLineItems(order1, order2){
+	var lineItemsArr1 = order1['lineItems'];
+	var lineItemsArr2 = order2['lineItems'];
+
+	if(lineItemsArr1.length !== lineItemsArr2.length){
+		return false;
+	}
+
+	for(var i = 0; i < lineItemsArr1.length; i++){
+
+		var lineItemFrom1 = lineItemsArr1[i];
+		var lineItemFrom2 = lineItemsArr2[i];
+
+		for(var key in lineItemFrom1){
+			if(String(lineItemFrom1[key]) !== String(lineItemFrom2[key])){
+				return false;
+			}
+		}
+
+	}
+
+	return true;
+}

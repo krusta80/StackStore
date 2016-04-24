@@ -48,7 +48,7 @@ router.put('/:id', function(req, res, next){
 	.then(null, next);
 })
 
-/* Do we even need a delete function? Aren't we just going to mark it as cancelled and keep it for records sake?
+//Do we even need a delete function? Aren't we just going to mark it as cancelled and keep it for records sake?
 router.delete('/:id', function(req, res, next){
 	Order.findByIdAndRemove(req.params.id)
 	.then(function(deletedOrder){
@@ -56,5 +56,4 @@ router.delete('/:id', function(req, res, next){
 	})
 	.then(null, next);
 })
-*/
 
