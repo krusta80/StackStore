@@ -34,7 +34,7 @@ router.put('/:id', function(req, res, next){
 	//not sure using Date.now or Date.now()
 	Category.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now})
 		.then(function(origCategory){
-			var newCategory = req.body;
+			var newCategory = new Category(req.body);
 			newCategory.origId = origCategory._id;
 			return newCategory.save();
 		})
