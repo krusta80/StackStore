@@ -22,17 +22,23 @@ var Promise = require('bluebird');
 var chalk = require('chalk');
 var connectToDb = require('./server/db');
 var User = mongoose.model('User');
+var Address = mongoose.model('Address');
+var Order = mongoose.model('Order');
 var Category = mongoose.model('Category');
 var Product = mongoose.model('Product');
 var Review = mongoose.model('Review');
 
 var wipeCollections = function () {
     var removeUsers = User.remove({});
+    var removeAddresses = Address.remove({});
+    var removeOrders = Order.remove({});
     var removeCategories = Category.remove({});
     var removeProducts = Product.remove({});
     var removeReviews = Review.remove({});
     return Promise.all([
         removeUsers,
+        removeAddresses,
+        removeOrders,
         removeCategories,
         removeProducts,
         removeReviews
@@ -40,24 +46,49 @@ var wipeCollections = function () {
 };
 
 var seedUsers = function () {
-
-    var users = [
+   console.log("   -Seeding users")
+            
+   var users = [
         {
-            email: 'testing@fsa.com',
-            password: 'password'
+            email: 'jag47@cornell.edu',
+            password: 'potus',
+            firstName: 'John',
+            lastName: 'Gruska',
+            middleName: 'Anthony',
+            role: 'Admin',
+            active: true,
+            pendingPasswordReset: false,
+            dateCreated: Date.now()
         },
         {
-            email: 'obama@gmail.com',
-            password: 'potus'
+            email: 'krusta80@aol.com',
+            password: 'yougotmail',
+            firstName: 'Jay',
+            lastName: 'Ginsta',
+            role: 'User',
+            active: true,
+            pendingPasswordReset: false,
+            dateCreated: Date.now()
+        },
+        {
+            email: 'david@yahoo.com',
+            password: 'ohhhbaby',
+            firstName: 'David',
+            lastName: 'Yang',
+            role: 'User',
+            active: true,
+            pendingPasswordReset: false,
+            dateCreated: Date.now(),
+            dateModified:  Date.now()
         }
     ];
 
     return User.create(users);
-
 };
 
 var seedCategories = function(){
-    var categories = [
+   console.log("   -Seeding categories")
+   var categories = [
         {
             name: 'fruit',
             description: 'good'
@@ -70,7 +101,8 @@ var seedCategories = function(){
 };
 
 var seedProducts = function(categories){
-    var products = [
+   console.log("   -Seeding products")
+   var products = [
         {
             title: 'foo',
             categories: categories[0],
@@ -89,6 +121,7 @@ var seedProducts = function(categories){
 }
 
 var seedReviews = function(products, users){
+    console.log("   -Seeding reviews")
     var reviews = [
         {
             product: products[0],
@@ -109,9 +142,22 @@ var seedReviews = function(products, users){
     return Review.create(reviews);
 }
 
+var seedAddresses = function(users) {
+    console.log("   -Seeding addresses");
+   
+};
+
+var seedOrders = function(addresses, users, products) {
+    console.log("   -Seeding orders")
+   
+};
+
 var _users;
 var _products;
 var _categories;
+var _addresses;
+var _orders;
+var _reviews;
 
 connectToDb
     .then(function () {
@@ -132,7 +178,16 @@ connectToDb
         _products = products;
         return seedReviews(_products, _users);
     })
-    .then(function () {
+    .then(function (reviews) {
+        _reviews = reviews;
+        return seedAddresses(_users);
+    })
+    .then(function (addresses) {
+        _addresses = addresses;
+        return seedOrders(addresses, _users, _products);
+    })
+    .then(function (orders) {
+        _orders = orders;
         console.log(chalk.green('Seed successful!'));
         process.kill(0);
     })
