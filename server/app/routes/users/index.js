@@ -8,7 +8,7 @@ module.exports = router;
 //Note - Still need to implement access control!
 
 router.get('/', function (req, res, next) {
-	User.find({})
+	User.find({dateModified : {$exists : false }})
 	.then(function(users){
 		res.send(users);
 	})

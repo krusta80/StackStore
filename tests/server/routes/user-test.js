@@ -196,7 +196,7 @@ describe('Users Route', function () {
 					return true;
 				return bool && (response.body[field] == newUser[field]);
 			}, true);
-			expect(isGood && response.body._id).to.equal(true);
+			expect(isGood && !!response.body._id).to.equal(true);
 			done();
 		});
 
