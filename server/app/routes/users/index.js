@@ -65,7 +65,7 @@ router.put('/:id', function(req, res, next){
 });
 
 router.delete('/:id', function(req, res, next){
-    User.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now()}, {new: true})
+    User.findByIdAndUpdate(req.params.id, {dateModified: Date.now()}, {new: true})
     .then(function(deletedUser) {
         res.send(deletedUser);
     })
