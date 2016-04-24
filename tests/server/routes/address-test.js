@@ -175,7 +175,12 @@ describe('Addresses Route', function () {
 			});
 
 			it('should respond with the correct address', function (done) {
-				expect(response.body).to.deep.equal(testAddress);
+				var isGood = Object.keys(response.body).reduce(function(bool, field) {
+					if(field === 'dateCreated')
+						return true;
+					return bool && (response.body[field] === testAddress[field])
+				}, true);
+				expect(isGood).to.equal(true);
 				done();
 			});
 		});
@@ -212,7 +217,9 @@ describe('Addresses Route', function () {
 
 		it('should create and respond with the new address', function (done) {
 			var isGood = Object.keys(newAddress).reduce(function(bool, field) {
-				return bool && (response.body[field] === newAddress[field]);
+				if(field === 'dateCreated')
+					return true;
+				return bool && (response.body[field] == newAddress[field]);
 			}, true);
 			expect(isGood && response.body._id).to.equal(true);
 			done();
@@ -259,7 +266,9 @@ describe('Addresses Route', function () {
 
 		it('should respond with the modified details', function (done) {
 			var isGood = addressFields.reduce(function(bool, field) {
-				return bool && (response.body[field] === modifiedAddress[field]);
+				if(field === 'dateCreated')
+					return true;
+				return bool && (response.body[field] == modifiedAddress[field]);
 			}, true);
 			expect(isGood && !response.body.dateModified).to.equal(true);
 			done();
@@ -267,7 +276,9 @@ describe('Addresses Route', function () {
 
 		it('should ONLY add a modified date to the original document', function (done) {
 			var isGood = addressFields.reduce(function(bool, field) {
-				return bool && (origAddressDocPrePut[field] === origAddressDocPostPut[field]);
+				if(field === 'dateCreated')
+					return true;
+				return bool && (origAddressDocPrePut[field] == origAddressDocPostPut[field]);
 			}, true);
 			expect(isGood && origAddressDocPostPut.dateModified).to.equal(true);
 			done();
@@ -308,7 +319,9 @@ describe('Addresses Route', function () {
 
 		it('should ONLY add a modified date to the original document', function (done) {
 			var isGood = addressFields.reduce(function(bool, field) {
-				return bool && (origAddressDoc[field] === response.body[field]);
+				if(field === 'dateCreated')
+					return true;
+				return bool && (origAddressDoc[field] == response.body[field]);
 			}, true);
 			expect(isGood && response.body.dateModified).to.equal(true);
 			done();
