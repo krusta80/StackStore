@@ -237,8 +237,8 @@ describe('Users Route', function () {
 			done();
 		});
 
-		it('should have its origId equal the original _id', function (done) {
-			expect(response.body.origId).to.equal(origUserDocPrePut._id);
+		it('should have its origId equal the original origId', function (done) {
+			expect(response.body.origId).to.equal(origUserDocPrePut.origId);
 			done();
 		});
 	});

@@ -273,8 +273,8 @@ describe('Addresses Route', function () {
 			done();
 		});
 
-		it('should have its origId equal the original _id', function (done) {
-			expect(response.body.origId).to.equal(origAddressDocPrePut._id);
+		it('should have its origId equal the original origId', function (done) {
+			expect(response.body.origId).to.equal(origAddressDocPrePut.origId);
 			done();
 		});
 	});
