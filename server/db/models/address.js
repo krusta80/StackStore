@@ -27,7 +27,9 @@ var schema = new mongoose.Schema({
     },
     zip: {
         type: String,
-        required: true
+        required: true,
+        minimum: 5,
+        maximum: 10
     },
     active: {
         type: Boolean,

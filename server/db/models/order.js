@@ -8,7 +8,10 @@ var schema = new mongoose.Schema({
     },
     sessionId: String,
     email: String,
-    lineItems: [{prod_id: String, quantity: Number, price: Number}], //To-do: Replace lineItems.prod_id with reference to "Product" 
+    lineItems: [{
+        prod_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Product'}, 
+        quantity: Number,
+        price: Number}], //To-do: Replace lineItems.prod_id with reference to "Product" 
     invoiceNumber: String,
     shippingAddress: {
         type: mongoose.Schema.Types.ObjectId, 

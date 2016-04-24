@@ -40,7 +40,7 @@ router.put('/:id', function(req, res, next){
 	Order.findByIdAndUpdate(req.params.id, req.body, {new: true})
 	.then(function(updatedOrder){
 		var timestamped = updatedOrder.timestampStatus(updatedOrder.status);
-		return timestamped.save();		
+		return timestamped.save(); //Maybe more efficient to use findByID and save once.
 	})
 	.then(function(timestampedOrder){
 		res.send(timestampedOrder);
