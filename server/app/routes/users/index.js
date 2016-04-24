@@ -49,12 +49,10 @@ router.put('/:id', function(req, res, next){
     	for(var key in req.body){
     		newUser[key] = req.body[key];
         }
-        console.log("newUser", newUser)
 
         //Save to backend and return
         return User.create(newUser)
         .then(function(newUser){
-        	// console.log("newUser", newUser)
         	return newUser.save();
         });
     })

@@ -46,4 +46,15 @@ var schema = new mongoose.Schema({
     }
 });
 
+schema.pre('save', function (next) {
+    if(this.isNew){
+        this.dateCreated = Date.now();
+        if(!this.origId){
+            this.origId = this._id;
+        }
+    }
+    
+    next();
+});
+
 module.exports = mongoose.model('Address', schema);
