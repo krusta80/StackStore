@@ -21,6 +21,8 @@ var mongoose = require('mongoose');
 var Promise = require('bluebird');
 var chalk = require('chalk');
 var connectToDb = require('./server/db');
+var faker = require('faker'); 
+
 var User = mongoose.model('User');
 var Address = mongoose.model('Address');
 var Order = mongoose.model('Order');
@@ -43,6 +45,49 @@ var wipeCollections = function () {
         removeProducts,
         removeReviews
     ]);
+};
+
+var generateRandomCategory = function() {
+    return {
+        name: faker.commerce.department(),
+        description: faker.lorem.sentence()
+    };
+};
+
+var generateRandomProduct = function(categoryId) {
+    return {
+        title: faker.commerce.productName(),
+        description: faker.lorem.sentence(),
+        imageUrls: [faker.image.imageUrl()],
+        categories: [categoryId],
+        price: faker.commerce.price(),
+        inventoryQty: Math.floor(Math.random()*100),
+        active: faker.random.boolean()
+    };
+};
+
+var generateRandomAddress = function(userId) {
+    return {
+        label: faker.random.locale(),
+        userId: userId,
+        name: faker.name.firstName()+' '+faker.name.lastName(),
+        address1: faker.address.streetAddress(),
+        address2: faker.address.secondaryAddress(),
+        city: faker.address.city(),
+        state: faker.address.stateAbbr(),
+        zip: faker.address.zipCode(),
+        active: faker.random.boolean()
+    };
+};
+
+var generateRandomReview = function(productId, userId) {
+    return {
+        product: productId,
+        user: userId,
+        title: faker.company.catchPhrase(),
+        stars: Math.ceil(Math.random()*5),
+        description: faker.lorem.sentence()    
+    };
 };
 
 var seedUsers = function () {
@@ -86,65 +131,44 @@ var seedUsers = function () {
     return User.create(users);
 };
 
-var seedCategories = function(){
-   console.log("   -Seeding categories")
-   var categories = [
-        {
-            name: 'fruit',
-            description: 'good'
-        },
-        {
-            name: 'meat'
-        }
-    ]
+var seedCategories = function(reps){
+    console.log("   -Seeding categories")
+    var categories = [];
+
+    for(var i = 0; i < reps; i++)
+        categories.push(generateRandomCategory());
+
     return Category.create(categories);
 };
 
-var seedProducts = function(categories){
-   console.log("   -Seeding products")
-   var products = [
-        {
-            title: 'foo',
-            categories: categories[0],
-            price: 1,
-            inventoryQty: 1
-        },
-        {
-            title: 'bar',
-            categories: categories,
-            price: 3,
-            inventoryQty: 3
-        }
-    ];
+var seedProducts = function(reps, categories){
+    console.log("   -Seeding products")
+    var products = [];
+
+    for(var i = 0; i < reps; i++)
+        products.push(generateRandomProduct(categories[Math.floor(Math.random()*categories.length)]));
 
     return Product.create(products);
 }
 
-var seedReviews = function(products, users){
+var seedReviews = function(reps, products, users){
     console.log("   -Seeding reviews")
-    var reviews = [
-        {
-            product: products[0],
-            user: users[0],
-            title: 'perfect',
-            stars: 3,
-            description: 'nice team'
-        },
-        {
-            product: products[1],
-            user: users[1],
-            title: 'blah',
-            description: 'awesome team',
-            stars: 1
-        }
-    ];
+    var reviews = [];
+
+    for(var i = 0; i < reps; i++)
+        products.push(generateRandomReview(products[Math.floor(Math.random()*products.length)], users[Math.floor(Math.random()*users.length)]));
 
     return Review.create(reviews);
 }
 
-var seedAddresses = function(users) {
+var seedAddresses = function(reps, users) {
     console.log("   -Seeding addresses");
-   
+    var addresses = [];
+
+    for(var i = 0; i < reps; i++)
+        addresses.push(generateRandomAddress(users[Math.floor(Math.random()*users.length)]));
+
+    return Address.create(addresses);  
 };
 
 var seedOrders = function(addresses, users, products) {
@@ -168,19 +192,19 @@ connectToDb
     })
     .then(function (users) {
         _users = users;
-        return seedCategories();
+        return seedCategories(10);
     })
     .then(function (categories) {
         _categories = categories;
-        return seedProducts(categories);
+        return seedProducts(1000, categories);
     })
     .then(function (products) {
         _products = products;
-        return seedReviews(_products, _users);
+        return seedReviews(1000, _products, _users);
     })
     .then(function (reviews) {
         _reviews = reviews;
-        return seedAddresses(_users);
+        return seedAddresses(10, _users);
     })
     .then(function (addresses) {
         _addresses = addresses;
