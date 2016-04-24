@@ -23,9 +23,11 @@ router.get('/:id', function(req, res, next){
 });
 
 router.post('/', function(req, res, next){
-	Category.create(req.body)
-		.then(function(newCategory){
-			res.send(newCategory);
+	var newCategory = new Category(req.body);
+	newCategory.origId = newCategory._id;
+	newCategory.save()
+		.then(function(category){
+			res.send(category);
 		})
 		.then(null, next);
 });
@@ -35,7 +37,7 @@ router.put('/:id', function(req, res, next){
 	Category.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now})
 		.then(function(origCategory){
 			var newCategory = new Category(req.body);
-			newCategory.origId = origCategory._id;
+			newCategory.origId = origCategory.origId;
 			return newCategory.save();
 		})
 		.then(function(newCategory){
