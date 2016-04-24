@@ -23,12 +23,18 @@ var schema = new mongoose.Schema({
         required: true,
         enum: ['Cart', 'Ordered', 'Notified', 'Shipped', 'Delivered', 'Canceled']
     },
-    dateCreated: {
-        type: Date
-    },
-    dateModified: {
-        type: Date
-    }
+    dateCreated: Date,
+    dateOrdered: Date,
+    dateNotified: Date,
+    dateShipped: Date, 
+    dateDelivered: Date, 
+    dateCanceled: Date
 });
+
+schema.methods.timestampStatus = function(status){
+    //Test - What happens if field doesn't exist on model?
+    var field = "date" + status.charAt(0).toUpperCase() + status.slice(1);
+    this[field] = Date.now();
+}
 
 module.exports = mongoose.model('Order', schema);

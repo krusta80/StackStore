@@ -1,4 +1,5 @@
 'use strict';
+var mongoose = require('mongoose');
 var router = require('express').Router();
 var models = require('../../../db/models');
 var Order = models.Order;
@@ -23,22 +24,28 @@ router.get('/:id', function(req, res, next){
 })
 
 router.post('/', function(req, res, next){
+	if(req.body.status !== 'Cart'){
+		res.send("In order to POST to /api/order, status must be Cart");
+	}
+
 	Order.create(req.body)
 	.then(function(newOrder){
+		newOrder.timestampStatus('created');
 		res.send(newOrder);
 	})
 	.then(null, next);
 })
 
 router.put('/:id', function(req, res, next){
-	// Need to DELETE certain fields and configure access control.
 	Order.findByIdAndUpdate(req.params.id, req.body, {new: true})
 	.then(function(updatedOrder){
+		updatedOrder.timestampStatus(updatedOrder.status);
 		res.send(updatedOrder);
 	})
 	.then(null, next);
 })
 
+/* Do we even need a delete function? Aren't we just going to mark it as cancelled and keep it for records sake?
 router.delete('/:id', function(req, res, next){
 	Order.findByIdAndRemove(req.params.id)
 	.then(function(deletedOrder){
@@ -46,3 +53,5 @@ router.delete('/:id', function(req, res, next){
 	})
 	.then(null, next);
 })
+*/
+

@@ -1,4 +1,5 @@
 'use strict';
+var mongoose = require('mongoose');
 var router = require('express').Router();
 var models = require('../../../db/models');
 var User = models.User;
@@ -31,19 +32,42 @@ router.post('/', function(req, res, next){
 	.then(null, next);
 })
 
+//To-do: Need to DELETE certain fields and configure access control.
 router.put('/:id', function(req, res, next){
-	// Need to DELETE certain fields and configure access control.
-	User.findByIdAndUpdate(req.params.id, req.body, {new: true})
-	.then(function(updatedUser){
-		res.send(updatedUser);
-	})
-	.then(null, next);
-})
+	//Find user by ID, add dateModified timestamp, but return ORIGINAL User object
+    User.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
+    .then(function(originalUser){
+    	;
+    	//Create new User object from old object properties + submitted changes
+    	var newUser = {};
+    	var originalUserObj = originalUser.toObject();
+    	for(var key in originalUserObj){
+    		if(key != '_id'){
+    			newUser[key] = originalUser[key];
+    		}
+    	}
+    	for(var key in req.body){
+    		newUser[key] = req.body[key];
+        }
+        console.log("newUser", newUser)
+
+        //Save to backend and return
+        return User.create(newUser)
+        .then(function(newUser){
+        	// console.log("newUser", newUser)
+        	return newUser.save();
+        });
+    })
+    .then(function(updatedUser) {
+        res.send(updatedUser);
+    })
+    .then(null, next);
+});
 
 router.delete('/:id', function(req, res, next){
-	User.findByIdAndRemove(req.params.id)
-	.then(function(deletedUser){
-		res.send(deletedUser);
-	})
-	.then(null, next);
+    User.findByIdAndUpdate(req.params.id, {dateModified: Date.now()}, {new: true})
+    .then(function(deletedUser) {
+        res.send(deletedUser);
+    })
+    .then(null, next);
 })
