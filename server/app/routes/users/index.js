@@ -30,7 +30,7 @@ router.post('/', function(req, res, next){
         User.find({email: newUser.email, _id: {$ne: newUser._id} })
         .then(function(existingUsers){
             if(existingUsers.length > 0){
-                res.send("Please use unique email.")
+                res.status(400).send("Please use unique email.")
             }else{
                res.send(newUser);  
             }
