@@ -312,7 +312,7 @@ describe('Order model', function () {
                 expect(badStatus.error).to.exist;
             });             
 		});	
-
+        
 		describe('dateCreated', function () {
 			it('should exist', function () {
             	expect(newOrderOut.dateCreated).to.exist;
