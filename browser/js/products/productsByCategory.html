@@ -1,0 +1,17 @@
+<h3 class="text-center">Products</h3>
+<br>
+<div class="row">
+	<div class="col-md-4" ng-repeat="product in products">
+		<div class="panel panel-success">
+			<div class="panel-heading">
+				<h3 class="panel-title">{{ product.title }}</h3>
+			</div>
+			<div class="panel-body">
+				<p><b>Price:</b> {{ product.price }}</p>
+				<p><b>Category:</b> {{ showCategories(product.categories) }}</p>
+				<p  style="height:50px; overflow-y: scroll"><b>Description:</b> {{ product.description }}</p>
+				<button class="btn btn-info">Add to Cart</button>
+			</div>
+		</div>
+	</div>
+</div><!-- row -->

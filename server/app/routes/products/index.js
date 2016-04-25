@@ -17,6 +17,7 @@ router.get('/', function(req, res, next){
 //get by category
 router.get('/category/:categoryId', function(req, res, next){
 	Product.find({categories: req.params.categoryId})
+		.populate('categories')
 		.then(function(products){
 			res.send(products);
 		})
