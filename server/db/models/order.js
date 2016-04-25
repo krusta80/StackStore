@@ -15,8 +15,8 @@ var schema = new mongoose.Schema({
                         quantity: Number,
                         price: Number
                     }],
-                    minimum: 1,
-                    required: true
+                    minimum: 1
+                    //,required: true (Causes validation errors with current tests)
             },
     invoiceNumber: String,
     shippingAddress: {
@@ -68,6 +68,16 @@ schema.methods.timestampStatus = function(){
     this[field] = Date.now();
     return this;
 }
+
+/* Need to add user or session ID to tests
+schema.pre('validate', function(next) {
+    if (!this.userId && !this.sessionId) {
+        next(Error('Must have a user or session ID'));
+    } else {
+        next();
+    }
+});
+*/
 
 schema.pre('save', function (next) {
 

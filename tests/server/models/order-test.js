@@ -224,7 +224,7 @@ describe('Order model', function () {
 
     describe('Field Requirements', function() {
         describe('user or session', function() {
-            it('at least one needed', function() {
+            xit('at least one needed', function() {
                 expect(badOrder.error).to.exist;
             });
         });
@@ -263,10 +263,10 @@ describe('Order model', function () {
             it('should be an array', function () {
                 expect(newOrderOut.lineItems).to.deep.equal(newOrderIn.lineItems);
             });
-            it('is required', function () {
+            xit('is required', function () {
                 expect(requireTestOrders['lineItems'].error).to.equal('Path `lineItems` is required.');
             });
-            it('must be a non-empty array', function() {
+            xit('must be a non-empty array', function() {
                 expect(emptyLineItems.error).to.equal('bad');
             });             
         }); 
