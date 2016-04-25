@@ -1,6 +1,7 @@
 'use strict';
 var mongoose = require('mongoose');
 var Address = require('./address')
+var Product = require('./product')
 
 var schema = new mongoose.Schema({
     userId: {
@@ -9,10 +10,14 @@ var schema = new mongoose.Schema({
     },
     sessionId: String,
     email: String,
-    lineItems: [{
-        prod_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Product'}, 
-        quantity: Number,
-        price: Number}], //To-do: Replace lineItems.prod_id with reference to "Product" 
+    lineItems: { type: [{
+                        prod_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Product'}, 
+                        quantity: Number,
+                        price: Number
+                    }],
+                    minimum: 1,
+                    required: true
+            },
     invoiceNumber: String,
     shippingAddress: {
         type: mongoose.Schema.Types.ObjectId, 
@@ -45,10 +50,13 @@ schema.virtual('subtotal').get(function(){
 })
 
 schema.virtual('total').get(function(){
-    Address.findById(this.billingAddress)
-    .then(function(address){
+    return this.subtotal;
+
+    //Work on - Return value instead of promise/query.
+    var that = this;
+    Address.findById(this.billingAddress, function(err, address){
         var state = address.state;
-        var total = this.subtotal + (1 * (getSalesTaxPercent(state) / 100));
+        total = that.subtotal + (1 * (getSalesTaxPercent(state) / 100));
         return total;
     })
 })

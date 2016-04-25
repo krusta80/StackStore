@@ -267,7 +267,7 @@ describe('Order model', function () {
                 expect(requireTestOrders['lineItems'].error).to.equal('Path `lineItems` is required.');
             });
             it('must be a non-empty array', function() {
-                expect(emptyLineItems.error).to.equal('at least one category required');
+                expect(emptyLineItems.error).to.equal('bad');
             });             
         }); 
 
@@ -341,6 +341,7 @@ describe('Order model', function () {
 
         describe('total', function () {
             it('should exist', function () {
+                console.log("noo", newOrderOut.total)
                 expect(newOrderOut.total).to.exist;
             }); 
         }); 
