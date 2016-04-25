@@ -341,7 +341,6 @@ describe('Order model', function () {
 
         describe('total', function () {
             it('should exist', function () {
-                console.log("noo", newOrderOut.total)
                 expect(newOrderOut.total).to.exist;
             }); 
         }); 
