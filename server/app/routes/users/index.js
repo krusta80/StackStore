@@ -27,7 +27,14 @@ router.get('/:id', function(req, res, next){
 router.post('/', function(req, res, next){
 	User.create(req.body)
 	.then(function(newUser){
-		res.send(newUser);
+        User.find({email: newUser.email, _id: {$ne: newUser._id} })
+        .then(function(existingUsers){
+            if(existingUsers.length > 0){
+                res.status(400).send("Please use unique email.")
+            }else{
+               res.send(newUser);  
+            }
+        })
 	})
 	.then(null, next);
 })

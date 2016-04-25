@@ -221,7 +221,7 @@ describe('Addresses Route', function () {
 					return true;
 				return bool && (response.body[field] == newAddress[field]);
 			}, true);
-			expect(isGood && response.body._id).to.equal(true);
+			expect(isGood && !!response.body._id).to.equal(true);
 			done();
 		});
 
@@ -280,12 +280,12 @@ describe('Addresses Route', function () {
 					return true;
 				return bool && (origAddressDocPrePut[field] == origAddressDocPostPut[field]);
 			}, true);
-			expect(isGood && origAddressDocPostPut.dateModified).to.equal(true);
+			expect(isGood && !!origAddressDocPostPut.dateModified).to.equal(true);
 			done();
 		});
 
 		it('should have its origId equal the original origId', function (done) {
-			expect(response.body.origId).to.equal(origAddressDocPrePut.origId);
+			expect(response.body.origId).to.equal(String(origAddressDocPrePut.origId));
 			done();
 		});
 	});
@@ -313,7 +313,7 @@ describe('Addresses Route', function () {
 		});
 
 		it('should respond with the original doc id', function (done) {
-			expect(response.body._id).to.equal(origAddressDoc._id);
+			expect(response.body._id).to.equal(String(origAddressDoc._id));
 			done();
 		});
 
@@ -323,7 +323,7 @@ describe('Addresses Route', function () {
 					return true;
 				return bool && (origAddressDoc[field] == response.body[field]);
 			}, true);
-			expect(isGood && response.body.dateModified).to.equal(true);
+			expect(isGood && !!response.body.dateModified).to.equal(true);
 			done();
 		});
 	});
