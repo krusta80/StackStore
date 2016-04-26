@@ -73,39 +73,38 @@ router.put('/myCart', function(req, res, next) {
 });
 
 router.put('/:id', function(req, res, next){
+
 	Order.findById(req.params.id)
 	.then(function(fetchedOrder){
+		//Most values can only be edited while in the 'Cart' stage
 		if(fetchedOrder.status !== 'Cart'){
-			delete req.body.userId;
-			delete req.body.sessionId;
+			delete req.body.userId; delete req.body.sessionId;
 			delete req.body.email;
-			delete req.body.lineItems;
-			delete req.body.invoiceNumber;
-			delete req.body.shippingAddress;
-			delete req.body.billingAddress;
-			if(req.body.status === 'Cart'){
-				delete req.body.status
-			}
-			delete req.body.dateCreated;
+			delete req.body.invoiceNumber; delete req.body.lineItems;
+			delete req.body.shippingAddress; delete req.body.billingAddress;
 		}
 
-		//Future Implementation:
-		//Create array of states <- This is the order
-		//With helper function, make sure state can only change to something "after" current state
-		//Also lock in timestamps.
+		//User may not edit timestamps directly under any circumstances
+		["Created", 'Ordered', "Notified", "Shipped", "Delivered", "Canceled"].forEach(function(state){
+			delete req.body["date"+state];
+		})
 
+		//Order status can only go "forward"
+		var states = Order.schema.path('status').enumValues;
+		if(states.indexOf(req.body.status) < states.indexOf(fetchedOrder.status)){
+			delete req.body.status
+		}
+
+		//Finally, update values and timestamp
 		for(var key in req.body){
 			fetchedOrder[key] = req.body[key];
 	    }
 
+	    var fetchedOrder = fetchedOrder.timestampStatus();
 	    return fetchedOrder.save();
 	})
 	.then(function(updatedOrder){
-		var timestamped = updatedOrder.timestampStatus(updatedOrder.status);
-		return timestamped.save(); //Maybe more efficient to use findByID and save once.
-	})
-	.then(function(timestampedOrder){
-		res.send(timestampedOrder);
+		res.send(updatedOrder);
 	})
 	.then(null, next);
 })
