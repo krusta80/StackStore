@@ -15,6 +15,17 @@ router.get('/', function (req, res, next) {
 	.then(null, next);
 });
 
+//	added by JAG on 04/25/16 for cart-related stuff
+router.get('/myCart', function(req, res, next){
+	var id = req.session.cartId;
+	console.log("session cart id", id);
+	Order.findById(id)
+	.then(function(order){
+		res.send(order);
+	})
+	.then(null, next);
+})
+
 router.get('/:id', function(req, res, next){
 	var id = req.params.id;
 	Order.findById(id)
@@ -46,6 +57,23 @@ router.post('/', function(req, res, next){
 	})
 	.then(null, next);
 })
+
+router.put('/myCart', function(req, res, next) {
+	Order.findById(req.session.cartId)
+	.then(function(fetchedOrder){
+		delete req.body.dateCreated;
+
+		for(var key in req.body){
+			fetchedOrder[key] = req.body[key];
+	    }
+
+	    return fetchedOrder.save();
+	})
+	.then(function(savedOrder) {
+		res.send(savedOrder);
+	})
+	.then(null, next);
+});
 
 router.put('/:id', function(req, res, next){
 
