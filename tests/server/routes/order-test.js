@@ -159,6 +159,7 @@ describe('Orders Route', function () {
 			});
 
 			it('should respond with an array of length 3', function (done) {
+				console.log("LOGGER", response.body)
 				expect(response.body.length).to.equal(3);
 				done();
 			});

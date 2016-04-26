@@ -5,7 +5,8 @@ var models = require('../../../db/models');
 var Order = models.Order;
 module.exports = router;
 
-//Note - Still need to implement access control!
+
+//Routes
 router.get('/', function (req, res, next) {
 	Order.find({})
 	.then(function(orders){
@@ -37,7 +38,33 @@ router.post('/', function(req, res, next){
 })
 
 router.put('/:id', function(req, res, next){
-	Order.findByIdAndUpdate(req.params.id, req.body, {new: true})
+	Order.findById(req.params.id)
+	.then(function(fetchedOrder){
+		if(fetchedOrder.status !== 'Cart'){
+			delete req.body.userId;
+			delete req.body.sessionId;
+			delete req.body.email;
+			delete req.body.lineItems;
+			delete req.body.invoiceNumber;
+			delete req.body.shippingAddress;
+			delete req.body.billingAddress;
+			if(req.body.status === 'Cart'){
+				delete req.body.status
+			}
+			delete req.body.dateCreated;
+		}
+
+		//Future Implementation:
+		//Create array of states <- This is the order
+		//With helper function, make sure state can only change to something "after" current state
+		//Also lock in timestamps.
+
+		for(var key in req.body){
+			fetchedOrder[key] = req.body[key];
+	    }
+
+	    return fetchedOrder.save();
+	})
 	.then(function(updatedOrder){
 		var timestamped = updatedOrder.timestampStatus(updatedOrder.status);
 		return timestamped.save(); //Maybe more efficient to use findByID and save once.
@@ -56,4 +83,7 @@ router.delete('/:id', function(req, res, next){
 	})
 	.then(null, next);
 })
+
+
+
 
