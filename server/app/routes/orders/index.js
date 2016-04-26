@@ -24,6 +24,16 @@ router.get('/:id', function(req, res, next){
 	.then(null, next);
 })
 
+router.get('/myCart', function(req, res, next){
+	var id = req.session.cartId;
+	console.log("session cart id", id);
+	Order.findById(id)
+	.then(function(order){
+		res.send(order);
+	})
+	.then(null, next);
+})
+
 router.post('/', function(req, res, next){
 	if(req.body.status !== 'Cart'){
 		res.send("In order to POST to /api/order, status must be Cart");
