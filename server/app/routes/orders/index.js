@@ -14,6 +14,17 @@ router.get('/', function (req, res, next) {
 	.then(null, next);
 });
 
+//	added by JAG on 04/25/16 for cart-related stuff
+router.get('/myCart', function(req, res, next){
+	var id = req.session.cartId;
+	console.log("session cart id", id);
+	Order.findById(id)
+	.then(function(order){
+		res.send(order);
+	})
+	.then(null, next);
+})
+
 router.get('/:id', function(req, res, next){
 	var id = req.params.id;
 	Order.findById(id)

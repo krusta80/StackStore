@@ -8,9 +8,10 @@
 			</div>
 			<div class="panel-body">
 				<p><b>Price:</b> {{ product.price }}</p>
+				<p><b># In Stock:</b> {{ product.inventoryQty }}</p>
 				<p><b>Category:</b> {{ showCategories(product.categories) }}</p>
 				<p  style="height:50px; overflow-y: scroll"><b>Description:</b> {{ product.description }}</p>
-				<button class="btn btn-info">Add to Cart</button>
+				<button class="btn btn-info" ng-click="addToCart(product._id)" ng-disabled="product.inventoryQty === 0">Add to Cart</button>
 			</div>
 		</div>
 	</div>
