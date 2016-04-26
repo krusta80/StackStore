@@ -41,6 +41,10 @@ router.post('/', function(req, res, next){
 
 //To-do: Need to DELETE certain fields and configure access control.
 router.put('/:id', function(req, res, next){
+    //Stripping fields example
+    //Prevents user from editing own role. Meant to be used in conuunction with isAdminOrSelf middleware.
+    //if(req.passport.session.user.equals(req.requestedUser)) delete req.body.role;
+    
 	//Find user by ID, add dateModified timestamp, but return ORIGINAL User object
     User.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
     .then(function(originalUser){
@@ -76,3 +80,48 @@ router.delete('/:id', function(req, res, next){
     })
     .then(null, next);
 })
+
+/*
+//Router Param
+router.param('id', function(req, res, next, id){
+    User.findById(id).exec()
+    .then(function(user){
+        if(!user) res.status(404).send();
+        req.requestedUser = user;
+        next();
+    })
+    .then(next, null);
+})
+
+//Access Control
+function isUser(){
+    var sessionUser = req.session.passport.user;
+    if(!sessionUser) next(res.status(401).send());
+    else next();
+};
+
+function isAdmin(){
+    var sessionUser = req.session.passport.user;
+
+    if(!sessionUser) next(res.status(401).send());
+    else if(!isAdmin(sessionUser)) next(res.status(401).send());
+    else next();
+};
+
+function isAdminOrSelf(req, res, next){
+    var sessionUser = req.session.passport.user;
+
+    if(!sessionUser) next(res.status(401).send());
+    else if(!isAdmin(sessionUser) && !sessionUser.equals(req.requestedUser)) next(res.status(401).send());
+    else next();
+}
+
+//Helper
+function isAdmin(user){
+    if(user.role.toLowerCase() === 'admin'){
+        return true;
+    }
+
+    return false;
+}
+*/
