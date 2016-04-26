@@ -28,7 +28,7 @@ router.get('/myCart', function(req, res, next){
 
 router.get('/:id', function(req, res, next){
 	var id = req.params.id;
-	Order.findById(id)
+	Order.findById(id).populate('lineItems.prod_id')
 	.then(function(order){
 		res.send(order);
 	})

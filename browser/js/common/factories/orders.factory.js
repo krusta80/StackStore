@@ -10,6 +10,18 @@ app.factory('OrdersFactory', function($http, $rootScope){
 				});
 
 	return {
+
+		getCart : function() {
+			return cart;
+		},
+
+		populateCart : function() {
+			return $http.get('/api/orders/'+cart._id)
+			.then(function(res) {
+				console.log("populated cart:", res.data);
+				return res.data;
+			});
+		},
 		
 		getLineIndex: function(product) {
 			var ret = -1;
@@ -48,6 +60,31 @@ app.factory('OrdersFactory', function($http, $rootScope){
 				})
 				.catch(function(err) {
 					console.log("error ",err);
+				});
+		},
+
+		addItem : function(product, qty) {
+			var lineIndex = this.getLineIndex(product);
+			cart.lineItems[lineIndex].quantity += qty;
+			
+			return $http.put('/api/orders/myCart', cart)
+				.then(function(res) {
+					cart = res.data;
+					$rootScope.$emit('cartUpdate', cart.itemCount);
+					return res.data;
+				});
+			
+		},
+
+		removeFromCart : function(product) {
+			var lineIndex = this.getLineIndex(product);
+			cart.lineItems.splice(lineIndex,1);
+
+			return $http.put('/api/orders/myCart', cart)
+				.then(function(res) {
+					cart = res.data;
+					$rootScope.$emit('cartUpdate', cart.itemCount);
+					return res.data;
 				});
 		}
 

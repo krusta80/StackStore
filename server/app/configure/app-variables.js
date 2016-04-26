@@ -6,7 +6,6 @@ var indexPath = path.join(rootPath, './server/app/views/index.html');
 var faviconPath = path.join(rootPath, './server/app/views/favicon.ico');
 var env = require(path.join(rootPath, './server/env'));
 
-
 module.exports = function (app) {
     app.setValue('env', env);
     app.setValue('projectRoot', rootPath);
