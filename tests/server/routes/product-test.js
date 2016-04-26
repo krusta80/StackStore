@@ -1,6 +1,9 @@
 var mongoose = require('mongoose');
 require('../../../server/db/models');
+var Review = mongoose.model('Review');
 var Product = mongoose.model('Product');
+var Category = mongoose.model('Category');
+var User = mongoose.model('User');
 
 var expect = require('chai').expect;
 
@@ -10,6 +13,44 @@ var dbURI = 'mongodb://localhost:27017/testingDB';
 var request = require('supertest');
 var app = require('../../../server/app');
 var agent = request.agent(app);
+
+var generateNewUser = function(){
+	return new User({
+		email: 'chris@gmail.com',
+		password: 'chrisrules',
+		firstName: 'Chris',
+		lastName: 'Topholus',
+		role: 'User',
+		active: true,
+		pendingPasswordReset: false
+	})
+}
+
+var generateNewCategory = function(){
+	return new Category({
+		name: 'Cheap'
+	});
+}
+
+var generateNewProduct = function(){
+	return new Product({
+		title: 'Cool title',
+		categories: [generateNewCategory()],
+		price: 2,
+		inventoryQty: 50,
+		active: true
+	});
+}
+
+var generateNewReview = function(){
+	return new Review({
+		product: generateNewProduct()._id,
+		user: generateNewUser()._id,
+		title: 'My Review',
+		stars: 3,
+		description: 'I liked it'
+	});
+}
 
 describe ('Product Route', function(){
 	beforeEach('Establish DB Connection', function(done){
@@ -28,19 +69,13 @@ describe ('Product Route', function(){
 				.expect('Content-Type', /json/)
 				.expect(200)
 				.expect(function(res){
-					expect(res.body)to.be.an.instanceOf(Array);
+					expect(res.body).to.be.an.instanceOf(Array);
 				})
 				.end(done);
 		});
 
 		it('returns a product if there is one in the DB', function(done){
-			var product = new Product({
-				title: 'Cool title',
-				categories: ['123'],
-				price: 3,
-				inventoryQty: 50,
-				active: true
-			});
+			var product = generateNewProduct();
 
 			product.save().then(function(){
 				agent
@@ -48,7 +83,7 @@ describe ('Product Route', function(){
 					.expect(200)
 					.expect(function(res){
 						expect(res.body).to.be.an.instanceOf(Array);
-						expect(res.body[0].title.to.equal('Cool title'));
+						expect(res.body[0].title).to.contain('Cool');
 					})
 					.end(done);
 			}).then(null, done);
@@ -58,13 +93,7 @@ describe ('Product Route', function(){
 	describe('GET One Product', function(){
 		var product;
 		before(function(done){
-			product = new Product({
-				title: 'Cool title',
-				categories: ['123'],
-				price: 3,
-				inventoryQty: 50,
-				active: true
-			});
+			product = generateNewProduct();
 			product.save().then(function(){
 				done();
 			}, done);
@@ -80,10 +109,10 @@ describe ('Product Route', function(){
 				.end(done);
 		});
 
-		it('fails and returns a 500 error when you pass in a bad id', function(done){
+		it('fails and returns a 404 error when you pass in a bad id', function(done){
 			agent
 				.get('/api/products/9z1')
-				.expect(500)
+				.expect(404)
 				.end(done);
 		});
 	});
@@ -94,15 +123,14 @@ describe ('Product Route', function(){
 				.post('/api/products')
 				.send({
 					title: 'Cool title',
-					categories: ['123'],
+					categories: [generateNewCategory()],
 					price: 3,
 					inventoryQty: 50,
 					active: true
 				})
 				.expect(200)
 				.expect(function(res){
-					expect(res.body.message.to.equal('Created successfully'));
-					expect(res.body.product._id).to.not.be.an('undefined');
+					expect(res.body._id).to.not.be.an('undefined');
 				})
 				.end(done);
 		});
@@ -126,7 +154,10 @@ describe ('Product Route', function(){
 				expect(product).to.exist;
 				expect(product.price).to.equal(3);
 				done();
-			}).then(null, done);
+			})
+			.catch(function(err){
+				done(err)
+			})
 		});
 	});
 
@@ -148,8 +179,10 @@ describe ('Product Route', function(){
 				.expect(function(res){
 					expect(res.body.dateModified).to.not.be.null;
 					expect(res.body.dateModified).to.not.be.undefined;
-				});
+				})
+				.end(done);
 		});
+	});
 
 	describe('DELETE Products', function(){
 		var product;
@@ -159,7 +192,7 @@ describe ('Product Route', function(){
 			}).exec().then(function(_product){
 				product = _product;
 				done();
-			}).then(null, done);
+			})
 		});
 
 		it ('deletes a product', function(done){

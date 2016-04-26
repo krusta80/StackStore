@@ -23,12 +23,12 @@ describe('Category Route', function(){
 				.expect('Content-Type', /json/)
 				.expect(200)
 				.expect(function(res){
-					expect(res.body)to.be.an.instanceOf(Array);
+					expect(res.body).to.be.an.instanceOf(Array);
 				})
 				.end(done);
 		});
 
-		it('returns a category if there is one in the DB', function(){
+		it('returns a category if there is one in the DB', function(done){
 			var category = new Category({
 				name: 'Cool Category',
 				description: 'This is for cool stuff'
@@ -39,11 +39,14 @@ describe('Category Route', function(){
 					.get('/api/categories/')
 					.expect(200)
 					.expect(function(res){
-						.expect(res.body).to.be.an.instanceOf(Array)
-						.expect(res.body[0].name.to.equal('Cool Category'))
+						expect(res.body).to.be.an.instanceOf(Array);
+						expect(res.body[0].name.to.equal('Cool Category'));
 					})
 					.end(done);
-			}).then(null, done);
+			})
+			.catch(function(err){
+				done(err);
+			})
 		});
 	});
 
@@ -65,6 +68,7 @@ describe('Category Route', function(){
 				.get('/api/categories/' + category._id)
 				.expect(200)
 				.expect(function(res){
+					console.log("******RES IS: ", res.body)
 					expect(res.body.name).to.equal('Awesome Category');
 				})
 				.end(done);
@@ -150,7 +154,7 @@ describe('Category Route', function(){
 
 		it('deletes a category', function(done){
 			agent
-				.delete('/api/categories/' + category._id);
+				.delete('/api/categories/' + category._id)
 				.expect(200)
 				.end(done)
 		});
