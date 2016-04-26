@@ -1,10 +1,11 @@
-app.factory('OrdersFactory', function($http){
+app.factory('OrdersFactory', function($http, $rootScope){
 
 	var cart;
 
 	$http.get('/api/orders/myCart')
 				.then(function(res) {
 					cart = res.data;
+					$rootScope.$emit('cartUpdate', cart.itemCount);
 					console.log("retrieved cart: ", cart);
 				});
 
@@ -41,7 +42,9 @@ app.factory('OrdersFactory', function($http){
 			$http.put('/api/orders/myCart', cart)
 				.then(function(res) {
 					cart = res.data;
-					console.log("New cart: ", cart);
+					$rootScope.$emit('cartUpdate', cart.itemCount);
+					//console.log("Items: ", cart.itemCount);
+					//console.log("Subtotal: ", cart.subtotal);
 				})
 				.catch(function(err) {
 					console.log("error ",err);

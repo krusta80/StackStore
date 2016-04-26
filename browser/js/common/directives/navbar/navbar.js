@@ -16,6 +16,8 @@ app.directive('navbar', function ($rootScope, AuthService, AUTH_EVENTS, $state) 
 
             scope.user = null;
 
+            console.log("cart is "+$rootScope.cart);
+
             scope.isLoggedIn = function () {
                 return AuthService.isAuthenticated();
             };
@@ -36,12 +38,16 @@ app.directive('navbar', function ($rootScope, AuthService, AUTH_EVENTS, $state) 
                 scope.user = null;
             };
 
+            var updateCartItems = function (event, data) {
+                scope.cartItems = data;
+            };
+
             setUser();
 
             $rootScope.$on(AUTH_EVENTS.loginSuccess, setUser);
             $rootScope.$on(AUTH_EVENTS.logoutSuccess, removeUser);
             $rootScope.$on(AUTH_EVENTS.sessionTimeout, removeUser);
-
+            $rootScope.$on('cartUpdate', updateCartItems);
         }
 
     };

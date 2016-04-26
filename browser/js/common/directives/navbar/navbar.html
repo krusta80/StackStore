@@ -8,10 +8,15 @@
                 <a ui-sref-active="active" ui-sref="{{ item.state }}">{{ item.label }}</a>
             </li>
         </ul>
+        
+            
         <button ng-show="!user" ui-sref="login" class="btn login-button">Login</button>
         <div ng-show="user" class="welcome">
             <span>Welcome, {{ user.email }}!</span>
             <a ng-click="logout()">Logout</a>
         </div>
+    
+        <button class="btn btn-success" style="float: right; margin-top: 9.2px; margin-right: 10px;"><span class="glyphicon glyphicon-shopping-cart"></span> <span class="items">{{cartItems}}</span></button>
+
     </div>
 </nav>
