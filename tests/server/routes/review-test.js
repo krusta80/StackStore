@@ -1,6 +1,9 @@
 var mongoose = require('mongoose');
 require('../../../server/db/models');
 var Review = mongoose.model('Review');
+var Product = mongoose.model('Product');
+var Category = mongoose.model('Category');
+var User = mongoose.model('User');
 
 var expect = require('chai').expect;
 
@@ -9,6 +12,44 @@ var dbURI = 'mongodb://localhost:27017/testingDB';
 var request = require('supertest');
 var app = require('../../../server/app');
 var agent = request.agent(app);
+
+var generateNewUser = function(){
+	return new User({
+		email: 'chris@gmail.com',
+		password: 'chrisrules',
+		firstName: 'Chris',
+		lastName: 'Topholus',
+		role: 'User',
+		active: true,
+		pendingPasswordReset: false
+	})
+}
+
+var generateNewCategory = function(){
+	return new Category({
+		name: 'Cheap'
+	});
+}
+
+var generateNewProduct = function(){
+	return new Product({
+		title: 'Cool Thing',
+		categories: [generateNewCategory()],
+		price: 2,
+		inventoryQty: 50,
+		active: true
+	});
+}
+
+var generateNewReview = function(){
+	return new Review({
+		product: generateNewProduct()._id,
+		user: generateNewUser()._id,
+		title: 'My Review',
+		stars: 3,
+		description: 'I liked it'
+	});
+}
 
 describe('Review Route', function(){
 	beforeEach('Establish DB Connection', function(done){
@@ -23,27 +64,21 @@ describe('Review Route', function(){
 				.expect('Content-Type', /json/)
 				.expect(200)
 				.expect(function(res){
-					expect(res.body)to.be.an.instanceOf(Array)
+					expect(res.body).to.be.an.instanceOf(Array);
 				})
 				.end(done)
 		});
 
 		it('returns a review if there is one in the DB', function(done){
-			var review = new Review({
-				product: '123', //placeholder
-				user: '456', //placeholder
-				title: 'My Review',
-				stars: 3,
-				description: 'I liked it'
-			})
+			var review = generateNewReview();
 
 			review.save().then(function(){
 				agent
 					.get('/api/reviews/')
 					.expect(200)
 					.expect(function(res){
-						.expect(res.body).to.be.an.instanceOf(Array);
-						.expect(res.body[0].title).to.equal('My Review');
+						expect(res.body).to.be.an.instanceOf(Array);
+						expect(res.body[0].title).to.equal('My Review');
 					})
 					.end(done);
 			}).then(null, done);
@@ -55,13 +90,7 @@ describe('Review Route', function(){
 		var review;
 
 		before(function(done){
-			review = new Review({
-				product: '123', //placeholder
-				user: '456', //placeholder
-				title: 'My Review',
-				stars: 3,
-				description: 'I liked it'
-			})
+			review = generateNewReview();
 			review.save().then(function(){
 				done();
 			}, done);
@@ -77,10 +106,10 @@ describe('Review Route', function(){
 				.end(done);
 		});
 
-		it('fails and returns a 500 error when you pass a bad ID', function(done){
+		it('fails and returns a 404 error when you pass a bad ID', function(done){
 			agent
 				.get('/api/reviews/9282')
-				.expect(500)
+				.expect(404)
 				.end(done);
 		});
 
@@ -108,7 +137,7 @@ describe('Review Route', function(){
 
 		it('updates the description', function(done){
 			agent
-				.PUT('/api/reviews/'+review._id)
+				.put('/api/reviews/'+review._id)
 				.send({
 					description: 'I REALLY liked it'
 				})
@@ -116,6 +145,7 @@ describe('Review Route', function(){
 				.expect(function(res){
 					expect(res.body.description)
 				})
+				.end(done)
 		});
 	});
 
@@ -130,9 +160,9 @@ describe('Review Route', function(){
 			}).then(null, done);
 		});
 
-		it('deletes a review', function(){
+		it('deletes a review', function(done){
 			agent
-				.delete('/api/reviews/' + review._id);
+				.delete('/api/reviews/' + review._id)
 				.expect(200)
 				.end(done)
 		});

@@ -13,10 +13,15 @@ app.config(function($stateProvider){
 
 });
 
-app.controller('ProductsByCategoryCtrl', function($scope, $stateParams, products, CategoriesFactory){
+app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateParams, products, CategoriesFactory){
 
 	CategoriesFactory.setCurrentCategory($stateParams.categoryId);
 	$scope.products = products;
+
+	$scope.addToCart = function(product) {
+		OrdersFactory.addToCart(product);
+
+	};
 
 	$scope.showCategories = function(categories){
 		var categoriesName = categories.map(function(category){

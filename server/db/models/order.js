@@ -40,6 +40,19 @@ var schema = new mongoose.Schema({
     dateCanceled: Date
 });
 
+schema.set('toJSON', {
+    virtuals : true
+});
+
+schema.virtual('itemCount').get(function(){
+    var sum = 0;
+    this.lineItems.forEach(function(lineItem){
+        sum += lineItem.quantity;
+    })
+
+    return sum;
+})
+
 schema.virtual('subtotal').get(function(){
     var sum = 0;
     this.lineItems.forEach(function(lineItem){

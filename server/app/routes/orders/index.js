@@ -5,7 +5,8 @@ var models = require('../../../db/models');
 var Order = models.Order;
 module.exports = router;
 
-//Note - Still need to implement access control!
+
+//Routes
 router.get('/', function (req, res, next) {
 	Order.find({})
 	.then(function(orders){
@@ -14,8 +15,29 @@ router.get('/', function (req, res, next) {
 	.then(null, next);
 });
 
+//	added by JAG on 04/25/16 for cart-related stuff
+router.get('/myCart', function(req, res, next){
+	var id = req.session.cartId;
+	console.log("session cart id", id);
+	Order.findById(id)
+	.then(function(order){
+		res.send(order);
+	})
+	.then(null, next);
+})
+
 router.get('/:id', function(req, res, next){
 	var id = req.params.id;
+	Order.findById(id)
+	.then(function(order){
+		res.send(order);
+	})
+	.then(null, next);
+})
+
+router.get('/myCart', function(req, res, next){
+	var id = req.session.cartId;
+	console.log("session cart id", id);
 	Order.findById(id)
 	.then(function(order){
 		res.send(order);
@@ -36,14 +58,56 @@ router.post('/', function(req, res, next){
 	.then(null, next);
 })
 
-router.put('/:id', function(req, res, next){
-	Order.findByIdAndUpdate(req.params.id, req.body, {new: true})
-	.then(function(updatedOrder){
-		var timestamped = updatedOrder.timestampStatus(updatedOrder.status);
-		return timestamped.save(); //Maybe more efficient to use findByID and save once.
+router.put('/myCart', function(req, res, next) {
+	Order.findById(req.session.cartId)
+	.then(function(fetchedOrder){
+		delete req.body.dateCreated;
+
+		for(var key in req.body){
+			fetchedOrder[key] = req.body[key];
+	    }
+
+	    return fetchedOrder.save();
 	})
-	.then(function(timestampedOrder){
-		res.send(timestampedOrder);
+	.then(function(savedOrder) {
+		res.send(savedOrder);
+	})
+	.then(null, next);
+});
+
+router.put('/:id', function(req, res, next){
+
+	Order.findById(req.params.id)
+	.then(function(fetchedOrder){
+		//Most values can only be edited while in the 'Cart' stage
+		if(fetchedOrder.status !== 'Cart'){
+			delete req.body.userId; delete req.body.sessionId;
+			delete req.body.email;
+			delete req.body.invoiceNumber; delete req.body.lineItems;
+			delete req.body.shippingAddress; delete req.body.billingAddress;
+		}
+
+		//User may not edit timestamps directly under any circumstances
+		["Created", 'Ordered', "Notified", "Shipped", "Delivered", "Canceled"].forEach(function(state){
+			delete req.body["date"+state];
+		})
+
+		//Order status can only go "forward"
+		var states = Order.schema.path('status').enumValues;
+		if(states.indexOf(req.body.status) < states.indexOf(fetchedOrder.status)){
+			delete req.body.status
+		}
+
+		//Finally, update values and timestamp
+		for(var key in req.body){
+			fetchedOrder[key] = req.body[key];
+	    }
+
+	    var fetchedOrder = fetchedOrder.timestampStatus();
+	    return fetchedOrder.save();
+	})
+	.then(function(updatedOrder){
+		res.send(updatedOrder);
 	})
 	.then(null, next);
 })
@@ -56,4 +120,7 @@ router.delete('/:id', function(req, res, next){
 	})
 	.then(null, next);
 })
+
+
+
 
