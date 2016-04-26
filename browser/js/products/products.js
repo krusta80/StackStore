@@ -18,9 +18,9 @@ app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateP
 	CategoriesFactory.setCurrentCategory($stateParams.categoryId);
 	$scope.products = products;
 
-	$scope.addToCart = function(productId) {
-		console.log("productId",productId);
-		OrdersFactory.addToCart(productId);
+	$scope.addToCart = function(product) {
+		console.log("productId",product._id);
+		OrdersFactory.addToCart(product);
 
 	};
 

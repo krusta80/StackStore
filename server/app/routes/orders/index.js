@@ -58,6 +58,20 @@ router.post('/', function(req, res, next){
 	.then(null, next);
 })
 
+router.put('/myCart', function(req, res, next) {
+	Order.findById(req.session.cartId)
+	.then(function(fetchedOrder){
+		delete req.body.dateCreated;
+
+		for(var key in req.body){
+			fetchedOrder[key] = req.body[key];
+	    }
+
+	    res.send(fetchedOrder);
+	})
+	.then(null, next);
+});
+
 router.put('/:id', function(req, res, next){
 	Order.findById(req.params.id)
 	.then(function(fetchedOrder){
