@@ -67,7 +67,10 @@ router.put('/myCart', function(req, res, next) {
 			fetchedOrder[key] = req.body[key];
 	    }
 
-	    res.send(fetchedOrder);
+	    return fetchedOrder.save();
+	})
+	.then(function(savedOrder) {
+		res.send(savedOrder);
 	})
 	.then(null, next);
 });
