@@ -1,0 +1,26 @@
+
+<div class="container">
+
+  <h4> Cart </h4>
+  
+  <div class="panel panel-default">  
+    <div class="list-group list-group-item" ng-repeat="item in cart.lineItems">
+      <h4>{{item.prod_id.title}}</h4>
+      <p>Qty: {{item.quantity}} (${{item.price}} / each)
+        <button ng-click="addToCart(item.prod_id, 1)" type="button" class="btn btn-default">
+          <span class="glyphicon glyphicon-chevron-up"></span>
+        </button>
+        <button ng-show="item.quantity > 1" ng-click="addToCart(item.prod_id, -1)" type="button" class="btn btn-default">
+          <span class="glyphicon glyphicon-chevron-down"></span>
+        </button>
+      </p>
+      <a href="" ng-click="deleteItem(item.prod_id)"> Remove from Cart </a>
+    </div>
+    
+  </div>
+  
+  <div class="well">
+    <h4 class="ng-binding"> Order Total: ${{cart.subtotal}} </h4>
+  </div>
+
+</div>
