@@ -1,33 +1,63 @@
 app.config(function($stateProvider){
 
-	$stateProvider.state('categories.products', {
-		url: '/:categoryId/products',
-		controller: 'ProductsByCategoryCtrl',
-		templateUrl: 'js/products/productsByCategory.html',
+	// $stateProvider.state('categories.products', {
+	// 	url: '/:categoryId/products',
+	// 	controller: 'ProductsByCategoryCtrl',
+	// 	templateUrl: 'js/products/productsByCategory.html',
+	// 	resolve: {
+	// 		products: function($stateParams, ProductsFactory){
+	// 			return ProductsFactory.fetchByCategory($stateParams.categoryId);
+	// 		}
+	// 	}
+	// });
+
+	$stateProvider.state('product', {
+		url: '/product/:id',
+		controller: 'ProductCtrl',
+		templateUrl: 'js/products/product.html',
 		resolve: {
-			products: function($stateParams, ProductsFactory){
-				return ProductsFactory.fetchByCategory($stateParams.categoryId);
+			product: function($stateParams, ProductsFactory){
+				return ProductsFactory.fetchById($stateParams.id);
 			}
 		}
 	});
 
 });
 
-app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateParams, products, CategoriesFactory){
+// app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateParams, products, CategoriesFactory){
 
-	CategoriesFactory.setCurrentCategory($stateParams.categoryId);
-	$scope.products = products;
+// 	CategoriesFactory.setCurrentCategory($stateParams.categoryId);
+// 	$scope.products = products;
 
-	$scope.addToCart = function(product) {
-		OrdersFactory.addToCart(product);
+// 	$scope.addToCart = function(product) {
+// 		OrdersFactory.addToCart(product);
 
+// 	};
+
+// 	$scope.showCategories = function(categories){
+// 		var categoriesName = categories.map(function(category){
+// 			return category.name;
+// 		});
+// 		return categoriesName.join(', ');
+// 	};
+
+// });
+
+app.controller('ProductCtrl', function($scope, product){
+
+	$scope.product = product;
+	$scope.getQuantityArray = function(){
+		var quantity = [];
+		for(var i = 1; i < $scope.product.inventoryQty + 1; i++){
+			quantity.push(i);
+		}
+		return quantity;
 	};
-
-	$scope.showCategories = function(categories){
-		var categoriesName = categories.map(function(category){
-			return category.name;
-		});
-		return categoriesName.join(', ');
-	};
+	$scope.addToCart = function(){
+		console.log($scope.selectedQuantity);
+	}
 
 });
+
+
+
