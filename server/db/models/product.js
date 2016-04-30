@@ -7,6 +7,8 @@ var productSchema = new mongoose.Schema({
 	},
 	description: String,
 	imageUrls: [String],
+	reviews: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Review'} ],
+	averageStars: Number,
 	categories: {
 		type: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Category'} ],
 		validate: {
@@ -45,6 +47,23 @@ var productSchema = new mongoose.Schema({
 	dateModified: {
 		type: Date
 	}
+
+});
+
+productSchema.pre('save', function(next){
+
+	var that = this;
+	that.populate('reviews')
+		.then(function(product){
+			var sum = 0;
+			for(var i = 0; i < product.reviews.length; i++){
+				sum += product.reviews[i].stars;
+			}
+			return that.averageStars = sum / that.reviews.length;
+		})
+		.then(function(){
+			next();
+		});
 
 });
 

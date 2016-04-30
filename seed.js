@@ -176,6 +176,19 @@ var seedOrders = function(addresses, users, products) {
    
 };
 
+// var insertReviewsToProducts = function(products, reviews) {
+//     reviews.forEach(function(review){
+//         products.forEach(function(product){
+//             if(product._id === review.product)
+//                 product.reviews.push(review);            
+//         });
+//     });
+//     var saveProducts = products.map(function(product){
+//             return product.save();
+//         });
+//     return Promise.all(saveProducts);
+// };
+
 var _users;
 var _products;
 var _categories;
@@ -204,8 +217,13 @@ connectToDb
     })
     .then(function (reviews) {
         _reviews = reviews;
-        return seedAddresses(10, _users);
+        //return insertReviewsToProducts(_products, _reviews);
+        return seedAddresses(10, _users); 
     })
+    // .then(function(products){
+    //     console.log('update products');
+    //     return seedAddresses(10, _users); 
+    // })
     .then(function (addresses) {
         _addresses = addresses;
         return seedOrders(addresses, _users, _products);
