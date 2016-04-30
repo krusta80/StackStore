@@ -1,1 +1,1 @@
-<input id="input-id" type="text" class="rating" size="{{size}}" >
+<input ng-model="stars" ng-change="updater({stars: stars})" id="{{id}}" type="text" class="rating" size="{{size}}" >
