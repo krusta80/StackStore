@@ -53,7 +53,7 @@ schema.pre('save', function (next) {
         this.dateCreated = Date.now();
         if(!this.origId){
             this.origId = this._id;
-        }
+        }//really confused by this origId???
     }
     
     next();

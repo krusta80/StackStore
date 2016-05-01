@@ -17,7 +17,7 @@ router.get('/', function (req, res, next) {
 
 //	added by JAG on 04/25/16 for cart-related stuff
 router.get('/myCart', function(req, res, next){
-	var id = req.session.cartId;
+	var id = req.session.cartId;//are you storing non-logged in users cartson the server? that could get messy..
 	console.log("session cart id", id);
 	Order.findById(id)
 	.then(function(order){
@@ -35,6 +35,7 @@ router.get('/:id', function(req, res, next){
 	.then(null, next);
 })
 
+//why is this route here twice?
 router.get('/myCart', function(req, res, next){
 	var id = req.session.cartId;
 	console.log("session cart id", id);
@@ -58,6 +59,7 @@ router.post('/', function(req, res, next){
 	.then(null, next);
 })
 
+//the general way this is usually solved is that for a logged in user a Cart is just an order in the Cart state... while for a non logged in user, the cart is only persisted client side until they log in.
 router.put('/myCart', function(req, res, next) {
 	Order.findById(req.session.cartId)
 	.then(function(fetchedOrder){

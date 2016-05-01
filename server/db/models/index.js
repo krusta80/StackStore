@@ -8,4 +8,4 @@ module.exports = {
 	Product: require('./product'),
 	Review: require('./review'),
 	User: require('./user')
-}
+};

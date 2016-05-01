@@ -23,7 +23,7 @@ router.get('/:id', function(req, res, next){
 });
 
 router.post('/', function(req, res, next){
-	var newCategory = new Category(req.body);
+	var newCategory = new Category(req.body);//be careful-- whiteList the parameters you want
 	newCategory.origId = newCategory._id;
 	newCategory.save()
 		.then(function(category){

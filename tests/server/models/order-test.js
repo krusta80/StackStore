@@ -116,6 +116,9 @@ describe('Order model', function () {
     var emptyLineItems = {error: 'bad'};
     
     beforeEach('Establish DB connection', function (done) {
+      //beforeEach's don't have expectations-- they should work-- you shouldn't need to have catch blocks here...
+      //perhaps you are seeding data for these tests..
+      //which is fine.. so how about a seed file?
         if (!mongoose.connection.db)
         	mongoose.connect(dbURI);
 
@@ -171,6 +174,7 @@ describe('Order model', function () {
             badOrder.error = undefined;   
         })
         .catch(function(err) {
+          //do you really want to catch error, here?
             if(badOrder.error)
                 console.log("*********** CAUGHT ERROR: ",err);
         })

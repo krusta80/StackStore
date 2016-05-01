@@ -16,6 +16,7 @@ var supertest = require('supertest');
 var app = require('../../../server/app');
 
 var cloneOrderFields = function(order) {
+  //I think underscore has a clone function
 	return {
 		userId: order.userId,
 		sessionId: order.sessionId,
@@ -146,6 +147,7 @@ describe('Orders Route', function () {
 			var response;
 
 			beforeEach('Execute get request', function (done) {
+        //you can probably take advantage of supertest... and not have to use done...
 				loggedInAgent.get('/api/orders')
 				.end(function(err, res) {
 					response = res;

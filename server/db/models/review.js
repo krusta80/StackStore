@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+//good schema
 
 var reviewSchema = new mongoose.Schema({
 	product: {

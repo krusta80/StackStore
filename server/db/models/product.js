@@ -37,7 +37,7 @@ var productSchema = new mongoose.Schema({
 	origId: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Product'
-	},
+	},//confused.. a product belongs to another product
 	dateCreated: {
 		type: Date,
 		default: Date.now
@@ -49,7 +49,3 @@ var productSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('Product', productSchema);
-
-
-
-

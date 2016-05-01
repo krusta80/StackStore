@@ -3,21 +3,23 @@ var mongoose = require('mongoose');
 var Address = require('./address')
 var Product = require('./product')
 
+
 var schema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User'
     },
     sessionId: String,
-    email: String,
+    email: String,//if you have a user, why do you need an email?
     lineItems: { type: [{
                         prod_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Product'}, 
                         quantity: Number,
                         price: Number
                     }],
-                    minimum: 1
+                    minimum: 1//not sure this will work-- just do a preSave and make sure there is a lineItem....no?
                     //,required: true (Causes validation errors with current tests)
-            },
+            },//why don't you use a nested Schema?
+    //lineItems: [ lineItemSchema ]
     invoiceNumber: String,
     shippingAddress: {
         type: mongoose.Schema.Types.ObjectId, 
@@ -44,6 +46,7 @@ schema.set('toJSON', {
     virtuals : true
 });
 
+//nice
 schema.virtual('itemCount').get(function(){
     var sum = 0;
     this.lineItems.forEach(function(lineItem){
@@ -51,16 +54,16 @@ schema.virtual('itemCount').get(function(){
     })
 
     return sum;
-})
+});
 
 schema.virtual('subtotal').get(function(){
     var sum = 0;
     this.lineItems.forEach(function(lineItem){
         sum += (lineItem.price * lineItem.quantity);
-    })
+    });
 
     return sum;
-})
+});
 
 schema.virtual('total').get(function(){
     return this.subtotal;
@@ -71,16 +74,17 @@ schema.virtual('total').get(function(){
         var state = address.state;
         total = that.subtotal + (1 * (getSalesTaxPercent(state) / 100));
         return total;
-    })
-})
+    });
+});
 
 
+//interesting.. perhaps overengineered though
 schema.methods.timestampStatus = function(){
     //Test - What happens if field doesn't exist on model?
     var field = "date" + this.status.charAt(0).toUpperCase() + this.status.slice(1);
     this[field] = Date.now();
     return this;
-}
+};
 
 /* Need to add user or session ID to tests
 schema.pre('validate', function(next) {
@@ -113,7 +117,7 @@ function getSalesTaxPercent(state){
         NH: 0.00, NJ: 7.00, NM: 5.125, NY: 4.00, NC: 4.75, ND: 5.00, OH: 5.75, OK: 4.50, OR: 0.00,
         PA: 6.00, RI: 7.00, SC: 6.00, SD: 4.00, TN: 7.00, TX: 6.35, UT: 5.95, VT: 6.00, VA: 5.30, 
         WA: 6.50, WV: 6.00, WI: 5.00, WY: 4.0
-    }
+    };
 
     return taxTable[state];
  }

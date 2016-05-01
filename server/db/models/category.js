@@ -6,11 +6,11 @@ var categorySchema = new mongoose.Schema({
 		required: true
 	},
 	description: String,
-	active: Boolean,
+	active: Boolean,//default value?
 	origId: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Category'
-	},
+	},//the category belongs to another category?
 	dateCreated: {
 		type: Date,
 		default: Date.now
