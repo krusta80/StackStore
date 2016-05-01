@@ -54,12 +54,14 @@ var generateRandomCategory = function() {
     };
 };
 
-var generateRandomProduct = function(categoryId) {
+var generateRandomProduct = function(categoryIds) {
     return {
         title: faker.commerce.productName(),
         description: faker.lorem.sentence(),
-        imageUrls: [faker.image.imageUrl()],
-        categories: [categoryId],
+        imageUrls: [faker.image.imageUrl()+'/?v='+Math.random().toString(36).slice(3,10),
+        			faker.image.imageUrl()+'/?v='+Math.random().toString(36).slice(3,10),
+        			faker.image.imageUrl()+'/?v='+Math.random().toString(36).slice(3,10)],
+        categories: categoryIds,
         price: faker.commerce.price(),
         inventoryQty: Math.floor(Math.random()*100),
         active: faker.random.boolean()
@@ -145,8 +147,12 @@ var seedProducts = function(reps, categories){
     console.log("   -Seeding products")
     var products = [];
 
-    for(var i = 0; i < reps; i++)
-        products.push(generateRandomProduct(categories[Math.floor(Math.random()*categories.length)]));
+    for(var i = 0; i < reps; i++) {
+        if(i%3 === 0)
+        	products.push(generateRandomProduct([categories[Math.floor(Math.random()*categories.length)],categories[Math.floor(Math.random()*categories.length)]]));
+        else
+        	products.push(generateRandomProduct([categories[Math.floor(Math.random()*categories.length)]]));
+	}
 
     return Product.create(products);
 }
@@ -169,6 +175,28 @@ var seedAddresses = function(reps, users) {
         addresses.push(generateRandomAddress(users[Math.floor(Math.random()*users.length)]));
 
     return Address.create(addresses);  
+};
+
+var addReviewsToProducts = function(products, reviews) {
+	var productHash = {};
+	products.forEach(function(product) {
+		productHash[product._id] = product;
+	});
+	reviews.forEach(function(review) {
+		productHash[review.product.id].reviews.push(review);
+		productHash[review.product.id].averageStars = (productHash[review.product.id].averageStars*(productHash[review.product.id].reviews.length-1) + review.stars)/productHash[review.product.id].reviews.length;
+	});
+	
+	var saveProducts = products.map(function(product){
+           return product.save();
+    });
+   	Promise.all(saveProducts)
+	.then(function(products) {
+		//console.log(products[0]);
+	})
+	.catch(function(err) {
+		console.log("ERROR:",err);
+	})
 };
 
 var seedOrders = function(addresses, users, products) {
@@ -200,10 +228,11 @@ connectToDb
     })
     .then(function (products) {
         _products = products;
-        return seedReviews(1000, _products, _users);
+        return seedReviews(10000, _products, _users);
     })
     .then(function (reviews) {
         _reviews = reviews;
+        addReviewsToProducts(_products, _reviews);
         return seedAddresses(10, _users);
     })
     .then(function (addresses) {
