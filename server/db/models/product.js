@@ -24,10 +24,6 @@ var productSchema = new mongoose.Schema({
 	reviews: {
 		type: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Review'} ],
 	},
-	averageStars: {
-		type: Number,
-		default: 0
-	},
 	price: {
 		type: Number,
 		required: true,
