@@ -9,14 +9,24 @@
             </li>
         </ul>
         
-            
-        <button ng-show="!user" ui-sref="login" class="btn login-button">Login</button>
-        <div ng-show="user" class="welcome">
-            <span>Welcome, {{ user.email }}!</span>
-            <a ng-click="logout()">Logout</a>
+        <div class="navbar-right">      
+            <button ng-show="!user" ui-sref="login" class="btn login-button">Login</button>
+            <div ng-show="user" class="welcome">
+                <span>Welcome, {{ user.email }}!</span>
+                <a ng-click="logout()">Logout</a>
+            </div>
+        
+            <a ui-sref="cart"><button class="btn btn-success" style="float: right; margin-top: 9.2px; margin-right: 10px;"><span class="glyphicon glyphicon-shopping-cart"></span> <span class="items">{{cartItems}}</span></button>
+            </a>
         </div>
-    
-        <a ui-sref="cart"><button class="btn btn-success" style="float: right; margin-top: 9.2px; margin-right: 10px;"><span class="glyphicon glyphicon-shopping-cart"></span> <span class="items">{{cartItems}}</span></button>
-        </a>
+
+        <!-- <form class="navbar-form">
+            <div class="form-group" style="display:inline;"> -->
+              <div class="input-group" style="margin-top: 9.2px; padding-right: 10px">
+                <input type="text" class="form-control" placeholder="Search products...">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+              </div>
+       <!--      </div>
+        </form> -->
     </div>
 </nav>
