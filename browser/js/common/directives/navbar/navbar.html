@@ -9,14 +9,37 @@
             </li>
         </ul>
         
+        <div class="navbar-right" style="float: right; margin-top: 9.2px; margin-right: 10px">      
             
-        <button ng-show="!user" ui-sref="login" class="btn login-button">Login</button>
-        <div ng-show="user" class="welcome">
-            <span>Welcome, {{ user.email }}!</span>
-            <a ng-click="logout()">Logout</a>
+            <div ng-show="!user" class="btn-group">
+                <button ui-sref="login" class="btn login-button btn-primary">Login</button>
+            </div>
+
+            <div ng-show="user" class="btn-group">
+              <button type="button" class="btn btn-primary">Your Account</button>
+              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a href="#">Order History</a></li>
+                <li><a href="#">Review History</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#" ng-click="logout()">Logout</a></li>
+              </ul>
+            </div>
+
+            <a ui-sref="cart"><button class="btn btn-success" style="float: right; margin-left: 10px;"><span class="glyphicon glyphicon-shopping-cart"></span> <span class="items">{{cartItems}}</span></button>
+            </a>
         </div>
-    
-        <a ui-sref="cart"><button class="btn btn-success" style="float: right; margin-top: 9.2px; margin-right: 10px;"><span class="glyphicon glyphicon-shopping-cart"></span> <span class="items">{{cartItems}}</span></button>
-        </a>
+
+        <!-- <form class="navbar-form">
+            <div class="form-group" style="display:inline;"> -->
+              <div class="input-group" style="margin-top: 9.2px; padding-right: 10px">
+                <input type="text" class="form-control" placeholder="Search products...">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+              </div>
+       <!--      </div>
+        </form> -->
     </div>
 </nav>
