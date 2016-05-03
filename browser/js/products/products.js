@@ -43,6 +43,7 @@ app.config(function($stateProvider){
 
 // });
 
+
 app.controller('ProductCtrl', function($scope, product){
 
 	$scope.product = product;
