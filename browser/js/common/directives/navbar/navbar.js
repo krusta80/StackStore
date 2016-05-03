@@ -1,4 +1,4 @@
-app.directive('navbar', function ($rootScope, AuthService, AUTH_EVENTS, $state) {
+app.directive('navbar', function ($rootScope, AuthService, OrdersFactory, AUTH_EVENTS, $state) {
 
     return {
         restrict: 'E',
@@ -9,12 +9,13 @@ app.directive('navbar', function ($rootScope, AuthService, AUTH_EVENTS, $state) 
             scope.items = [
                 { label: 'Home', state: 'home' },
                 { label: 'About', state: 'about' },
-                { label: 'Documentation', state: 'docs' },
-                { label: 'Members Only', state: 'membersOnly', auth: true },
+                //{ label: 'Members Only', state: 'membersOnly', auth: true },
                 { label: 'Categories', state: 'categories'}
             ];
 
             scope.user = null;
+
+            console.log("cart is "+$rootScope.cart);
 
             scope.isLoggedIn = function () {
                 return AuthService.isAuthenticated();
@@ -22,6 +23,7 @@ app.directive('navbar', function ($rootScope, AuthService, AUTH_EVENTS, $state) 
 
             scope.logout = function () {
                 AuthService.logout().then(function () {
+                   OrdersFactory.reloadCart();
                    $state.go('home');
                 });
             };
@@ -36,12 +38,16 @@ app.directive('navbar', function ($rootScope, AuthService, AUTH_EVENTS, $state) 
                 scope.user = null;
             };
 
+            var updateCartItems = function (event, data) {
+                scope.cartItems = data;
+            };
+
             setUser();
 
             $rootScope.$on(AUTH_EVENTS.loginSuccess, setUser);
             $rootScope.$on(AUTH_EVENTS.logoutSuccess, removeUser);
             $rootScope.$on(AUTH_EVENTS.sessionTimeout, removeUser);
-
+            $rootScope.$on('cartUpdate', updateCartItems);
         }
 
     };

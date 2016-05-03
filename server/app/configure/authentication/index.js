@@ -5,6 +5,7 @@ var passport = require('passport');
 var path = require('path');
 var mongoose = require('mongoose');
 var UserModel = mongoose.model('User');
+var OrderModel = mongoose.model('Order');
 
 var ENABLED_AUTH_STRATEGIES = [
     'local',
@@ -15,6 +16,7 @@ var ENABLED_AUTH_STRATEGIES = [
 
 module.exports = function (app) {
 
+    
     // First, our session middleware will set/read sessions from the request.
     // Our sessions will get stored in Mongo using the same connection from
     // mongoose. Check out the sessions collection in your MongoCLI.
@@ -41,6 +43,45 @@ module.exports = function (app) {
         UserModel.findById(id, done);
     });
 
+    // Simple /logout route.
+    app.get('/logout', function (req, res) {
+        console.log("Removing cart id", req.session.cartId);
+        delete req.session.cartId;
+        req.logout();
+        res.status(200).end();
+    });
+
+    // Added by JAG on 04/25/16 to initialize a cart when a new session
+    // is created...
+    app.use(function (req, res, next) {
+        if(!req.session.cartId) {
+            console.log("No cart found for this session...creating one now.");
+            OrderModel.create({
+                sessionId: req.cookies['connect.sid'],
+                status: 'Cart',
+                dateCreated: Date.now()
+            })
+            .then(function(cart) {
+                req.session.cartId = cart._id;
+            })
+            .catch(function(err) {
+                console.log("ERROR:",err);
+            });
+        }
+        // else if(req.user) {
+        //     console.log("Retrieving last-known cart for this user.");
+        //     OrderModel.findOne({userId: req.user._id, status: 'Cart'})
+        //     .then(function(cart) {
+        //        req.session.cartId = cart._id;
+        //     })
+        //     .catch(function(err) {
+        //         console.log("ERROR:",err);
+        //     });
+        // }            
+        next();
+    });
+
+    
     // We provide a simple GET /session in order to get session information directly.
     // This is used by the browser application (Angular) to determine if a user is
     // logged in already.
@@ -50,12 +91,6 @@ module.exports = function (app) {
         } else {
             res.status(401).send('No authenticated user.');
         }
-    });
-
-    // Simple /logout route.
-    app.get('/logout', function (req, res) {
-        req.logout();
-        res.status(200).end();
     });
 
     // Each strategy enabled gets registered.

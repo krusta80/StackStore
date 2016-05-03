@@ -34,6 +34,7 @@ router.get('/user/:userId', function(req, res, next){
 		.then(null, next);
 });
 
+//delete this route because in product populate will take care of it
 router.post('/', function(req, res, next){
 	var newReview = new Review(req.body);
 	newReview.origId = newReview._id;
@@ -58,6 +59,7 @@ router.put('/:id', function(req, res, next){
 		.then(null, next);	
 });
 
+//delete this route because in product populate will take care of it
 router.delete('/:id', function(req, res, next){
 	//not sure using Date.now or Date.now()
 	Review.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now}, {new: true})

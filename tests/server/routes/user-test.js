@@ -263,12 +263,14 @@ describe('Users Route', function () {
 					return true;
 				return bool && (origUserDocPrePut[field] == origUserDocPostPut[field]);
 			}, true);
-			expect(isGood && origUserDocPostPut.dateModified).to.equal(true);
+			expect(isGood && !!origUserDocPostPut.dateModified).to.equal(true);
 			done();
 		});
 
 		it('should have its origId equal the original origId', function (done) {
-			expect(response.body.origId).to.equal(origUserDocPrePut.origId);
+			// console.log("res.body.origId", typeof response.body.origId); (STRING)
+			// console.log("origUserDocPrePut.origId", typeof origUserDocPrePut.origId); (OBJECT)
+			expect(response.body.origId).to.equal(String(origUserDocPrePut.origId));
 			done();
 		});
 	});
@@ -296,7 +298,7 @@ describe('Users Route', function () {
 		});
 
 		it('should respond with the original doc id', function (done) {
-			expect(response.body._id).to.equal(origUserDoc._id);
+			expect(response.body._id).to.equal(String(origUserDoc._id));
 			done();
 		});
 
@@ -306,7 +308,7 @@ describe('Users Route', function () {
 					return true;
 				return bool && (origUserDoc[field] == response.body[field]);
 			}, true);
-			expect(isGood && response.body.dateModified).to.equal(true);
+			expect(isGood && !!response.body.dateModified).to.equal(true);
 			done();
 		});
 	});

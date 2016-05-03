@@ -7,6 +7,11 @@ var productSchema = new mongoose.Schema({
 	},
 	description: String,
 	imageUrls: [String],
+	reviews: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Review'} ],
+	averageStars: {
+		type: Number,
+		default: 0
+	},
 	categories: {
 		type: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Category'} ],
 		validate: {
@@ -15,6 +20,9 @@ var productSchema = new mongoose.Schema({
 			},
 			message: 'at least one category required'
 		}
+	},
+	reviews: {
+		type: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Review'} ],
 	},
 	price: {
 		type: Number,
@@ -47,6 +55,7 @@ var productSchema = new mongoose.Schema({
 	}
 
 });
+
 
 module.exports = mongoose.model('Product', productSchema);
 

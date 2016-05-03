@@ -14,4 +14,9 @@ app.controller('AboutController', function ($scope, FullstackPics) {
     // Images of beautiful Fullstack people.
     $scope.images = _.shuffle(FullstackPics);
 
+    $scope.updateReview = function(reviewID, stars) {
+    	console.log("review id :", reviewID);
+    	console.log("stars     :", stars);
+    };
+
 });

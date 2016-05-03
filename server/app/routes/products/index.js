@@ -27,6 +27,13 @@ router.get('/category/:categoryId', function(req, res, next){
 router.get('/:id', function(req, res, next){
 	var id = req.params.id;
 	Product.findById(id)
+		//nested populate
+		.populate({
+			path: 'reviews',
+			populate: {
+				path: 'user'
+			}
+		})
 		.then(function(product){
 			res.send(product);
 		})

@@ -1,35 +1,27 @@
 /*
-
 This seed file is only a placeholder. It should be expanded and altered
 to fit the development of your application.
-
 It uses the same file the server uses to establish
 the database connection:
 --- server/db/index.js
-
 The name of the database used is set in your environment files:
 --- server/env/*
-
 This seed file has a safety check to see if you already have users
 in the database. If you are developing multiple applications with the
 fsg scaffolding, keep in mind that fsg always uses the same database
 name in the environment files.
-
 */
-
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
 var chalk = require('chalk');
 var connectToDb = require('./server/db');
 var faker = require('faker'); 
-
 var User = mongoose.model('User');
 var Address = mongoose.model('Address');
 var Order = mongoose.model('Order');
 var Category = mongoose.model('Category');
 var Product = mongoose.model('Product');
 var Review = mongoose.model('Review');
-
 var wipeCollections = function () {
     var removeUsers = User.remove({});
     var removeAddresses = Address.remove({});
@@ -46,7 +38,6 @@ var wipeCollections = function () {
         removeReviews
     ]);
 };
-
 var generateRandomCategory = function() {
     return {
         name: faker.commerce.department(),
@@ -54,18 +45,19 @@ var generateRandomCategory = function() {
     };
 };
 
-var generateRandomProduct = function(categoryId) {
+var generateRandomProduct = function(categoryIds) {
     return {
         title: faker.commerce.productName(),
         description: faker.lorem.sentence(),
-        imageUrls: [faker.image.imageUrl()],
-        categories: [categoryId],
+        imageUrls: [faker.image.imageUrl()+'/?v='+Math.random().toString(36).slice(3,10),
+        			faker.image.imageUrl()+'/?v='+Math.random().toString(36).slice(3,10),
+        			faker.image.imageUrl()+'/?v='+Math.random().toString(36).slice(3,10)],
+        categories: categoryIds,
         price: faker.commerce.price(),
         inventoryQty: Math.floor(Math.random()*100),
         active: faker.random.boolean()
     };
 };
-
 var generateRandomAddress = function(userId) {
     return {
         label: faker.random.locale(),
@@ -79,7 +71,6 @@ var generateRandomAddress = function(userId) {
         active: faker.random.boolean()
     };
 };
-
 var generateRandomReview = function(productId, userId) {
     return {
         product: productId,
@@ -89,7 +80,6 @@ var generateRandomReview = function(productId, userId) {
         description: faker.lorem.sentence()    
     };
 };
-
 var seedUsers = function () {
    console.log("   -Seeding users")
             
@@ -127,62 +117,75 @@ var seedUsers = function () {
             dateModified:  Date.now()
         }
     ];
-
     return User.create(users);
 };
-
 var seedCategories = function(reps){
     console.log("   -Seeding categories")
     var categories = [];
-
     for(var i = 0; i < reps; i++)
         categories.push(generateRandomCategory());
-
     return Category.create(categories);
 };
-
 var seedProducts = function(reps, categories){
     console.log("   -Seeding products")
     var products = [];
 
-    for(var i = 0; i < reps; i++)
-        products.push(generateRandomProduct(categories[Math.floor(Math.random()*categories.length)]));
+    for(var i = 0; i < reps; i++) {
+        if(i%3 === 0)
+        	products.push(generateRandomProduct([categories[Math.floor(Math.random()*categories.length)],categories[Math.floor(Math.random()*categories.length)]]));
+        else
+        	products.push(generateRandomProduct([categories[Math.floor(Math.random()*categories.length)]]));
+	}
 
     return Product.create(products);
 }
-
 var seedReviews = function(reps, products, users){
     console.log("   -Seeding reviews")
     var reviews = [];
-
     for(var i = 0; i < reps; i++)
         reviews.push(generateRandomReview(products[Math.floor(Math.random()*products.length)], users[Math.floor(Math.random()*users.length)]));
-
     return Review.create(reviews);
 }
-
 var seedAddresses = function(reps, users) {
     console.log("   -Seeding addresses");
     var addresses = [];
-
     for(var i = 0; i < reps; i++)
         addresses.push(generateRandomAddress(users[Math.floor(Math.random()*users.length)]));
-
     return Address.create(addresses);  
+};
+
+var addReviewsToProducts = function(products, reviews) {
+	var productHash = {};
+	products.forEach(function(product) {
+		productHash[product._id] = product;
+	});
+	reviews.forEach(function(review) {
+		productHash[review.product.id].reviews.push(review);
+		productHash[review.product.id].averageStars = (productHash[review.product.id].averageStars*(productHash[review.product.id].reviews.length-1) + review.stars)/productHash[review.product.id].reviews.length;
+	});
+	
+	var saveProducts = products.map(function(product){
+           return product.save();
+    });
+   	Promise.all(saveProducts)
+	.then(function(products) {
+		//console.log(products[0]);
+	})
+	.catch(function(err) {
+		console.log("ERROR:",err);
+	})
 };
 
 var seedOrders = function(addresses, users, products) {
     console.log("   -Seeding orders")
    
 };
-
 var _users;
 var _products;
 var _categories;
 var _addresses;
 var _orders;
 var _reviews;
-
 connectToDb
     .then(function () {
         return wipeCollections();
@@ -200,10 +203,11 @@ connectToDb
     })
     .then(function (products) {
         _products = products;
-        return seedReviews(1000, _products, _users);
+        return seedReviews(10000, _products, _users);
     })
     .then(function (reviews) {
         _reviews = reviews;
+        addReviewsToProducts(_products, _reviews);
         return seedAddresses(10, _users);
     })
     .then(function (addresses) {
