@@ -17,28 +17,40 @@ router.get('/', function (req, res, next) {
 
 //	added by JAG on 04/25/16 for cart-related stuff
 router.get('/myCart', function(req, res, next){
-	var id = req.session.cartId;
-	console.log("session cart id", id);
-	Order.findById(id)
-	.then(function(order){
-		res.send(order);
-	})
-	.then(null, next);
+	if(!req.session.cartId) {
+		console.log("No cart found for this session...creating one now.");
+        Order.create({
+            sessionId: req.cookies['connect.sid'],
+            status: 'Cart',
+            dateCreated: Date.now()
+        })
+        .then(function(cart) {
+            req.session.cartId = cart._id;
+            res.send(cart);
+        })
+        .catch(function(err) {
+            console.log("ERROR:",err);
+        });
+	}
+	else {
+		var id = req.session.cartId;
+	
+		console.log("session cart id", id);
+		Order.findById(id)
+		.then(function(order){
+			res.send(order);
+		})
+		.then(null, next);	
+			
+	}
 })
 
 router.get('/:id', function(req, res, next){
-	var id = req.params.id;
-	Order.findById(id).populate('lineItems.prod_id')
-	.then(function(order){
-		res.send(order);
-	})
-	.then(null, next);
-})
+	var queryPromise = Order.findById(req.params.id).populate('lineItems.prod_id');
+	if(req.user)
+		queryPromise = Order.findOne({userId: req.user._id, status: 'Cart'}).populate('lineItems.prod_id');
 
-router.get('/myCart', function(req, res, next){
-	var id = req.session.cartId;
-	console.log("session cart id", id);
-	Order.findById(id)
+	queryPromise
 	.then(function(order){
 		res.send(order);
 	})
@@ -59,26 +71,40 @@ router.post('/', function(req, res, next){
 })
 
 router.put('/myCart', function(req, res, next) {
-	Order.findById(req.session.cartId)
+	var queryPromise;
+	if(req.user)
+		queryPromise = Order.findOne({userId: req.user._id, status: 'Cart'});
+	else
+		queryPromise = Order.findById(req.session.cartId);
+
+	queryPromise
 	.then(function(fetchedOrder){
-		delete req.body.dateCreated;
-
-		for(var key in req.body){
-			fetchedOrder[key] = req.body[key];
-	    }
-
-	    return fetchedOrder.save();
+		if(req.cookies['connect.sid'] === fetchedOrder.sessionId) {
+			delete req.body.dateCreated;
+			delete req.body.__v;
+			
+			for(var key in req.body){
+				fetchedOrder[key] = req.body[key];
+		    }
+		}
+		else {
+			req.session.cartId = fetchedOrder.id	
+			fetchedOrder.sessionId = req.cookies['connect.sid'];
+		}
+		return fetchedOrder.save();
 	})
 	.then(function(savedOrder) {
 		res.send(savedOrder);
 	})
-	.then(null, next);
+	.catch(next);
 });
 
 router.put('/:id', function(req, res, next){
 
 	Order.findById(req.params.id)
 	.then(function(fetchedOrder){
+		delete req.body.__v;
+			
 		//Most values can only be edited while in the 'Cart' stage
 		if(fetchedOrder.status !== 'Cart'){
 			delete req.body.userId; delete req.body.sessionId;

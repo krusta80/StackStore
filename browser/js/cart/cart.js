@@ -20,20 +20,20 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams){
 	$scope.addToCart = function(product, qty) {
 		OrdersFactory.addItem(product, qty)
 		.then(function(updatedCart) {
-			updatedCart.lineItems.forEach(function(lineItem, index) {
-				$scope.cart.lineItems[index].quantity = updatedCart.lineItems[index].quantity;
-			});
-			$scope.cart.subtotal = updatedCart.subtotal;
+			return OrdersFactory.populateCart(updatedCart.id);
+		})
+		.then(function(populatedCart) {
+			$scope.cart = populatedCart;
 		})
 	};
 
 	$scope.deleteItem = function(product) {
 		OrdersFactory.removeFromCart(product)
 		.then(function(updatedCart) {
-			$scope.cart.lineItems = $scope.cart.lineItems.filter(function(lineItem) {
-				return lineItem.prod_id._id !== product._id;
-			});
-			$scope.cart.subtotal = updatedCart.subtotal;
+			return OrdersFactory.populateCart(updatedCart.id);
+		})
+		.then(function(populatedCart) {
+			$scope.cart = populatedCart;
 		})
 	};
 

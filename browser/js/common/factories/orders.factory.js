@@ -11,6 +11,15 @@ app.factory('OrdersFactory', function($http, $rootScope){
 
 	return {
 
+		reloadCart: function() {
+			$http.get('/api/orders/myCart')
+				.then(function(res) {
+					cart = res.data;
+					$rootScope.$emit('cartUpdate', cart.itemCount);
+					console.log("retrieved cart: ", cart);
+				});
+		},
+
 		getCart : function() {
 			return cart;
 		},
@@ -18,6 +27,8 @@ app.factory('OrdersFactory', function($http, $rootScope){
 		populateCart : function() {
 			return $http.get('/api/orders/'+cart._id)
 			.then(function(res) {
+				cart = res.data;
+				$rootScope.$emit('cartUpdate', cart.itemCount);
 				console.log("populated cart:", res.data);
 				return res.data;
 			});
@@ -26,7 +37,7 @@ app.factory('OrdersFactory', function($http, $rootScope){
 		getLineIndex: function(product) {
 			var ret = -1;
 			cart.lineItems.forEach(function(li, index) {
-				if(li.prod_id === product._id) {
+				if(li.prod_id == product._id || li.prod_id._id == product._id) {
 					ret = index;
 				}
 			});
@@ -51,12 +62,11 @@ app.factory('OrdersFactory', function($http, $rootScope){
 			var lineIndex = this.getLineIndex(product);
 			cart.lineItems[lineIndex].quantity++;
 			
-			$http.put('/api/orders/myCart', cart)
+			return $http.put('/api/orders/myCart', cart)
 				.then(function(res) {
 					cart = res.data;
 					$rootScope.$emit('cartUpdate', cart.itemCount);
-					//console.log("Items: ", cart.itemCount);
-					//console.log("Subtotal: ", cart.subtotal);
+					return cart;
 				})
 				.catch(function(err) {
 					console.log("error ",err);
