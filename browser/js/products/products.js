@@ -1,15 +1,15 @@
 app.config(function($stateProvider){
 
-	// $stateProvider.state('categories.products', {
-	// 	url: '/:categoryId/products',
-	// 	controller: 'ProductsByCategoryCtrl',
-	// 	templateUrl: 'js/products/productsByCategory.html',
-	// 	resolve: {
-	// 		products: function($stateParams, ProductsFactory){
-	// 			return ProductsFactory.fetchByCategory($stateParams.categoryId);
-	// 		}
-	// 	}
-	// });
+	$stateProvider.state('categories.products', {
+		url: '/:categoryId/products',
+		controller: 'ProductsByCategoryCtrl',
+		templateUrl: 'js/products/productsByCategory.html',
+		resolve: {
+			products: function($stateParams, ProductsFactory){
+				return ProductsFactory.fetchByCategory($stateParams.categoryId);
+			}
+		}
+	});
 
 	$stateProvider.state('product', {
 		url: '/product/:id',
@@ -24,24 +24,24 @@ app.config(function($stateProvider){
 
 });
 
-// app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateParams, products, CategoriesFactory){
+app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateParams, products, CategoriesFactory){
 
-// 	CategoriesFactory.setCurrentCategory($stateParams.categoryId);
-// 	$scope.products = products;
+	CategoriesFactory.setCurrentCategory($stateParams.categoryId);
+	$scope.products = products;
 
-// 	$scope.addToCart = function(product) {
-// 		OrdersFactory.addToCart(product);
+	$scope.addToCart = function(product) {
+		OrdersFactory.addToCart(product);
 
-// 	};
+	};
 
-// 	$scope.showCategories = function(categories){
-// 		var categoriesName = categories.map(function(category){
-// 			return category.name;
-// 		});
-// 		return categoriesName.join(', ');
-// 	};
+	$scope.showCategories = function(categories){
+		var categoriesName = categories.map(function(category){
+			return category.name;
+		});
+		return categoriesName.join(', ');
+	};
 
-// });
+});
 
 
 app.controller('ProductCtrl', function($scope, product){
