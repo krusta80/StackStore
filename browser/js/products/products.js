@@ -1,15 +1,15 @@
 app.config(function($stateProvider){
 
-	// $stateProvider.state('categories.products', {
-	// 	url: '/:categoryId/products',
-	// 	controller: 'ProductsByCategoryCtrl',
-	// 	templateUrl: 'js/products/productsByCategory.html',
-	// 	resolve: {
-	// 		products: function($stateParams, ProductsFactory){
-	// 			return ProductsFactory.fetchByCategory($stateParams.categoryId);
-	// 		}
-	// 	}
-	// });
+	$stateProvider.state('categories.products', {
+		url: '/:categoryId/products',
+		controller: 'ProductsByCategoryCtrl',
+		templateUrl: 'js/products/productsByCategory.html',
+		resolve: {
+			products: function($stateParams, ProductsFactory){
+				return ProductsFactory.fetchByCategory($stateParams.categoryId);
+			}
+		}
+	});
 
 	$stateProvider.state('product', {
 		url: '/product/:id',
@@ -24,24 +24,24 @@ app.config(function($stateProvider){
 
 });
 
-// app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateParams, products, CategoriesFactory){
+app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateParams, products, CategoriesFactory){
 
-// 	CategoriesFactory.setCurrentCategory($stateParams.categoryId);
-// 	$scope.products = products;
+	CategoriesFactory.setCurrentCategory($stateParams.categoryId);
+	$scope.products = products;
 
-// 	$scope.addToCart = function(product) {
-// 		OrdersFactory.addToCart(product);
+	$scope.addToCart = function(product) {
+		OrdersFactory.addToCart(product);
 
-// 	};
+	};
 
-// 	$scope.showCategories = function(categories){
-// 		var categoriesName = categories.map(function(category){
-// 			return category.name;
-// 		});
-// 		return categoriesName.join(', ');
-// 	};
+	$scope.showCategories = function(categories){
+		var categoriesName = categories.map(function(category){
+			return category.name;
+		});
+		return categoriesName.join(', ');
+	};
 
-// });
+});
 
 
 app.controller('ProductCtrl', function($scope, product){
@@ -61,33 +61,33 @@ app.controller('ProductCtrl', function($scope, product){
 	}
 
 
-	//$scope.currentImage = $scope.product.imageUrls[0];
-	// $scope.nextImage = function(){
-	// 	console.log('next');
-	// 	$scope.product.imageUrls.forEach(function(imgUrl, index){
-	// 		if($scope.currentImage === imgUrl){
-	// 			if(index === $scope.product.imageUrls.length - 1){
-	// 				console.log('last one');
-	// 				return $scope.currentImage = $scope.product.imageUrls[0];
-	// 			}
-	// 			else{
-	// 				console.log('not');
-	// 				return $scope.currentImage = $scope.product.imageUrls[index + 1];	
-	// 			}
-	// 		}			
-	// 	});
-	// };
-	// $scope.previousImage = function(){
-	// 	console.log('previous')
-	// 	$scope.product.imageUrls.forEach(function(imgUrl, index){
-	// 		if($scope.currentImage === imgUrl){
-	// 			if(index === 0)
-	// 				return $scope.currentImage = $scope.product.imageUrls[$scope.product.imageUrls.length - 1];
-	// 			else
-	// 				return $scope.currentImage = $scope.product.imageUrls[index - 1];	
-	// 		};			
-	// 	});
-	// };
+	$scope.currentImage = $scope.product.imageUrls[0];
+	$scope.nextImage = function(){
+		console.log('next');
+		$scope.product.imageUrls.forEach(function(imgUrl, index){
+			if($scope.currentImage === imgUrl){
+				if(index === $scope.product.imageUrls.length - 1){
+					console.log('last one');
+					return $scope.currentImage = $scope.product.imageUrls[0];
+				}
+				else{
+					console.log('not');
+					return $scope.currentImage = $scope.product.imageUrls[index + 1];	
+				}
+			}			
+		});
+	};
+	$scope.previousImage = function(){
+		console.log('previous')
+		$scope.product.imageUrls.forEach(function(imgUrl, index){
+			if($scope.currentImage === imgUrl){
+				if(index === 0)
+					return $scope.currentImage = $scope.product.imageUrls[$scope.product.imageUrls.length - 1];
+				else
+					return $scope.currentImage = $scope.product.imageUrls[index - 1];	
+			};			
+		});
+	};
 
 });
 
