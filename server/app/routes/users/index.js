@@ -81,7 +81,6 @@ router.delete('/:id', function(req, res, next){
     .then(null, next);
 })
 
-/*
 //Router Param
 router.param('id', function(req, res, next, id){
     User.findById(id).exec()
@@ -124,4 +123,3 @@ function isAdmin(user){
 
     return false;
 }
-*/

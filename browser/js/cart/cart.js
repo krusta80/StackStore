@@ -10,7 +10,6 @@ app.config(function($stateProvider){
 			}
 		}
 	});
-
 });
 
 app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams){

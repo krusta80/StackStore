@@ -1,9 +1,45 @@
 
 <div class="container">
+  <div class="row">
+    <div class="col-md-8">
+      <h4 class="header-inline">Shopping Cart</h4>
+    </div>
+    <div class="col-md-2">Price</div>
+    <div class="col-md-2">Quantity</div>
+  </div>
 
-  <h4> Cart </h4>
-  
-  <div class="panel panel-default">  
+  <div class="row"> <!-- ngRepeat goes here-->
+    <div class="col-md-8"> <!-- Items Container -->
+      <div class="row">
+        <div class="col-md-2">Image</div>
+        <div class="col-md-6">Description</div>
+      </div>
+    </div>
+
+    <div class="col-md-2">Item Price</div> <!-- Price -->
+    <div class="col-md-2">Item #</div> <!-- Quantity -->
+  </div>
+
+</div>   
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8">
+      <h4>Checkout</h4>
+
+      <p>Billing Address:</p>
+      <address-form></address-form>
+
+      <p>Shipping Address:</p>
+      <address-form></address-form>
+
+      <!-- Submit Button Goes Here -->
+    </div>
+  </div>
+</div>
+
+
+  <!-- div class="panel panel-default">  
     <div class="list-group list-group-item" ng-repeat="item in cart.lineItems">
       <h4>{{item.prod_id.title}}</h4>
       <p>Qty: {{item.quantity}} (${{item.price}} / each)
@@ -16,8 +52,7 @@
       </p>
       <a href="" ng-click="deleteItem(item.prod_id)"> Remove from Cart </a>
     </div>
-    
-  </div>
+  </div> -->
   
   <div class="well">
     <h4 class="ng-binding"> Order Total: ${{cart.subtotal}} </h4>
