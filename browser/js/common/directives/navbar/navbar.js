@@ -1,4 +1,4 @@
-app.directive('navbar', function ($rootScope, AuthService, OrdersFactory, AUTH_EVENTS, $state) {
+app.directive('navbar', function ($rootScope, AuthService, OrdersFactory, CategoriesFactory, AUTH_EVENTS, $state) {
 
     return {
         restrict: 'E',
@@ -26,6 +26,10 @@ app.directive('navbar', function ($rootScope, AuthService, OrdersFactory, AUTH_E
                    OrdersFactory.reloadCart();
                    $state.go('home');
                 });
+            };
+
+            scope.clearCurrentCategory = function(){
+                return CategoriesFactory.clearCurrentCategory();
             };
 
             var setUser = function () {

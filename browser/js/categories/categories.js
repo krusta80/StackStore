@@ -15,8 +15,6 @@ app.config(function($stateProvider){
 
 app.controller('CategoriesCtrl', function($scope, categories, CategoriesFactory){
 
-	CategoriesFactory.clearCurrentCategory();
-
 	$scope.categories = categories;
 
 	$scope.fetchCurrentCategory = function(){

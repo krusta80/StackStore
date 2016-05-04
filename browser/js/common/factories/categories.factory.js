@@ -19,7 +19,6 @@ app.factory('CategoriesFactory', function($http){
 	};
 
 	CategoriesFactory.clearCurrentCategory = function(){
-		console.log('ihihihi');
 		currentCategory = null;
 	};
 
