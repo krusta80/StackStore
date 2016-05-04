@@ -19,6 +19,8 @@
           <a ui-sref="product({id: item.prod_id._id})">{{item.prod_id.title}}</a>
           <br>
           in <span ng-repeat="category in item.prod_id.categories">{{category.name}}{{$last ? '' : ', '}}</span>
+          <br><br>
+          <a ng-click="deleteItem(item.prod_id)">Delete</a>
         </div>
       </div>
     </div>
