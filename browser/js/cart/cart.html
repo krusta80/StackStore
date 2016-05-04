@@ -1,5 +1,5 @@
 
-<div class="container">
+<div class="container container-cart"> <!-- Header for Items -->
   <div class="row">
     <div class="col-md-8">
       <h4 class="header-inline">Shopping Cart</h4>
@@ -7,37 +7,42 @@
     <div class="col-md-2">Price</div>
     <div class="col-md-2">Quantity</div>
   </div>
+  <hr class="rule">
 
-  <div class="row"> <!-- ngRepeat goes here-->
+  <div class="row" ng-repeat="item in cart.lineItems"> <!-- List of Items-->
     <div class="col-md-8"> <!-- Items Container -->
       <div class="row">
-        <div class="col-md-2">Image</div>
-        <div class="col-md-6">Description</div>
+        <!-- <div class="col-md-2"><img src=""></div> -->
+        <div class="col-md-6">{{item.prod_id.title}}</div>
       </div>
     </div>
 
-    <div class="col-md-2">Item Price</div> <!-- Price -->
-    <div class="col-md-2">Item #</div> <!-- Quantity -->
+    <div class="col-md-2">${{item.price}}</div> <!-- Price -->
+    <div class="col-md-2">{{item.quantity}}</div> <!-- Quantity -->
   </div>
 
 </div>   
 
-<div class="container">
+<div class="container container-checkout"> <!-- Checkout -->
   <div class="row">
     <div class="col-md-8">
-      <h4>Checkout</h4>
-
-      <p>Billing Address:</p>
-      <address-form></address-form>
-
-      <p>Shipping Address:</p>
-      <address-form></address-form>
-
-      <!-- Submit Button Goes Here -->
+      <h4 class="header-inline">Checkout</h4>
     </div>
   </div>
-</div>
+  <hr class="rule">
+  <div class="row">
+    <div class="col-md-6">
+      <p>Billing Address:</p>
+      <address-form></address-form> <!-- Ask if shipping is same -->
+    </div>
+    <div class="col-md-6">
+      <p>Shipping Address:</p>
+      <address-form></address-form>
+    </div>
 
+    <!-- Submit Button here -->
+  </div>
+</div>
 
   <!-- div class="panel panel-default">  
     <div class="list-group list-group-item" ng-repeat="item in cart.lineItems">
