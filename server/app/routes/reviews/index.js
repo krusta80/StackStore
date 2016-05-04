@@ -37,12 +37,21 @@ router.get('/user/:userId', function(req, res, next){
 //delete this route because in product populate will take care of it
 router.post('/', function(req, res, next){
 	var newReview = new Review(req.body);
+	newReview.user = req.user._id;
 	newReview.origId = newReview._id;
 	newReview.save()
 		.then(function(review){
 			res.send(review);
 		})
 		.then(null, next);
+});
+
+router.get('/:id', function(req, res, next){
+	Review.findById(req.params.id)
+		.then(function(review){
+			res.send(review);
+		})
+		.then(null, next);	
 });
 
 router.put('/:id', function(req, res, next){
