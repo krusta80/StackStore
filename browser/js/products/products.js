@@ -55,9 +55,14 @@ app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateP
 });
 
 
-app.controller('ProductCtrl', function($scope, product){
+app.controller('ProductCtrl', function($scope, product, $state, AuthService){
 
 	$scope.product = product;
+	console.log(product);
+	AuthService.getLoggedInUser().then(function(user){
+		$scope.user = user;
+		console.log(user);
+	})
 
 	$scope.getQuantityArray = function(){
 		var quantity = [];
@@ -71,6 +76,13 @@ app.controller('ProductCtrl', function($scope, product){
 		console.log($scope.selectedQuantity);
 	}
 
+	$scope.roundStars = function(stars) {
+		return Math.round(stars*10)/10;
+	};
+
+	$scope.addReview = function() {
+		$state.go('addReviews', {productId: product._id});
+	};
 
 	$scope.currentImage = $scope.product.imageUrls[0];
 	$scope.nextImage = function(){

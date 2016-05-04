@@ -58,8 +58,11 @@ router.put('/:id', function(req, res, next){
 	//not sure using Date.now or Date.now()
 	Review.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now})
 		.then(function(origReview){
+			var origId = req.body._id;
+			delete req.body._id;
+			delete req.body.__v;
 			var newReview = new Review(req.body);
-			newReview.origId = origReview.origId;
+			newReview.origId = origId;
 			return newReview.save();
 		})
 		.then(function(newReview){
