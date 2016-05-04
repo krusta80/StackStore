@@ -48,7 +48,7 @@ var generateRandomCategory = function() {
 var generateRandomProduct = function(categoryIds) {
     return {
         title: faker.commerce.productName(),
-        description: faker.lorem.sentence(),
+        description: faker.lorem.paragraph(),
         imageUrls: [faker.image.imageUrl()+'/?v='+Math.random().toString(36).slice(3,10),
         			faker.image.imageUrl()+'/?v='+Math.random().toString(36).slice(3,10),
         			faker.image.imageUrl()+'/?v='+Math.random().toString(36).slice(3,10)],
@@ -77,7 +77,8 @@ var generateRandomReview = function(productId, userId) {
         user: userId,
         title: faker.company.catchPhrase(),
         stars: Math.ceil(Math.random()*5),
-        description: faker.lorem.sentence()    
+        description: faker.lorem.paragraph(),
+        dateCreated: faker.date.past()
     };
 };
 var seedUsers = function () {

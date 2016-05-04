@@ -16,7 +16,7 @@ router.get('/', function(req, res, next){
 
 //get products that match search query
 router.get('/search/:searchString', function(req, res, next){
-	var findOptions = JSON.parse('{ "title" : { "$regex": \"'+req.params.searchString+'\", "$options": "i"} }');
+	var findOptions = JSON.parse('{ "title" : { "$regex": \"'+req.params.searchString+'\", "$options": "i"}, "dateModified" : {"$exists" : false } }');
 	Product.find(findOptions)
 		.then(function(products){
 			res.send(products);
@@ -67,6 +67,7 @@ router.put('/:id', function(req, res, next){
 			var origId = req.body._id;
 			delete req.body._id;
 			delete req.body.__v;
+			delete req.body.dateCreated;
 
 			req.body.averageStars = 0;
 			req.body.reviews.forEach(function(review) {

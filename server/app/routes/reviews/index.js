@@ -61,6 +61,7 @@ router.put('/:id', function(req, res, next){
 			var origId = req.body._id;
 			delete req.body._id;
 			delete req.body.__v;
+			delete req.body.dateCreated;
 			var newReview = new Review(req.body);
 			newReview.origId = origId;
 			return newReview.save();
