@@ -14,6 +14,16 @@ router.get('/', function(req, res, next){
 		.then(null, next);
 });
 
+//get products that match search query
+router.get('/search/:searchString', function(req, res, next){
+	var findOptions = JSON.parse('{ "title" : { "$regex": \"'+req.params.searchString+'\", "$options": "i"} }');
+	Product.find(findOptions)
+		.then(function(products){
+			res.send(products);
+		})
+		.then(null, next);
+});
+
 //get by category
 router.get('/category/:categoryId', function(req, res, next){
 	Product.find({categories: req.params.categoryId})
