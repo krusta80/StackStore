@@ -49,7 +49,7 @@ app.controller('ReviewsCtrl', function($scope, $stateParams, $state, ProductsFac
 					return ProductsFactory.addReview($scope.product)
 				})
 				.then(function(product){
-					$state.go('product', {id: $scope.product._id})
+					$state.go('product', {id: product._id})
 				})
 				.catch(function(err){
 					console.log(err);
