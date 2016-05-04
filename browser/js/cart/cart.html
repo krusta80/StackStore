@@ -32,11 +32,11 @@
   <hr class="rule">
   <div class="row">
     <div class="col-md-6">
-      <p>Billing Address:</p>
+      <h4>Billing Address:</h4>
       <address-form></address-form> <!-- Ask if shipping is same -->
     </div>
     <div class="col-md-6">
-      <p>Shipping Address:</p>
+      <h4>Shipping Address:</h4>
       <address-form></address-form>
     </div>
 
@@ -60,7 +60,9 @@
   </div> -->
   
   <div class="well">
+    <h4 class="ng-binding"> {{cart.numItems}} Items </h4>
     <h4 class="ng-binding"> Order Total: ${{cart.subtotal}} </h4>
+    <!-- <h4 class="ng-binding">{{cart.total}} {{cart.billingAddress.state}} </h4>-->
   </div>
 
 </div>
