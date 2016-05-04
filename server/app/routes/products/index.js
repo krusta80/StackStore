@@ -67,9 +67,15 @@ router.put('/:id', function(req, res, next){
 			var origId = req.body._id;
 			delete req.body._id;
 			delete req.body.__v;
+
+			req.body.averageStars = 0;
+			req.body.reviews.forEach(function(review) {
+				req.body.averageStars += review.stars;
+			});
+			req.body.averageStars /= req.body.reviews.length;
+
 			var newProduct = new Product(req.body);
 			newProduct.origId = origId;
-			console.log("pre save",newProduct);
 			return newProduct.save();
 		})
 		.then(function(newProduct){

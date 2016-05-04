@@ -6,7 +6,7 @@ app.config(function($stateProvider){
 			templateUrl: 'js/reviews/editOrAdd.html',
 			resolve: {
 				review: function(){
-					return {}
+					return {title: '', description: '', stars: 0}
 				}
 			}
 		})
@@ -39,8 +39,22 @@ app.controller('ReviewsCtrl', function($scope, $stateParams, $state, ProductsFac
 		if($stateParams.reviewId){//This is for editing existing reviews
 			ReviewsFactory.updateReview($scope.review)
 				.then(function(review){
-					$state.go('product', {id: $scope.product._id})
+					var i = 0;
+					for(i = 0; i < $scope.product.reviews.length; i++) {
+						var oldReview = $scope.product.reviews[i];
+						if(oldReview._id === $scope.review._id) {
+							break;
+						}
+					}
+					$scope.product.reviews[i] = review;
+					return ProductsFactory.addReview($scope.product);
 				})
+				.then(function(product){
+					$state.go('product', {id: product._id});
+				})
+				.catch(function(err){
+					console.log(err);
+				});
 		}
 		else{//This is for new reviews
 			ReviewsFactory.submitReview($scope.review)
@@ -56,6 +70,7 @@ app.controller('ReviewsCtrl', function($scope, $stateParams, $state, ProductsFac
 				})
 			}
 	}
+
 	$scope.updateReview = function(stars){
 		$scope.review.stars=stars;
 		console.log($scope.review);
