@@ -6,6 +6,11 @@ app.config(function ($stateProvider) {
         controller: 'SignupCtrl'
     });
 
+    $stateProvider.state('signedUp', {
+        url: '/signedUp',
+        template: '<div class=well><h3>Signup Successful!</h3>Rerouting you to login page...</div>'
+    });
+
 });
 
 app.controller('SignupCtrl', function ($scope, AuthService, $state) {
@@ -13,15 +18,17 @@ app.controller('SignupCtrl', function ($scope, AuthService, $state) {
     $scope.login = {};
     $scope.error = null;
 
-    $scope.sendLogin = function (loginInfo) {
+    $scope.createAccount = function (userInfo) {
 
         $scope.error = null;
 
-        AuthService.login(loginInfo).then(function () {
-            OrdersFactory.reloadCart();
-            $state.go('home');
-        }).catch(function () {
-            $scope.error = 'Invalid login credentials.';
+        AuthService.signup(userInfo).then(function (newUser) {
+            $state.go('signedUp');
+            setTimeout(function() {
+                $state.go('login');
+            },2000);
+        }).catch(function (err) {
+            $scope.error = err.message;
         });
 
     };
