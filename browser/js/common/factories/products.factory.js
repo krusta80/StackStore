@@ -23,6 +23,14 @@ app.factory('ProductsFactory', function($http){
 			})
 	}
 
+	ProductsFactory.searchProducts = function(searchString) {
+		console.log("Searching", searchString);
+		return $http.get('/api/products/search/'+searchString)
+			.then(function(res) {
+				return res.data;
+			});
+	}
+
 	return ProductsFactory;
 
 });

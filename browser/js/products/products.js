@@ -1,5 +1,16 @@
 app.config(function($stateProvider){
 
+	$stateProvider.state('productSearch', {
+		url: '/products/search/:string',
+		controller: 'ProductsByCategoryCtrl',
+		templateUrl: 'js/products/productsByCategory.html',
+		resolve: {
+			products: function($stateParams, ProductsFactory){
+				return ProductsFactory.searchProducts($stateParams.string);
+			}
+		}
+	});
+
 	$stateProvider.state('categories.products', {
 		url: '/:categoryId/products',
 		controller: 'ProductsByCategoryCtrl',

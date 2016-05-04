@@ -8,8 +8,6 @@ app.directive('navbar', function ($rootScope, AuthService, OrdersFactory, AUTH_E
 
             scope.items = [
                 { label: 'Home', state: 'home' },
-                //{ label: 'About', state: 'about' },
-                //{ label: 'Members Only', state: 'membersOnly', auth: true },
                 { label: 'Categories', state: 'categories'}
             ];
 
@@ -42,12 +40,21 @@ app.directive('navbar', function ($rootScope, AuthService, OrdersFactory, AUTH_E
                 scope.cartItems = data;
             };
 
+            scope.productSearch = function() {
+                $state.go('productSearch', {string: scope.searchString});
+            };
+
+            var clearSearch = function() {
+                scope.searchString = '';
+            };
+
             setUser();
 
             $rootScope.$on(AUTH_EVENTS.loginSuccess, setUser);
             $rootScope.$on(AUTH_EVENTS.logoutSuccess, removeUser);
             $rootScope.$on(AUTH_EVENTS.sessionTimeout, removeUser);
             $rootScope.$on('cartUpdate', updateCartItems);
+            $rootScope.$on('clearProductSearch', clearSearch);
         }
 
     };
