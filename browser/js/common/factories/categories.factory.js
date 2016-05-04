@@ -18,6 +18,11 @@ app.factory('CategoriesFactory', function($http){
 		return currentCategory;
 	};
 
+	CategoriesFactory.clearCurrentCategory = function(){
+		console.log('ihihihi');
+		currentCategory = null;
+	};
+
 	return CategoriesFactory;
 
 });
