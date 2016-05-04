@@ -17,7 +17,8 @@
         </div>
         <div class="col-md-6">
           <a ui-sref="product({id: item.prod_id._id})">{{item.prod_id.title}}</a>
-          in <span ng-repeat="category in item.prod_id.categories"> {{category.name}}</span>
+          <br>
+          in <span ng-repeat="category in item.prod_id.categories">{{category.name}}{{$last ? '' : ', '}}</span>
         </div>
       </div>
     </div>
