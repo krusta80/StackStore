@@ -40,7 +40,7 @@ module.exports = function (app) {
 
             //  We merge carts (if applicable)
             var oldCart, updatedCart;
-            Order.findOne({userId: user._id, status: 'Cart'})
+            Order.findOne({userId: user.origId, status: 'Cart'})
             .then(function(_oldCart) {
                 oldCart = _oldCart;
                 if(oldCart && oldCart._id === req.session.cartId)
@@ -61,7 +61,7 @@ module.exports = function (app) {
                             newCart.lineItems.push(oldLineItem);
                     });
                 
-                newCart.userId = user._id;
+                newCart.userId = user.origId;
                 return newCart.save();
             })
             .then(function(_updatedCart) {

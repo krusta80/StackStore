@@ -17,7 +17,7 @@
 	</div> -->
 	<div class="col-md-4" ng-repeat="product in products">
 		<div class="thumbnail">
-			<a ui-sref="product({id: product._id })"><img src="{{product.imageUrls[0]}}"></a>
+			<a ui-sref="product({id: product._id })"><img ng-src="{{scaleDown(product.imageUrls[0])}}"></a>
 			<div class="caption">
 				<a ui-sref="product({id: product._id })">{{ product.title }}</a>
 				<span style="float:right">${{ product.price }}</span>
