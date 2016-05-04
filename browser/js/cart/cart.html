@@ -12,7 +12,7 @@
   <div class="row" ng-repeat="item in cart.lineItems"> <!-- List of Items-->
     <div class="col-md-8"> <!-- Items Container -->
       <div class="row">
-        <!-- <div class="col-md-2"><img src=""></div> -->
+        <div class="col-md-2 thumbnail"><img src="{{item.prod_id.imageUrls[0]}}"></div>
         <div class="col-md-6">{{item.prod_id.title}}</div>
       </div>
     </div>
@@ -61,8 +61,9 @@
   
   <div class="well">
     <h4 class="ng-binding"> {{cart.numItems}} Items </h4>
-    <h4 class="ng-binding"> Order Total: ${{cart.subtotal}} </h4>
-    <!-- <h4 class="ng-binding">{{cart.total}} {{cart.billingAddress.state}} </h4>-->
+    <h4 class="ng-binding"> Subtotal: ${{cart.subtotal}} </h4>
+    <h4 class="ng-binding"> Taxes Owed: ${{cart.total - cart.subtotal}} ({{cart.billingAddress.state}})</h4>
+    <h4 class="ng-binding">Total: {{cart.total}}</h4>
   </div>
 
 </div>

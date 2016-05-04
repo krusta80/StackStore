@@ -63,9 +63,12 @@ schema.virtual('subtotal').get(function(){
 })
 
 schema.virtual('total').get(function(){
-    var state = this.billingAddress.state;
-    var total = this.subtotal + (1 * (getSalesTaxPercent(state) / 100));
-    return total;
+    if(this.billingAddress){
+       var state = this.billingAddress.state; 
+       return this.subtotal + (1 * (getSalesTaxPercent(state) / 100));
+    } 
+
+    return undefined;
 })
 
 schema.virtual('numItems').get(function(){
