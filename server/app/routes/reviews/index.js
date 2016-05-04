@@ -46,6 +46,14 @@ router.post('/', function(req, res, next){
 		.then(null, next);
 });
 
+router.get('/:id', function(req, res, next){
+	Review.findById(req.params.id)
+		.then(function(review){
+			res.send(review);
+		})
+		.then(null, next);	
+});
+
 router.put('/:id', function(req, res, next){
 	//not sure using Date.now or Date.now()
 	Review.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now})

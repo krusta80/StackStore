@@ -1,7 +1,7 @@
 <h3 class="text-center">Products</h3>
 <br>
 <div class="row">
-	<div class="col-md-4" ng-repeat="product in products">
+<!-- 	<div class="col-md-4" ng-repeat="product in products">
 		<div class="panel panel-success">
 			<div class="panel-heading">
 				<h3 class="panel-title"><a ui-sref="product({id: product._id })">{{ product.title }}</a></h3>
@@ -12,6 +12,19 @@
 				<p><b>Category:</b> {{ showCategories(product.categories) }}</p>
 				<p  style="height:50px; overflow-y: scroll"><b>Description:</b> {{ product.description }}</p>
 				<button class="btn btn-info" ng-click="addToCart(product)" ng-disabled="product.inventoryQty === 0">Add to Cart</button>
+			</div>
+		</div>
+	</div> -->
+	<div class="col-md-4" ng-repeat="product in products">
+		<div class="thumbnail">
+			<a ui-sref="product({id: product._id })"><img src="{{product.imageUrls[0]}}"></a>
+			<div class="caption">
+				<a ui-sref="product({id: product._id })">{{ product.title }}</a>
+				<span style="float:right">${{ product.price }}</span>
+				<rating-stars filled-stars="{{ product.averageStars }}" size="XS" display-only="true"></rating-stars>
+				<span>{{ product.reviews.length }} reviews</span>
+				<span style="color:red;float:right" ng-show="product.inventoryQty === 0"><b>Sold Out</b></span>
+				<button style="margin-top:10px" class="btn btn-primary btn-block" ng-click="addToCart(product)" ng-disabled="product.inventoryQty === 0">Add to Cart</button>
 			</div>
 		</div>
 	</div>

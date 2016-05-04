@@ -54,8 +54,11 @@ router.put('/:id', function(req, res, next){
 	//not sure using Date.now or Date.now()
 	Product.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now})
 		.then(function(origProduct){
+			delete req.body._id;
+			delete req.body.__v;
 			var newProduct = new Product(req.body);
 			newProduct.origId = origProduct.origId;
+			console.log("pre save",newProduct);
 			return newProduct.save();
 		})
 		.then(function(newProduct){
