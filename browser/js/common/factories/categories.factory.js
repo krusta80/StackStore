@@ -10,6 +10,13 @@ app.factory('CategoriesFactory', function($http){
 				});
 	};
 
+	// CategoriesFactory.fetchById = function(id){
+	// 	return $http.get('/api/categories/' + id)
+	// 			.then(function(res){
+	// 				return res.data;
+	// 			});
+	// }
+
 	CategoriesFactory.setCurrentCategory = function(categoryId){
 		currentCategory = categoryId;
 	};
