@@ -69,10 +69,6 @@ router.get('/:id', function(req, res, next){
 
 	queryPromise
 	.then(function(order){
-		order.lineItems.forEach(function(iten){
-			console.log("Ordah in the court", order)
-		})
-		
 		res.send(order);
 	})
 	.then(null, next);
