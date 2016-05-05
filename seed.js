@@ -156,9 +156,15 @@ var seedUsers = function () {
 };
 var seedCategories = function(reps){
     console.log("   -Seeding categories")
+    var categoryHash = {};
     var categories = [];
-    for(var i = 0; i < reps; i++)
-        categories.push(generateRandomCategory());
+    for(var i = 0; i < reps; i++) {
+        var thisCategory = generateRandomCategory();
+        while(categoryHash[thisCategory.name])
+            thisCategory = generateRandomCategory();
+        categories.push(thisCategory);
+        categoryHash[thisCategory.name] = true;
+    }
     return Category.create(categories);
 };
 var seedProducts = function(reps, categories){
