@@ -67,17 +67,7 @@ module.exports = function (app) {
             .catch(function(err) {
                 console.log("ERROR:",err);
             });
-        }
-        // else if(req.user) {
-        //     console.log("Retrieving last-known cart for this user.");
-        //     OrderModel.findOne({userId: req.user._id, status: 'Cart'})
-        //     .then(function(cart) {
-        //        req.session.cartId = cart._id;
-        //     })
-        //     .catch(function(err) {
-        //         console.log("ERROR:",err);
-        //     });
-        // }            
+        }          
         next();
     });
 

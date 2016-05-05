@@ -53,7 +53,7 @@ var generateRandomProduct = function(categoryIds) {
         			faker.image.imageUrl()+'/?v='+Math.random().toString(36).slice(3,10),
         			faker.image.imageUrl()+'/?v='+Math.random().toString(36).slice(3,10)],
         categories: categoryIds,
-        price: faker.commerce.price(),
+        price: faker.finance.amount(),
         inventoryQty: Math.floor(Math.random()*100),
         active: faker.random.boolean()
     };
@@ -80,6 +80,40 @@ var generateRandomReview = function(productId, userId) {
         description: faker.lorem.paragraph(),
         dateCreated: faker.date.past()
     };
+};
+var generateRandomOrder = function(user, products, shippingAddress, billingAddress) {
+    var statuses = ['Ordered','Notified','Shipped','Delivered'];
+    var dateFields = statuses.map(function(status) {
+        return 'date'+status;
+    });
+    var index = Math.floor(Math.random()*statuses.length);
+
+    var ret = {
+        userId: user.origId,
+        email: user.email,
+        invoiceNumber: 'INV000'+Math.random().toString(10).slice(3,8),
+        shippingAddress: shippingAddress,
+        billingAddress: billingAddress,
+        status: statuses[index]
+    };
+
+    for(var i = 0; i <= index; i++) {
+        ret[dateFields[i]] = faker.date.past();
+        while(i > 0 && ret[dateFields[i]] < ret[dateFields[i-1]])
+            ret[dateFields[i]] = faker.date.past();
+    }
+
+    var lineItems = [];
+    var lineCount = Math.ceil(Math.random()*5);
+
+    for(var i = 0; i < lineCount; i++) {
+        var product = products[Math.floor(Math.random()*products.length)];
+        var qty = Math.ceil(Math.random()*5);
+        lineItems.push({prod_id: product._id, quantity: qty, price: product.price});
+    }
+    ret.lineItems = lineItems;
+
+    return ret;
 };
 var seedUsers = function () {
    console.log("   -Seeding users")
@@ -155,6 +189,14 @@ var seedAddresses = function(reps, users) {
     return Address.create(addresses);  
 };
 
+var seedOrders = function(reps, addresses, users, products) {
+    console.log("   -Seeding orders")
+    var orders = [];
+    for(var i = 0; i < reps; i++)
+        orders.push(generateRandomOrder(users[Math.floor(Math.random()*users.length)], products, addresses[Math.floor(Math.random()*addresses.length)], addresses[Math.floor(Math.random()*addresses.length)]));
+    return Order.create(orders);      
+};
+
 var addReviewsToProducts = function(products, reviews) {
 	var productHash = {};
 	products.forEach(function(product) {
@@ -177,10 +219,6 @@ var addReviewsToProducts = function(products, reviews) {
 	})
 };
 
-var seedOrders = function(addresses, users, products) {
-    console.log("   -Seeding orders")
-   
-};
 var _users;
 var _products;
 var _categories;
@@ -213,7 +251,7 @@ connectToDb
     })
     .then(function (addresses) {
         _addresses = addresses;
-        return seedOrders(addresses, _users, _products);
+        return seedOrders(100, addresses, _users, _products);
     })
     .then(function (orders) {
         _orders = orders;
