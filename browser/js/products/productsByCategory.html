@@ -1,20 +1,6 @@
 <h3 class="text-center">Products</h3>
 <br>
 <div class="row">
-<!-- 	<div class="col-md-4" ng-repeat="product in products">
-		<div class="panel panel-success">
-			<div class="panel-heading">
-				<h3 class="panel-title"><a ui-sref="product({id: product._id })">{{ product.title }}</a></h3>
-			</div>
-			<div class="panel-body">
-				<p><b>Price:</b> {{ product.price }}</p>
-				<p><b># In Stock:</b> {{ product.inventoryQty }}</p>
-				<p><b>Category:</b> {{ showCategories(product.categories) }}</p>
-				<p  style="height:50px; overflow-y: scroll"><b>Description:</b> {{ product.description }}</p>
-				<button class="btn btn-info" ng-click="addToCart(product)" ng-disabled="product.inventoryQty === 0">Add to Cart</button>
-			</div>
-		</div>
-	</div> -->
 	<div class="col-md-4" dir-paginate="product in products | itemsPerPage: 6">
 		<div class="thumbnail">
 			<a ui-sref="product({id: product._id })"><img hi-res="{{product.imageUrls[0]}}" src="./spacer.png"></a>

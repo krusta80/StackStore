@@ -15,6 +15,7 @@ app.config(function($stateProvider){
 
 app.controller('CategoriesCtrl', function($scope, $rootScope, categories, CategoriesFactory){
 
+
 	$rootScope.$emit('clearProductSearch', true);
 	CategoriesFactory.clearCurrentCategory();
 
