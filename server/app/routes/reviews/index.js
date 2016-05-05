@@ -37,6 +37,7 @@ router.get('/user/:userId', function(req, res, next){
 //delete this route because in product populate will take care of it
 router.post('/', function(req, res, next){
 	var newReview = new Review(req.body);
+	newReview.user = req.user._id;
 	newReview.origId = newReview._id;
 	newReview.save()
 		.then(function(review){
@@ -45,12 +46,24 @@ router.post('/', function(req, res, next){
 		.then(null, next);
 });
 
+router.get('/:id', function(req, res, next){
+	Review.findById(req.params.id)
+		.then(function(review){
+			res.send(review);
+		})
+		.then(null, next);	
+});
+
 router.put('/:id', function(req, res, next){
 	//not sure using Date.now or Date.now()
 	Review.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now})
 		.then(function(origReview){
+			var origId = req.body._id;
+			delete req.body._id;
+			delete req.body.__v;
+			delete req.body.dateCreated;
 			var newReview = new Review(req.body);
-			newReview.origId = origReview.origId;
+			newReview.origId = origId;
 			return newReview.save();
 		})
 		.then(function(newReview){

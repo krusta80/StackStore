@@ -36,7 +36,10 @@ router.post('/', function(req, res, next){
             }
         })
 	})
-	.then(null, next);
+	.catch(function(err) {
+        console.log(err);
+        res.status(500).send(err);
+    });
 })
 
 //To-do: Need to DELETE certain fields and configure access control.

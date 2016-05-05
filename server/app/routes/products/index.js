@@ -14,6 +14,16 @@ router.get('/', function(req, res, next){
 		.then(null, next);
 });
 
+//get products that match search query
+router.get('/search/:searchString', function(req, res, next){
+	var findOptions = JSON.parse('{ "title" : { "$regex": \"'+req.params.searchString+'\", "$options": "i"}, "dateModified" : {"$exists" : false } }');
+	Product.find(findOptions)
+		.then(function(products){
+			res.send(products);
+		})
+		.then(null, next);
+});
+
 //get by category
 router.get('/category/:categoryId', function(req, res, next){
 	Product.find({categories: req.params.categoryId})
@@ -54,8 +64,19 @@ router.put('/:id', function(req, res, next){
 	//not sure using Date.now or Date.now()
 	Product.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now})
 		.then(function(origProduct){
+			var origId = req.body._id;
+			delete req.body._id;
+			delete req.body.__v;
+			delete req.body.dateCreated;
+
+			req.body.averageStars = 0;
+			req.body.reviews.forEach(function(review) {
+				req.body.averageStars += review.stars;
+			});
+			req.body.averageStars /= req.body.reviews.length;
+
 			var newProduct = new Product(req.body);
-			newProduct.origId = origProduct.origId;
+			newProduct.origId = origId;
 			return newProduct.save();
 		})
 		.then(function(newProduct){

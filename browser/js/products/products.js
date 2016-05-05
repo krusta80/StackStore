@@ -1,5 +1,16 @@
 app.config(function($stateProvider){
 
+	$stateProvider.state('productSearch', {
+		url: '/products/search/:string',
+		controller: 'ProductsByCategoryCtrl',
+		templateUrl: 'js/products/productsByCategory.html',
+		resolve: {
+			products: function($stateParams, ProductsFactory){
+				return ProductsFactory.searchProducts($stateParams.string);
+			}
+		}
+	});
+
 	$stateProvider.state('categories.products', {
 		url: '/:categoryId/products',
 		controller: 'ProductsByCategoryCtrl',
@@ -34,6 +45,10 @@ app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateP
 
 	};
 
+	$scope.scaleDown = function(imgUrl) {
+		return imgUrl.replace(/640/, '230').replace(/480/, '172');
+	};
+
 	$scope.showCategories = function(categories){
 		var categoriesName = categories.map(function(category){
 			return category.name;
@@ -44,9 +59,14 @@ app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateP
 });
 
 
-app.controller('ProductCtrl', function($scope, product){
+app.controller('ProductCtrl', function($scope, product, $state, AuthService){
 
 	$scope.product = product;
+	console.log(product);
+	AuthService.getLoggedInUser().then(function(user){
+		$scope.user = user;
+		console.log(user);
+	})
 
 	$scope.getQuantityArray = function(){
 		var quantity = [];
@@ -60,6 +80,13 @@ app.controller('ProductCtrl', function($scope, product){
 		console.log($scope.selectedQuantity);
 	}
 
+	$scope.roundStars = function(stars) {
+		return Math.round(stars*10)/10;
+	};
+
+	$scope.addReview = function() {
+		$state.go('addReviews', {productId: product._id});
+	};
 
 	$scope.currentImage = $scope.product.imageUrls[0];
 	$scope.nextImage = function(){

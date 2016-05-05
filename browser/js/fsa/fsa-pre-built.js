@@ -101,6 +101,35 @@
             });
         };
 
+        this.signup = function(newUser) {
+            var nameParts = newUser.name.split(" ");
+            if(nameParts.length < 2)
+                return $q.reject({message: 'First and last name required.'});
+            if(newUser.password !== newUser.confirm)
+                return $q.reject({message: 'Password and confirmation do not match.'});
+            
+            newUser.firstName = nameParts.shift();
+            newUser.lastName = nameParts.pop();
+            newUser.middleName = nameParts.join(" ");
+            delete newUser.name;
+            delete newUser.confirm;
+            newUser.role = 'User';      //  this needs to be tightened up!
+
+            return $http.post('/api/users', newUser)
+                .then(function(createdUser) {
+                    console.log("New user successfully created...");
+                    return $q.resolve();
+                })
+                .catch(function(res) {
+                    var err = {};
+                    if(res.data.errmsg.indexOf("E11000") === 0)
+                        err.message = "Email already taken!";
+                    else
+                        err.message = res.data.errmsg;
+                    return $q.reject(err);
+                });
+        };
+
     });
 
     app.service('Session', function ($rootScope, AUTH_EVENTS) {

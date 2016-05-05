@@ -39,23 +39,41 @@
 			<button ng-click="addToCart()" class="btn btn-info">+ Add To Cart</button>
 		</div>
 	</div>
-	<hr>
+	<hr style="border-color: #999999">
 	<div>
 		<h2>Product Description</h2>
 		<div class="container">
 			<p>{{ product.description }}</p>
 		</div>
 	</div>
-	<hr>
-	<h2>Customer Reviews</h2>
-	<rating-stars filled-stars="{{ product.averageStars }}" size="SM" display-only="true"></rating-stars>
-	<p>{{ product.averageStars }} out of 5</p>
-	<div class="row container" ng-repeat="review in product.reviews">
-		<rating-stars style="float:left" filled-stars="{{review.stars}}" size="XS" display-only="true"></rating-stars>
-		<h4 style="float:left">{{ review.title }}</h4>
-		<br style="clear:both">
-		<p>By {{ review.user.firstName }} {{review.user.lastName }}<span>{{ review.dateCreated | date:'mm/dd/yyyy' }}</span></p>
-		<p>{{ review.description }}</p>
+	<hr style="border-color: #999999">
+	<h2 style="margin-bottom: 15px">Customer Reviews</h2>
+	<div class="row container" style="margin-bottom: 30px">
+		<div style="float: left">
+			<rating-stars filled-stars="{{ product.averageStars }}" size="SM" display-only="true"></rating-stars>
+			<p style="margin-top: -7px;"> &nbsp;&nbsp;{{ roundStars(product.averageStars) }} out of 5 stars</p>
+		</div>
+		<div style="float: center; margin-top: 20px;" ng-show="user">
+			<button style="margin-left: 100px" ng-click='addReview()'>Write a Customer Review</button>
+		</div>
+	</div>
+	<div class="row container" style="margin-bottom: 15px;" ng-repeat="review in product.reviews">
+		<div style="float:left; margin-top: 4px;">
+			<rating-stars filled-stars="{{review.stars}}" size="XS" display-only="true"></rating-stars>
+		</div>
+		<div style="float: left; margin-top: 0;">
+			<h4 style="float:left; margin-top: 15px;">
+			<a ng-show="user._id === review.user._id" ui-sref="editReviews({productId: product._id, reviewId: review._id})"><u>{{ review.title }}</u></a>
+			<span ng-show="user._id !== review.user._id">{{ review.title }}</span>
+			</h4>
+		</div>
+		<div style="clear: both; float: left; margin-top: -5px;">
+			<p style="margin-top: -5px;""><small>&nbsp;&nbsp;By <a href="#">{{ review.user.firstName }} {{review.user.lastName }}</a><span> &nbsp;&nbsp;{{ review.dateCreated | date:'MM/dd/yyyy' }}</span></p>
+		</div>
+		<div style="clear: both; float: left;">
+			<p style="margin-left: 5px"><big>{{ review.description }}</p>	
+		</div>
+		
 	</div>
 	<hr>
 </div>

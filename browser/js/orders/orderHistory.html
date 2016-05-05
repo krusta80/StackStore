@@ -1,0 +1,48 @@
+<div>
+	<div class="col-md-12">
+		<div class="col-md-6">
+			<h3>Your Past Orders</h3>
+		</div>
+<!-- 	<div> PLACEHOLDER FOR SEARCH FUNCTIONALITY
+			Search Bar
+		</div>
+		<div class="col-md-6">
+			<button type="submit" ng-click="searchOrders()">Submit</button>
+		</div> -->
+	</div>
+	<div ng-repeat= "order in orders" class="col-md-12">
+		<div>
+			<h5>Invoice Number: {{order.invoiceNumber}}</h5><!-- Order Number -->
+		</div>
+		<div>
+			<div class="col-md-3">
+				Order Date: {{order.dateOrdered}}<!-- Date Ordered -->
+			</div>
+			<div class="col-md-3">
+				Order Total: {{order.total}}<!-- Total Order Price -->
+			</div>
+			<div class="col-md-3">
+				Order Status: {{order.status}}<!-- Order Status -->
+			</div>
+			<div class="col-md-3">
+				Ship To: {{order.shippingAddress.address1}}<!-- Ship To Address -->
+			</div>
+		</div>
+		<div ng-repeat= "lineItem in order.lineItems" class="col-md-4">
+			<div class="col-md-6">
+				<img src={{lineItem.prod_id.imageUrls[0]}} class="img-responsive"> <!-- Order Product Image -->
+			</div>
+			<div class="cold-md-6">
+				<div>
+					LineItemTitle: {{lineItem.prod_id.title}}<!-- Order Product Name -->
+				</div>
+				<div>
+					LineItemQty: {{lineItem.quantity}}<!-- Order Product Qty -->
+				</div>
+				<div>
+					LineItemPrice: {{lineItem.price}}<!-- Order Product Price -->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

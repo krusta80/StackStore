@@ -28,6 +28,11 @@ app.directive('ratingStars', function () {
         templateUrl: 'js/common/directives/rating-stars/rating-stars.html',
         link: function(scope) {
         	
+        	scope.ready = false;
+        	scope.isReady = function() {
+        		return scope.ready;
+        	}
+
         	if(!scope.step)
         		scope.step = 1;
         	if(!scope.size)
@@ -42,8 +47,6 @@ app.directive('ratingStars', function () {
         	scope.stars = scope.filledStars;
         	scope.id = 'input-'+Math.random().toString(36).slice(3,10);
 
-        	console.log(scope);
-        	
         	var settings = {
         		showCaption: false,
         		clearButton: '',
@@ -54,9 +57,10 @@ app.directive('ratingStars', function () {
         	};
 
         	setTimeout(function() {
-	        	console.log(this);
-	        	$("#"+scope.id).rating(this);
-        	}.bind(settings), 0);
+	        	//console.log(this);
+	        	$("#"+scope.id).rating(settings);
+	        	scope.ready = true;
+        	}, 0);
         }
     };
 });
