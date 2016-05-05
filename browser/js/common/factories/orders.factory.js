@@ -27,10 +27,6 @@ app.factory('OrdersFactory', function($http, $rootScope){
 				});
 		},
 
-		searchOrders : function(orders){
-			console.log(orders);
-		},
-
 		getCart : function() {
 			return cart;
 		},
