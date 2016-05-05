@@ -73,8 +73,5 @@ app.controller('ReviewsCtrl', function($scope, $stateParams, $state, ProductsFac
 
 	$scope.updateReview = function(stars){
 		$scope.review.stars=stars;
-		console.log($scope.review);
 	}
-	//fetch the product in a resolve
-	//572818ed6954b9627acd9b98/reviews
 });
