@@ -45,6 +45,10 @@ app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateP
 
 	};
 
+	$scope.scaleDown = function(imgUrl) {
+		return imgUrl.replace(/640/, '230').replace(/480/, '172');
+	};
+
 	$scope.showCategories = function(categories){
 		var categoriesName = categories.map(function(category){
 			return category.name;
