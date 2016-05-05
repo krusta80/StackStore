@@ -20,6 +20,17 @@ app.factory('OrdersFactory', function($http, $rootScope){
 				});
 		},
 
+		getOrderHistory : function(userId){
+			return $http.get('/api/orders/myOrders/'+userId)
+				.then(function(res){
+					return res.data;
+				});
+		},
+
+		searchOrders : function(orders){
+			console.log(orders);
+		},
+
 		getCart : function() {
 			return cart;
 		},
