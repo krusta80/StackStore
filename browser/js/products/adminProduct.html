@@ -2,7 +2,7 @@
 
 	<div class="panel panel-info">
 		<div class="panel-heading">
-			<h3 class="panel-title">Edit Basic Info</h3>
+			<h3 class="panel-title">Manage Basic Info</h3>
 		</div>
 		<div class="panel-body">
 			<div class="well well-sm">
@@ -24,7 +24,7 @@
 
 	<div class="panel panel-info">
 		<div class="panel-heading">
-			<h3 class="panel-title">Edit Images</h3>
+			<h3 class="panel-title">Manage Images</h3>
 		</div>
 		<div class="panel-body">
 			<div class="row">
@@ -48,7 +48,20 @@
 		</div>
 	</div>
 
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<h3 class="panel-title">Manage Reviews</h3>
+		</div>
+		<div class="panel-body">
+			<div class="list-group">
+			  <a ui-sref="editReviews({productId: product._id, reviewId: review._id})" ng-repeat="review in product.reviews" class="list-group-item">
+			  	<span class="badge">stars: {{ review.stars }}</span>
+			    <h4 class="list-group-item-heading">{{ review.title }} <small>By {{review.user.firstName}} {{review.user.lastName}}</small></h4>
+			    <p class="list-group-item-text">{{ review.description }}</p>
+			  </a>
+			</div>
+		</div>
+	</div>
 
 </div>
 
-{{product}}
