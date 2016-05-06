@@ -7,7 +7,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="row in rows" ng-click="tableCallback({index: $index})">
+      <tr ng-repeat="row in rows" ng-click="tableCallback({index: row.index})">
         <td ng-repeat="col in cols">{{row[col.key]}}</td>
       </tr>
     </tbody>

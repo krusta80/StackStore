@@ -40,7 +40,12 @@ app.controller('JGController', function($scope){
                 title: fancify(key)
             };
         });
-        $scope.rows = $scope.tableData;
+        
+        $scope.rows = [];
+        for(var i = 0; i < $scope.tableData.length; i++) {
+            $scope.rows[i] = $scope.tableData[i];
+            $scope.rows[i].index = i;
+        };
     }
     
 });
