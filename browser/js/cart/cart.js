@@ -26,6 +26,10 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $
 	    } 
 	 };
 
+	$scope.isEmpty = function(){
+		return $scope.cart.lineItems.length === 0;
+	}
+
 	$scope.addToCart = function(product, qty) {
 		OrdersFactory.addItem(product, qty)
 		.then(function(updatedCart) {
