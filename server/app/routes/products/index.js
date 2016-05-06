@@ -26,7 +26,7 @@ router.get('/search/:searchString', function(req, res, next){
 
 //get by category
 router.get('/category/:categoryId', function(req, res, next){
-	Product.find({categories: req.params.categoryId})
+	Product.find({categories: req.params.categoryId, dateModified: {$exists : false}})
 		.populate('categories')
 		.then(function(products){
 			res.send(products);

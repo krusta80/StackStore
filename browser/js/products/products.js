@@ -36,15 +36,24 @@ app.config(function($stateProvider){
 		}
 	});
 
+	$stateProvider.state('adminProduct', {
+		url: '/admin/product/:id',
+		controller: 'adminProductCtrl',
+		templateUrl: 'js/products/adminProduct.html',
+		resolve: {
+			product: function($stateParams, ProductsFactory){
+				return ProductsFactory.fetchById($stateParams.id);
+			}
+		}
+	});
+
 });
 
-app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateParams, products, user, CategoriesFactory){
+app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $state, $scope, $stateParams, products, user, CategoriesFactory){
 
 	CategoriesFactory.setCurrentCategory($stateParams.categoryId);
 	$scope.products = products;
 	$scope.user = user;
-	console.log(user);
-
 
 	$scope.addToCart = function(product) {
 		OrdersFactory.addToCart(product);
@@ -60,6 +69,10 @@ app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateP
 			return category.name;
 		});
 		return categoriesName.join(', ');
+	};
+
+	$scope.editPage = function(productId){
+		$state.go('adminProduct', {id: productId});
 	};
 
 });
@@ -96,6 +109,16 @@ app.controller('ProductCtrl', function($scope, product, $state, AuthService){
 
 
 
+});
+
+app.controller('adminProductCtrl', function($scope, product){
+	$scope.product = product;
+	$scope.newProduct = {
+		title: product.title,
+		price: product.price,
+		inventoryQty: product.inventoryQty,
+		description: product.description
+	}
 });
 
 

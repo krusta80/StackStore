@@ -1,0 +1,54 @@
+<div class="container">
+
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<h3 class="panel-title">Edit Basic Info</h3>
+		</div>
+		<div class="panel-body">
+			<div class="well well-sm">
+				<label>Title:</label>
+				<input ng-model="newProduct.title" type="text" class="form-control"><br>
+				<label>Price($):</label>
+				<input ng-model="newProduct.price" type="text" class="form-control"><br>
+				<label>Inventory:</label>
+				<input ng-model="newProduct.inventoryQty" type="text" class="form-control"><br>
+				<label>Description:</label>
+				<textarea ng-model="newProduct.description" class="form-control"></textarea><br>
+				<button class="btn btn-success">Save</button>
+				<hr>
+				<button class="btn btn-danger">Delete Product</button>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<h3 class="panel-title">Edit Images</h3>
+		</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-md-10">
+					<input type="text" class="form-control" placeholder="Image Url">
+				</div>
+				<div class="col-md-2">
+					<button type="submit" class="btn btn-primary">Add Image</button>
+				</div>
+			</div><!-- row -->
+			<div style="margin-top:20px" class="row">
+				<div class="col-md-3" ng-repeat="img in product.imageUrls">
+					<div class="thumbnail">
+						<img hi-res="{{img}}" src="./spacer.png">
+						<div class="caption">
+							<button style="margin-top:10px" class="btn btn-danger btn-block">Delete</button>
+						</div>
+					</div>
+				</div>
+			</div><!-- row -->
+		</div>
+	</div>
+
+
+</div>
+
+{{product}}
