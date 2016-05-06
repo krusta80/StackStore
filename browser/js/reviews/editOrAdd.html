@@ -15,7 +15,10 @@
 						    <rating-stars filled-stars="{{review.stars}}" size="SM" updater="updateReview(stars)"></rating-stars> <!-- Stars -->
 					</div>
 					<div style="float:left">
-					<button type="submit" ng-click="submitReview()">Submit</button> <!-- Submit button -->
+						<button type="submit" ng-click="submitReview()" class="btn btn-success">Submit</button> <!-- Submit button -->
+					</div>
+					<div style="float:left">
+						<button type="submit" ng-click="deleteReview()" class="btn btn-danger">Delete</button> <!-- Delete button -->
 					</div>
 				</div>
 				<div class="row">

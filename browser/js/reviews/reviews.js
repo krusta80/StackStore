@@ -47,7 +47,7 @@ app.controller('ReviewsCtrl', function($scope, $stateParams, $state, ProductsFac
 						}
 					}
 					$scope.product.reviews[i] = review;
-					return ProductsFactory.addReview($scope.product);
+					return ProductsFactory.updateProduct($scope.product);
 				})
 				.then(function(product){
 					$state.go('product', {id: product._id});
@@ -60,7 +60,31 @@ app.controller('ReviewsCtrl', function($scope, $stateParams, $state, ProductsFac
 			ReviewsFactory.submitReview($scope.review)
 				.then(function(review){
 					$scope.product.reviews.push(review);
-					return ProductsFactory.addReview($scope.product)
+					return ProductsFactory.updateProduct($scope.product)
+				})
+				.then(function(product){
+					$state.go('product', {id: product._id});
+				})
+				.catch(function(err){
+					console.log(err);
+				})
+			}
+	}
+
+	$scope.deleteReview = function(){
+		if($stateParams.reviewId){
+			ReviewsFactory.deleteReview($scope.review)
+				.then(function(review){
+					var i = 0;
+					for (i = 0; i < $scope.product.reviews.length; i++) {
+						var reviewToDelete = $scope.product.reviews[i];
+						if (reviewToDelete._id === $scope.review._id) {
+							break;
+						}
+					}
+					$scope.product.reviews.splice(i,1);
+					return ProductsFactory.updateProduct($scope.product);
+
 				})
 				.then(function(product){
 					$state.go('product', {id: product._id})
@@ -68,7 +92,7 @@ app.controller('ReviewsCtrl', function($scope, $stateParams, $state, ProductsFac
 				.catch(function(err){
 					console.log(err);
 				})
-			}
+		}
 	}
 
 	$scope.updateReview = function(stars){

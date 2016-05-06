@@ -16,7 +16,7 @@ app.factory('ProductsFactory', function($http){
 				});
 	}
 
-	ProductsFactory.addReview = function(product){
+	ProductsFactory.updateProduct = function(product){
 		return $http.put('/api/products/'+product._id, product)
 			.then(function(res){
 				return res.data;
