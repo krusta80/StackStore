@@ -12,7 +12,9 @@
 	</div>
 	<div ng-repeat= "order in orders" class="col-md-12">
 		<div>
-			<h5>Invoice Number: {{order.invoiceNumber}}</h5><!-- Order Number -->
+			<a ui-sref="orderDetails({id: order._id})">
+				<h5>Invoice Number: {{order.invoiceNumber}}</h5><!-- Order Number -->
+			</a>
 		</div>
 		<div>
 			<div class="col-md-3">
@@ -30,7 +32,7 @@
 		</div>
 		<div ng-repeat= "lineItem in order.lineItems" class="col-md-4">
 			<div class="col-md-6">
-				<img src={{lineItem.prod_id.imageUrls[0]}} class="img-responsive"> <!-- Order Product Image -->
+				<img ng-src={{lineItem.prod_id.imageUrls[0]}} class="img-responsive"> <!-- Order Product Image -->
 			</div>
 			<div class="cold-md-6">
 				<div>
