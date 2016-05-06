@@ -36,9 +36,9 @@
   <div class="container container-cart"> <!-- Header for Items -->
     <div class="row">
       <div class="col-md-3 col-md-offset-8 pricing">
-        <span class="ng-binding">{{cart.numItems}}</span>  items | Subtotal: <h4 class="inline ng-binding">${{cart.subtotal}}</h4><br>
-        <span ng-show="billing.state">Taxes Owed ({{billingAddress.state}}): <h4 class="inline ng-binding">{{calculateTax()}}</h4></span><br>
-        <span ng-show="billing.state">Total: <h4 class="inline ng-binding">${{cart.subtotal + calculateTax()}}</h4></span>
+        <span class="ng-binding">{{order.numItems}}</span>  items | Subtotal: <h4 class="inline ng-binding">${{order.subtotal}}</h4><br>
+        <span ng-show="billingAddress.state">Taxes Owed ({{billingAddress.state}}): <h4 class="inline ng-binding">{{calculateTax()}}</h4></span><br>
+        <span ng-show="billingAddress.state">Total: <h4 class="inline ng-binding">${{order.subtotal + calculateTax()}}</h4></span>
       </div>
     </div>
   </div>

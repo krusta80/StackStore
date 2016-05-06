@@ -27,14 +27,21 @@ app.config(function($stateProvider){
 		});
 });
 
-app.controller('OrderCtrl', function($scope, user, order, billingAddress, shippingAddress){
+app.controller('OrderCtrl', function($scope, user, order, billingAddress, shippingAddress, OrdersFactory){
 
 	$scope.user = user;
 	$scope.order = order;
+	$scope.billingAddress = billingAddress;
+	$scope.shippingAddress = shippingAddress;
 
-	console.log("user", user, "order", order);
-	console.log("billingAddress", billingAddress, 
-		"shippingAddress", shippingAddress);
+	//DUPLICATED CODE - DRY this out
+	$scope.calculateTax = function(){
+		var state = $scope.billingAddress.state;
+		var subtotal = $scope.order.subtotal;
+		if(state){
+			return parseFloat((subtotal * (OrdersFactory.getSalesTaxPercent(state) / 100)).toFixed(2));
+		}
+	}
 
 	//Calculate Tax
 });
