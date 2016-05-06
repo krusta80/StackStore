@@ -33,5 +33,15 @@ app.factory('ReviewsFactory', function($http){
 			});
 	}
 
+	ReviewsFactory.deleteReview = function(review){
+		return $http.delete('/api/reviews/'+review._id)
+			.then(function(res){
+				return res.data;
+			})
+			.catch(function(err){
+				throw(err);
+			});
+	}
+
 	return ReviewsFactory;
 });
