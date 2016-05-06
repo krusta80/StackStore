@@ -7,12 +7,31 @@ module.exports = router;
 
 //Note - Still need to implement access control!
 
+var readWhitelist = {
+    Any: ['firstName', 'middleName', 'lastName', 'email'],
+    User: ['firstName', 'middleName', 'lastName', 'email', 'dateCreated', 'origId', '_id', 'active', 'pendingPasswordReset', 'role'],
+    Admin: ['firstName', 'middleName', 'lastName', 'email', 'dateCreated', 'origId', '_id', 'active', 'pendingPasswordReset', 'role']
+};
+
+var writeWhitelist = {
+    Any: [],
+    User: ['firstName', 'middleName', 'lastName', 'email'],
+    Admin: ['firstName', 'middleName', 'lastName', 'email', 'active', 'pendingPasswordReset', 'role']
+};
+
+
 router.get('/', function (req, res, next) {
-	User.find({dateModified : {$exists : false }})
-	.then(function(users){
-		res.send(users);
-	})
-	.then(null, next);
+    User.find({dateModified : {$exists : false }})
+    .then(function(users){
+        res.send(users);
+    })
+    .then(null, next);
+});
+
+router.get('/fields', function (req, res, next) {
+    if(!req.user)
+        res.send(readWhitelist.Any);
+    res.send(readWhitelist[req.user.role]);
 });
 
 router.get('/:id', function(req, res, next){
