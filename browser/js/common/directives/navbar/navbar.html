@@ -5,14 +5,14 @@
         </div>
         <ul class="nav navbar-nav">
             <li ng-repeat="item in items" ng-show="!item.auth || isLoggedIn()">
-                <a ui-sref-active="active" ui-sref="{{ item.state }}">{{ item.label }}</a>
+                <a ui-sref-active="active" ng-click="clearCurrentCategory()" ui-sref="{{ item.state }}">{{ item.label }}</a>
             </li>
         </ul>
         
         <div class="navbar-right" style="float: right; margin-top: 9.2px; margin-right: 10px">      
             
             <div ng-show="!user" class="btn-group">
-                <button ui-sref="login" class="btn login-button btn-primary">Login</button>
+                <button ui-sref="login" class="btn login-button btn-primary">Login / Signup</button>
             </div>
 
             <div ng-show="user" class="btn-group">
@@ -22,7 +22,7 @@
                 <span class="sr-only">Toggle Dropdown</span>
               </button>
               <ul class="dropdown-menu">
-                <li><a href="#">Order History</a></li>
+                <li><a ui-sref="orderHistory()">Order History</a></li>
                 <li><a href="#">Review History</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="#" ng-click="logout()">Logout</a></li>
@@ -36,8 +36,8 @@
         <!-- <form class="navbar-form">
             <div class="form-group" style="display:inline;"> -->
               <div class="input-group" style="margin-top: 9.2px; padding-right: 10px">
-                <input type="text" class="form-control" placeholder="Search products...">
-                <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+                <input type="text" class="form-control" ng-enter="productSearch()" ng-model="searchString" placeholder="Search products...">
+                <span class="input-group-addon"><a ui-sref="productSearch({string: searchString})"><span class="glyphicon glyphicon-search"></span></a></span>
               </div>
        <!--      </div>
         </form> -->

@@ -17,7 +17,7 @@ var reviewSchema = new mongoose.Schema({
 	},
 	stars: {
 		type: Number,
-		min: [1, 'stars number should not be below 1'],
+		min: [0, 'stars number should not be below 0'],
 		max: [5, 'stars number should not be over 5'],
 		required: true
 	},

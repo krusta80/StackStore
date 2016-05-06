@@ -1,0 +1,30 @@
+<div class="container">
+	<div class="row">
+		<div class="col-md-4">
+			<h3>{{product.title}}</h3> <!-- Retrieve product title -->
+			<br>
+			<img src={{product.imageUrls[0]}} class="img-responsive"><!-- Retrieve product image -->
+		</div>
+		<div class="col-md-8">
+			<form name="reviewForm">
+				<div class="row">
+					<div style="float:left">
+						<input type="text" ng-model="review.title"> <!-- Form to input Title -->
+					</div>
+					<div style="float:left">
+						    <rating-stars filled-stars="{{review.stars}}" size="SM" updater="updateReview(stars)"></rating-stars> <!-- Stars -->
+					</div>
+					<div style="float:left">
+						<button type="submit" ng-click="submitReview()" class="btn btn-success">Submit</button> <!-- Submit button -->
+					</div>
+					<div style="float:left">
+						<button type="submit" ng-click="deleteReview()" class="btn btn-danger">Delete</button> <!-- Delete button -->
+					</div>
+				</div>
+				<div class="row">
+					<textarea rows="20" cols="80" ng-model="review.description"></textarea> <!-- Form to input review description -->
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

@@ -6,7 +6,7 @@ var Category = mongoose.model('Category');
 module.exports = router;
 
 router.get('/', function(req, res, next){
-	Category.find({})
+	Category.find({}).sort('name')
 		.then(function(categories){
 			res.send(categories);
 		})

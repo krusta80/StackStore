@@ -25,6 +25,10 @@ app.factory('CategoriesFactory', function($http){
 		return currentCategory;
 	};
 
+	CategoriesFactory.clearCurrentCategory = function(){
+		currentCategory = null;
+	};
+
 	return CategoriesFactory;
 
 });

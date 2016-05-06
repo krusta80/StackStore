@@ -15,6 +15,19 @@ router.get('/', function (req, res, next) {
 	.then(null, next);
 });
 
+//added by CK on 5/4 to retrieve historical orders
+router.get('/myOrders/:userId', function(req, res, next){
+	Order.find({userId: req.params.userId, status: { $not: /^Cart.*/}})//filters out orders in status "Cart"
+	.populate('lineItems.prod_id')
+	.populate('shippingAddress')
+	.then(function(orders){
+		res.send(orders);
+	})
+	.catch(function(err){
+		console.log("ERR:", err)
+	})
+})
+
 //	added by JAG on 04/25/16 for cart-related stuff
 router.get('/myCart', function(req, res, next){
 	if(!req.session.cartId) {
