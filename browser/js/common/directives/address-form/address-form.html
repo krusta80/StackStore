@@ -24,8 +24,7 @@
   <fieldset class="form-group form-inline">
     <label for="state">State</label>
     <select class="form-control" id="state" ng-model="values.state">
-      <option>NJ</option>
-      <option>NY</option>
+      <option ng-repeat="state in states">{{state}}</option>
     </select>
   </fieldset>
 
