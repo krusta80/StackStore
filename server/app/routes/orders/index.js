@@ -29,9 +29,10 @@ router.get('/myOrders/:userId', function(req, res, next){
 })
 
 //	added by JAG on 04/25/16 for cart-related stuff
+//    added by JAG on 04/25/16 for cart-related stuff
 router.get('/myCart', function(req, res, next){
-	if(!req.session.cartId) {
-		console.log("No cart found for this session...creating one now.");
+    if(!req.session.cartId) {
+        console.log("No cart found for this session...creating one now.");
         Order.create({
             sessionId: req.cookies['connect.sid'],
             status: 'Cart',
@@ -44,18 +45,17 @@ router.get('/myCart', function(req, res, next){
         .catch(function(err) {
             console.log("ERROR:",err);
         });
-	}
-	else {
-		var id = req.session.cartId;
-	
-		console.log("session cart id", id);
-		Order.findById(id)
-		.then(function(order){
-			res.send(order);
-		})
-		.then(null, next);	
-			
-	}
+    }
+    else {
+        var id = req.session.cartId;
+    
+        console.log("session cart id", id);
+        Order.findById(id).populate({path: 'lineItems.prod_id'})
+        .then(function(order){
+            res.send(order);
+        })
+        .then(null, next);    
+    }
 })
 
 router.get('/:id', function(req, res, next){

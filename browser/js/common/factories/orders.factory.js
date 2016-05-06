@@ -21,7 +21,6 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 		},
 
 		getOrder: function(id){
-			console.log("get ordah");
 			return $http.get('/api/orders/' + id)
 			.then(function(res){
 				return res.data;
@@ -40,14 +39,14 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 		},
 
 		populateCart : function() {
-			return $http.get('/api/orders/'+cart._id)
-			.then(function(res) {
-				cart = res.data;
-				$rootScope.$emit('cartUpdate', cart.itemCount);
-				console.log("populated cart:", res.data);
-				return res.data;
-			});
-		},
+            return $http.get('/api/orders/myCart')
+            .then(function(res) {
+                cart = res.data;
+                $rootScope.$emit('cartUpdate', cart.itemCount);
+                console.log("populated cart:", res.data);
+                return res.data;
+            });
+	    },
 		
 		getLineIndex: function(product) {
 			var ret = -1;
@@ -162,6 +161,18 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 					return res.data;
 				})
 			})
+		},
+
+		cancelOrder: function(obj){
+			if(obj.status === 'Ordered'){
+				obj.status = 'Canceled';
+				return $http.put('/api/orders/' + obj.id, obj)
+				.then(function(res){
+					return res.data;
+				})
+			}
+
+			return;
 		}
 	};
 });

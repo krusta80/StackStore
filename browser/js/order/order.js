@@ -27,7 +27,7 @@ app.config(function($stateProvider){
 		});
 });
 
-app.controller('OrderCtrl', function($scope, user, order, billingAddress, shippingAddress, OrdersFactory){
+app.controller('OrderCtrl', function($scope, $state, user, order, billingAddress, shippingAddress, OrdersFactory){
 
 	$scope.user = user;
 	$scope.order = order;
@@ -40,6 +40,12 @@ app.controller('OrderCtrl', function($scope, user, order, billingAddress, shippi
 		var subtotal = $scope.order.subtotal;
 		if(state){
 			return parseFloat((subtotal * (OrdersFactory.getSalesTaxPercent(state) / 100)).toFixed(2));
+		}
+	}
+
+	$scope.cancelOrder = function(){
+		if($scope.order.status === 'Ordered'){
+			OrdersFactory.cancelOrder($scope.order);
 		}
 	}
 
