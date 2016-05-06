@@ -1,7 +1,6 @@
 app.directive('jgTable', function () {
     /**
 		Attributes for this directive:
-		 -- table-name (string)
 		 -- table-title (string)
          -- table-data (array of objects with identical keys)
          -- table-callback (function to be triggered when a row is clicked)
