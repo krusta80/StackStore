@@ -1,32 +1,34 @@
-.header-inline{
-	display: inline;
-}
-
-.rule{
-	margin-top: 5px;
-	margin-bottom: 10px;
-}
-
-.container-checkout{
-	margin-top: 20px;
-}
-
-.thumbnail{
-	width: 100px;
-}
-
-.quantity-input{
-	width: 67px;
-}
-
-.pricing{
-	text-align: right;
-
-	.inline{
+#cart{
+	.header-inline{
 		display: inline;
 	}
-}
 
-h4{
-	margin-bottom: 0;
+	.rule{
+		margin-top: 5px;
+		margin-bottom: 10px;
+	}
+
+	.container-checkout{
+		margin-top: 20px;
+	}
+
+	.thumbnail{
+		width: 100px;
+	}
+
+	.quantity-input{
+		width: 67px;
+	}
+
+	.pricing{
+		text-align: right;
+
+		.inline{
+			display: inline;
+		}
+	}
+
+	h4{
+		margin-bottom: 0;
+	}
 }
