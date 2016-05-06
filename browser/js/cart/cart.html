@@ -16,7 +16,7 @@
           <img ng-src="{{item.prod_id.imageUrls[0]}}">
         </div>
         <div class="col-md-6">
-          <a ui-sref="product({id: item.prod_id._id})">{{item.prod_id.title}}</a>
+          <a ui-sref="product({id: item.prod_id._id})"><b>{{item.prod_id.title}}</b></a>
           <br>
           in <span ng-repeat="category in item.prod_id.categories">{{category.name}}{{$last ? '' : ', '}}</span>
           <br><br>
@@ -27,11 +27,25 @@
 
     <div class="col-md-2">${{item.price}}</div> <!-- Price -->
     <div class="col-md-2">
+      <!-- Todo: Refactor to only call function when value changes (rather than when input loses focus.) -->
       <input ng-blur="setQuantity(item.prod_id, item.quantity)" type="text" class="form-control quantity-input" name="itemQuantity" ng-model="item.quantity"></input>
     </div> <!-- Quantity -->
   </div>
-
+  <hr class="rule">
 </div>   
+
+
+<div class="container container-cart"> <!-- Header for Items -->
+  <div class="row">
+    <div class="col-md-3 col-md-offset-8 pricing">
+      <span class="ng-binding">{{cart.numItems}}</span>  items | Subtotal: <h4 class="inline ng-binding">${{cart.subtotal}}</h4><br>
+      <span ng-show="billing.state">Taxes Owed ({{billing.state}}): <h4 class="inline ng-binding">{{calculateTax()}}</h4></span><br>
+      <span ng-show="billing.state">Total: <h4 class="inline ng-binding">{{cart.subtotal + calculateTax()}}</h4></span>
+      <!-- Taxes Owed: ({{cart.billingAddress.state}}) <h4 class="inline ng-binding">${{cart.total - cart.subtotal}}</h4><br>
+      Total: <h4 class="inline ng-binding">${{cart.total}}</h4> -->
+    </div>
+  </div>
+</div>
 
 <div class="container container-checkout"> <!-- Checkout -->
   <div class="row">
@@ -43,16 +57,27 @@
   <div class="row">
     <div class="col-md-6">
       <h4>Billing Address:</h4>
-      <address-form></address-form> <!-- Ask if shipping is same -->
+      <a>Choose from address book:</a><br><br>
+      <address-form values="billing"></address-form> <!-- Ask if shipping is same -->
     </div>
     <div class="col-md-6">
       <h4>Shipping Address:</h4>
-      <address-form></address-form>
+      <a>Choose from address book:</a><br><br>
+      <address-form values="shipping"></address-form>
     </div>
 
     <!-- Submit Button here -->
+    <div class="row">
+      <div class="col-md-3 col-md-offset-8 pricing">
+        <button type="button" class="btn btn-primary" ng-click="testValues()">Submit</button>
+      </div>
+    </div>
+
   </div>
 </div>
+
+</div>
+
 
   <!-- div class="panel panel-default">  
     <div class="list-group list-group-item" ng-repeat="item in cart.lineItems">
@@ -68,12 +93,3 @@
       <a href="" ng-click="deleteItem(item.prod_id)"> Remove from Cart </a>
     </div>
   </div> -->
-  
-  <div class="well">
-    <h4 class="ng-binding"> {{cart.numItems}} Items </h4>
-    <h4 class="ng-binding"> Subtotal: ${{cart.subtotal}} </h4>
-    <h4 class="ng-binding"> Taxes Owed: ${{cart.total - cart.subtotal}} ({{cart.billingAddress.state}})</h4>
-    <h4 class="ng-binding">Total: {{cart.total}}</h4>
-  </div>
-
-</div>

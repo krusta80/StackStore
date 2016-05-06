@@ -28,7 +28,6 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams){
 
 	//Still have to test in HTML
 	$scope.setQuantity = function(product, qty){
-		console.log("Set the numba mon", product, qty)
 		OrdersFactory.setItemQuantity(product, qty)
 		.then(function(updatedCart){
 			return OrdersFactory.populateCart(updatedCart.id)
@@ -48,5 +47,18 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams){
 		})
 	};
 
+	// Truncate to two decimal places
+	$scope.calculateTax = function(){
+		var state = $scope.billing.state;
+		var subtotal = $scope.cart.subtotal;
+		if(state){
+			return parseFloat((subtotal * (OrdersFactory.getSalesTaxPercent(state) / 100)).toFixed(2));
+		}
+	}
+
+	$scope.testValues = function(){
+		console.log("billing", $scope.billing);
+		console.log("shipping", $scope.shipping)
+	}
 
 });
