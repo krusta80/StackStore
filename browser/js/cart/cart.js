@@ -12,7 +12,7 @@ app.config(function($stateProvider){
 	});
 });
 
-app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams){
+app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $state){
 
 	$scope.cart = cart;
 
@@ -56,9 +56,14 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams){
 		}
 	}
 
-	$scope.testValues = function(){
-		console.log("billing", $scope.billing);
-		console.log("shipping", $scope.shipping)
+	$scope.submitOrder = function(){
+		$scope.billing.userId = cart.userId; $scope.shipping.userId = cart.userId;
+		OrdersFactory.submitOrder(cart.id, $scope.cart, $scope.billing, $scope.shipping)
+		.then(function(updatedCart){
+			//Clear cart after ordering
+			$state.go('home');
+		})
+		
 	}
 
 });

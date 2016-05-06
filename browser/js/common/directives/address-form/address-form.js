@@ -4,7 +4,8 @@ app.directive('addressForm', function ($state) {
         restrict: 'E',
         templateUrl: 'js/common/directives/address-form/address-form.html',
         scope:{
-        	values: "="
+        	values: "=",
+        	checkbox: "="
         }
     };
 

@@ -1,4 +1,4 @@
-app.factory('OrdersFactory', function($http, $rootScope){
+app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 
 	var cart;
 
@@ -126,7 +126,28 @@ app.factory('OrdersFactory', function($http, $rootScope){
 		    }
 
 		    return taxTable[state];
-		 }
+		 },
+
+		submitOrder: function(id, obj, billing, shipping){
+
+			var addresses = {}
+
+			return AddressesFactory.findOrCreate(billing)
+			.then(function(billingAddress){
+				addresses.billing = billingAddress._id;
+				return AddressesFactory.findOrCreate(shipping)
+			})
+			.then(function(shippingAddress){
+				addresses.shipping = shippingAddress._id;
+				obj.shippingAddress = addresses.shipping;
+				obj.billingAddress = addresses.billing;
+				obj.status = "Ordered";
+				return $http.put('/api/orders/' + id, obj)
+				.then(function(res){
+					return res.data;
+				})
+			})
+		}
 	};
 });
 

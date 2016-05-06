@@ -17,11 +17,9 @@ router.get('/:id', function(req, res, next){
 })
 
 router.post('/', function(req, res, next){
-    Address.create(req.body)
-    .then(function(newAddress){
+    Address.findOrCreate(req.body, function(err, newAddress, created){
         res.status(200).send(newAddress);
     })
-    .then(null, next);
 })
 
 
