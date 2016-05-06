@@ -61,8 +61,7 @@ router.post('/', function(req, res, next){
 });
 
 router.put('/:id', function(req, res, next){
-	//not sure using Date.now or Date.now()
-	Product.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now})
+	Product.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
 		.then(function(origProduct){
 			var origId = req.body._id;
 			delete req.body._id;
@@ -86,8 +85,7 @@ router.put('/:id', function(req, res, next){
 });
 
 router.delete('/:id', function(req, res, next){
-	//not sure using Date.now or Date.now()
-	Product.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now}, {new: true})
+	Product.findByIdAndUpdate(req.params.id, {dateModified: Date.now()}, {new: true})
 		.then(function(deletedProduct){
 			res.send(deletedProduct);
 		})
