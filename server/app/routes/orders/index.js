@@ -59,9 +59,26 @@ router.get('/myCart', function(req, res, next){
 })
 
 router.get('/:id', function(req, res, next){
-	var queryPromise = Order.findById(req.params.id).populate('lineItems.prod_id');
+	var queryPromise = Order.findById(req.params.id)
+						.populate({
+							path: 'lineItems.prod_id',
+							model: 'Product',
+							populate: {
+								path: 'categories',
+								model: 'Category'
+							}
+						});
+
 	if(req.user)
-		queryPromise = Order.findOne({userId: req.user._id, status: 'Cart'}).populate('lineItems.prod_id');
+		queryPromise = Order.findOne({userId: req.user._id, status: 'Cart'})
+						.populate({
+							path: 'lineItems.prod_id',
+							model: 'Product',
+							populate: {
+								path: 'categories',
+								model: 'Category'
+							}
+						});
 
 	queryPromise
 	.then(function(order){

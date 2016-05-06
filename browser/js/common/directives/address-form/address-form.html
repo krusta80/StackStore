@@ -1,0 +1,44 @@
+<form>
+  <fieldset class="form-group">
+    <label for="name">Name</label>
+    <input type="text" class="form-control" id="name" ng-model="values.name">
+    <!-- <small class="text-muted">Notes</small> -->
+  </fieldset>
+
+  <fieldset class="form-group">
+    <label for="address1">Address</label>
+    <input type="text" class="form-control" id="address1" ng-model="values.address1">
+  </fieldset>
+  
+  <fieldset class="form-group">
+    <label for="address2">Address - Line 2</label>
+    <input type="text" class="form-control" id="address2" ng-model="values.address2">
+  </fieldset>
+
+  <fieldset class="form-group">
+    <label for="city">City</label>
+    <input type="text" class="form-control" id="city" ng-model="values.city">
+  </fieldset>
+
+  <!-- State -->
+  <fieldset class="form-group form-inline">
+    <label for="state">State</label>
+    <select class="form-control" id="state" ng-model="values.state">
+      <option ng-repeat="state in states">{{state}}</option>
+    </select>
+  </fieldset>
+
+  <fieldset class="form-group form-inline">
+    <label for="zip">Zip</label>
+    <input type="text" class="form-control" id="zip" ng-model="values.zip">
+  </fieldset>
+
+  <fieldset class="form-group" ng-if="values.prompt">
+    <label><input type="checkbox" class="form-control" ng-model="values.check">Same as {{checkbox}} address</label>
+  </fieldset>
+
+
+
+  <!-- Same as ... (Directive Attribute)-->
+</form>
+<br>

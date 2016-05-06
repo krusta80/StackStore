@@ -1,5 +1,6 @@
 'use strict';
 var mongoose = require('mongoose');
+var findOrCreate = require('mongoose-findorcreate');
 
 var schema = new mongoose.Schema({
     label: String,
@@ -58,5 +59,7 @@ schema.pre('save', function (next) {
     
     next();
 });
+
+schema.plugin(findOrCreate);
 
 module.exports = mongoose.model('Address', schema);

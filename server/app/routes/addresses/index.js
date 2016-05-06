@@ -16,12 +16,18 @@ router.get('/:id', function(req, res, next){
     .then(null, next);
 })
 
+router.get('/user/:userId', function(req, res, next){
+    Address.find({userId: req.params.userId})
+        .then(function(addresses){
+            res.send(addresses);
+        })
+        .then(null, next);
+});
+
 router.post('/', function(req, res, next){
-    Address.create(req.body)
-    .then(function(newAddress){
+    Address.findOrCreate(req.body, function(err, newAddress, created){
         res.status(200).send(newAddress);
     })
-    .then(null, next);
 })
 
 

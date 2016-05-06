@@ -63,15 +63,22 @@ schema.virtual('subtotal').get(function(){
 })
 
 schema.virtual('total').get(function(){
-    return this.subtotal;
+    if(this.billingAddress){
+       var state = this.billingAddress.state; 
+       return this.subtotal + (1 * (getSalesTaxPercent(state) / 100));
+    } 
 
-    //Work on - Return value instead of promise/query.
-    var that = this;
-    Address.findById(this.billingAddress, function(err, address){
-        var state = address.state;
-        total = that.subtotal + (1 * (getSalesTaxPercent(state) / 100));
-        return total;
+    return undefined;
+})
+
+schema.virtual('numItems').get(function(){
+    var count = 0;
+
+    this.lineItems.forEach(function(lineItem){
+        count = count + lineItem.quantity;
     })
+
+    return count;
 })
 
 

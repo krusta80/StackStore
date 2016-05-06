@@ -1,26 +1,91 @@
+<div ng-show="isEmpty()">
+  <div class="container">
+  <h2>You have nothing in your cart. Why don't you take a look at some of our <a href="/categories">products</a>?</h2>
+  </div>
+</div>
 
-<div class="container">
-
-  <h4> Cart </h4>
-  
-  <div class="panel panel-default">  
-    <div class="list-group list-group-item" ng-repeat="item in cart.lineItems">
-      <h4>{{item.prod_id.title}}</h4>
-      <p>Qty: {{item.quantity}} (${{item.price}} / each)
-        <button ng-click="addToCart(item.prod_id, 1)" type="button" class="btn btn-default">
-          <span class="glyphicon glyphicon-chevron-up"></span>
-        </button>
-        <button ng-show="item.quantity > 1" ng-click="addToCart(item.prod_id, -1)" type="button" class="btn btn-default">
-          <span class="glyphicon glyphicon-chevron-down"></span>
-        </button>
-      </p>
-      <a href="" ng-click="deleteItem(item.prod_id)"> Remove from Cart </a>
+<div ng-hide="isEmpty()">
+  <div class="container container-cart"> <!-- Header for Items -->
+    <div class="row">
+      <div class="col-md-8">
+        <h4 class="header-inline">Shopping Cart</h4>
+      </div>
+      <div class="col-md-2">Price</div>
+      <div class="col-md-2">Quantity</div>
     </div>
-    
-  </div>
-  
-  <div class="well">
-    <h4 class="ng-binding"> Order Total: ${{cart.subtotal}} </h4>
+    <hr class="rule">
+
+    <div class="row" ng-repeat="item in cart.lineItems"> <!-- List of Items-->
+      <div class="col-md-8"> <!-- Items Container -->
+        <div class="row">
+          <div class="col-md-2 thumbnail">
+            <img ng-src="{{item.prod_id.imageUrls[0]}}">
+          </div>
+          <div class="col-md-6">
+            <a ui-sref="product({id: item.prod_id._id})"><b>{{item.prod_id.title}}</b></a>
+            <br>
+            in <span ng-repeat="category in item.prod_id.categories">{{category.name}}{{$last ? '' : ', '}}</span>
+            <br><br>
+            <a ng-click="deleteItem(item.prod_id)">Delete</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-2">${{item.price}}</div> <!-- Price -->
+      <div class="col-md-2">
+        <!-- Todo: Refactor to only call function when value changes (rather than when input loses focus.) -->
+        <input ng-blur="setQuantity(item.prod_id, item.quantity)" type="text" class="form-control quantity-input" name="itemQuantity" ng-model="item.quantity"></input>
+      </div> <!-- Quantity -->
+    </div>
+    <hr class="rule">
+  </div>   
+
+
+  <div class="container container-cart"> <!-- Header for Items -->
+    <div class="row">
+      <div class="col-md-3 col-md-offset-8 pricing">
+        <span class="ng-binding">{{cart.numItems}}</span>  items | Subtotal: <h4 class="inline ng-binding">${{cart.subtotal}}</h4><br>
+        <span ng-show="billing.state">Taxes Owed ({{billing.state}}): <h4 class="inline ng-binding">{{calculateTax()}}</h4></span><br>
+        <span ng-show="billing.state">Total: <h4 class="inline ng-binding">${{cart.subtotal + calculateTax()}}</h4></span>
+      </div>
+    </div>
   </div>
 
+  <div ng-show="addressBookShown" class="container container-book"> <!-- Address Book -->
+    <div class="row">
+      <div class="col-md-12">
+        <address-book values="addressBookContext" user="cart.userId"></address-book>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="container container-checkout"> <!-- Checkout -->
+    <div class="row">
+      <div class="col-md-8">
+        <h4 class="header-inline">Checkout</h4>
+      </div>
+    </div>
+    <hr class="rule">
+    <div class="row">
+      <div class="col-md-6">
+        <h4>Billing Address:</h4>
+        <a ng-click="toggleAddressBook(billing)">Choose from address book:</a><br><br>
+        <address-form values="billing"></address-form> <!-- Ask if shipping is same -->
+      </div>
+      <div class="col-md-6">
+        <h4>Shipping Address:</h4>
+        <a ng-click="toggleAddressBook(shipping)">Choose from address book:</a><br><br>
+        <address-form values="shipping"></address-form>
+      </div>
+
+      <!-- Submit Button here -->
+      <div class="row">
+        <div class="col-md-3 col-md-offset-8 pricing">
+          <button type="button" class="btn btn-primary" ng-click="submitOrder()">Submit</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
