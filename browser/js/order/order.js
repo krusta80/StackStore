@@ -16,13 +16,7 @@ app.config(function($stateProvider){
 				},
 				order: function(OrdersFactory, $stateParams){
 					console.log("stateParams", $stateParams)
-					return OrdersFactory.getOrder($stateParams.id)
-						.then(function(orders){
-							return orders;
-						})
-						.catch(function(err){
-							console.log("Get History ERR:", err);
-						})
+					return OrdersFactory.getOrder($stateParams.id);
 				}
 			}
 		});

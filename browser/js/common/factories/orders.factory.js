@@ -21,6 +21,7 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 		},
 
 		getOrder: function(id){
+			console.log("get ordah");
 			return $http.get('/api/orders/' + id)
 			.then(function(res){
 				return res.data;
