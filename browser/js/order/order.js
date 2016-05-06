@@ -15,19 +15,26 @@ app.config(function($stateProvider){
 					})
 				},
 				order: function(OrdersFactory, $stateParams){
-					console.log("stateParams", $stateParams)
 					return OrdersFactory.getOrder($stateParams.id);
+				},
+				billingAddress: function(AddressesFactory, order){
+					return AddressesFactory.findById(order.billingAddress);
+				},
+				shippingAddress: function(AddressesFactory, order){
+					return AddressesFactory.findById(order.shippingAddress);
 				}
 			}
 		});
 });
 
-app.controller('OrderCtrl', function($scope, user, order){
+app.controller('OrderCtrl', function($scope, user, order, billingAddress, shippingAddress){
 
 	$scope.user = user;
 	$scope.order = order;
 
 	console.log("user", user, "order", order);
+	console.log("billingAddress", billingAddress, 
+		"shippingAddress", shippingAddress);
 
 	//Calculate Tax
 });
