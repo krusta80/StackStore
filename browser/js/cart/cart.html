@@ -46,7 +46,7 @@
       <div class="col-md-3 col-md-offset-8 pricing">
         <span class="ng-binding">{{cart.numItems}}</span>  items | Subtotal: <h4 class="inline ng-binding">${{cart.subtotal}}</h4><br>
         <span ng-show="billing.state">Taxes Owed ({{billing.state}}): <h4 class="inline ng-binding">{{calculateTax()}}</h4></span><br>
-        <span ng-show="billing.state">Total: <h4 class="inline ng-binding">{{cart.subtotal + calculateTax()}}</h4></span>
+        <span ng-show="billing.state">Total: <h4 class="inline ng-binding">${{cart.subtotal + calculateTax()}}</h4></span>
       </div>
     </div>
   </div>
