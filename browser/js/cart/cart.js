@@ -20,6 +20,10 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $
 	$scope.addressBookShown = false;
 	$scope.toggleAddressBook = function(context) {
 	    $scope.addressBookShown = !$scope.addressBookShown;
+	    if(context !== $scope.addressBookContext){
+	    	$scope.addressBookShown = true;
+	    }
+	    
 	    if($scope.addressBookShown){
 	    	$scope.addressBookContext = context;
 			console.log("context", $scope.addressBookContext);
