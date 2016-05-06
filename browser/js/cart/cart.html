@@ -26,7 +26,9 @@
     </div>
 
     <div class="col-md-2">${{item.price}}</div> <!-- Price -->
-    <div class="col-md-2">{{item.quantity}}</div> <!-- Quantity -->
+    <div class="col-md-2">
+      <input ng-blur="setQuantity(item.prod_id, item.quantity)" type="text" class="form-control" name="itemQuantity" ng-model="item.quantity"></input>
+    </div> <!-- Quantity -->
   </div>
 
 </div>   

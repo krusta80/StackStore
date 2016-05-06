@@ -86,6 +86,23 @@ app.factory('OrdersFactory', function($http, $rootScope){
 			
 		},
 
+		setItemQuantity: function(product, qty){
+			var lineIndex = this.getLineIndex(product);
+			if(qty >= 0){
+				cart.lineItems[lineIndex].quantity = qty;
+				
+				return $http.put('/api/orders/myCart', cart)
+					.then(function(res) {
+						cart = res.data;
+						$rootScope.$emit('cartUpdate', cart.itemCount);
+						return res.data;
+					});
+			}else{
+				console.log("Cannot set quantity below 0.")
+			}
+	
+		},
+
 		removeFromCart : function(product) {
 			var lineIndex = this.getLineIndex(product);
 			cart.lineItems.splice(lineIndex,1);

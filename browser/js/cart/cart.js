@@ -26,6 +26,18 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams){
 		})
 	};
 
+	//Still have to test in HTML
+	$scope.setQuantity = function(product, qty){
+		console.log("Set the numba mon", product, qty)
+		OrdersFactory.setItemQuantity(product, qty)
+		.then(function(updatedCart){
+			return OrdersFactory.populateCart(updatedCart.id)
+		})
+		.then(function(populatedCart){
+			$scope.cart = populatedCart;
+		})
+	}
+
 	$scope.deleteItem = function(product) {
 		OrdersFactory.removeFromCart(product)
 		.then(function(updatedCart) {
@@ -35,5 +47,6 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams){
 			$scope.cart = populatedCart;
 		})
 	};
+
 
 });
