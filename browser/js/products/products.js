@@ -18,6 +18,9 @@ app.config(function($stateProvider){
 		resolve: {
 			products: function($stateParams, ProductsFactory){
 				return ProductsFactory.fetchByCategory($stateParams.categoryId);
+			},
+			user: function(AuthService){
+				return AuthService.getLoggedInUser();
 			}
 		}
 	});
@@ -35,10 +38,13 @@ app.config(function($stateProvider){
 
 });
 
-app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateParams, products, CategoriesFactory){
+app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateParams, products, user, CategoriesFactory){
 
 	CategoriesFactory.setCurrentCategory($stateParams.categoryId);
 	$scope.products = products;
+	$scope.user = user;
+	console.log(user);
+
 
 	$scope.addToCart = function(product) {
 		OrdersFactory.addToCart(product);
@@ -88,33 +94,7 @@ app.controller('ProductCtrl', function($scope, product, $state, AuthService){
 		$state.go('addReviews', {productId: product._id});
 	};
 
-	$scope.currentImage = $scope.product.imageUrls[0];
-	$scope.nextImage = function(){
-		console.log('next');
-		$scope.product.imageUrls.forEach(function(imgUrl, index){
-			if($scope.currentImage === imgUrl){
-				if(index === $scope.product.imageUrls.length - 1){
-					console.log('last one');
-					return $scope.currentImage = $scope.product.imageUrls[0];
-				}
-				else{
-					console.log('not');
-					return $scope.currentImage = $scope.product.imageUrls[index + 1];	
-				}
-			}			
-		});
-	};
-	$scope.previousImage = function(){
-		console.log('previous')
-		$scope.product.imageUrls.forEach(function(imgUrl, index){
-			if($scope.currentImage === imgUrl){
-				if(index === 0)
-					return $scope.currentImage = $scope.product.imageUrls[$scope.product.imageUrls.length - 1];
-				else
-					return $scope.currentImage = $scope.product.imageUrls[index - 1];	
-			};			
-		});
-	};
+
 
 });
 
