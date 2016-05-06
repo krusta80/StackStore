@@ -1,7 +1,8 @@
-<div>
+<h4>Saved Addresses</h4>
+<div class="radio">
     <label class="radio" ng-repeat='address in addresses'>
-          <input type="radio" ng-click=updateValues(address)>
-          {{address.name}}, 
+          <input type="radio" ng-click="updateValues(address)" name="addressPicker">
+          <b>{{address.name}}</b>, 
           {{address.address1}}, 
           {{address.address2}},
           {{address.city}},
@@ -9,4 +10,5 @@
           {{address.zip}}
     </label>
 
+    New addresses are automatically saved for logged in users.
 </div>
