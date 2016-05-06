@@ -15,6 +15,16 @@ app.config(function($stateProvider){
 app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $state){
 
 	$scope.cart = cart;
+	$scope.billing = {}; $scope.shipping = {};
+
+	$scope.addressBookShown = false;
+	$scope.toggleAddressBook = function(context) {
+	    $scope.addressBookShown = !$scope.addressBookShown;
+	    if($scope.addressBookShown){
+	    	$scope.addressBookContext = context;
+			console.log("context", $scope.addressBookContext);
+	    } 
+	 };
 
 	$scope.addToCart = function(product, qty) {
 		OrdersFactory.addItem(product, qty)
@@ -26,7 +36,6 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $
 		})
 	};
 
-	//Still have to test in HTML
 	$scope.setQuantity = function(product, qty){
 		OrdersFactory.setItemQuantity(product, qty)
 		.then(function(updatedCart){

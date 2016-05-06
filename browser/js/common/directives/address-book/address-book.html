@@ -1,0 +1,12 @@
+<div>
+    <label class="radio" ng-repeat='address in addresses'>
+          <input type="radio" ng-click=updateValues(address)>
+          {{address.name}}, 
+          {{address.address1}}, 
+          {{address.address2}},
+          {{address.city}},
+          {{adddress.state}},
+          {{address.zip}}
+    </label>
+
+</div>

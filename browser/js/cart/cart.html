@@ -41,11 +41,18 @@
       <span class="ng-binding">{{cart.numItems}}</span>  items | Subtotal: <h4 class="inline ng-binding">${{cart.subtotal}}</h4><br>
       <span ng-show="billing.state">Taxes Owed ({{billing.state}}): <h4 class="inline ng-binding">{{calculateTax()}}</h4></span><br>
       <span ng-show="billing.state">Total: <h4 class="inline ng-binding">{{cart.subtotal + calculateTax()}}</h4></span>
-      <!-- Taxes Owed: ({{cart.billingAddress.state}}) <h4 class="inline ng-binding">${{cart.total - cart.subtotal}}</h4><br>
-      Total: <h4 class="inline ng-binding">${{cart.total}}</h4> -->
     </div>
   </div>
 </div>
+
+<div ng-show="addressBookShown" class="container container-book"> <!-- Address Book -->
+  <div class="row">
+    <div class="col-md-12">
+      <address-book values="addressBookContext" user="cart.userId"></address-book>
+    </div>
+  </div>
+</div>
+
 
 <div class="container container-checkout"> <!-- Checkout -->
   <div class="row">
@@ -57,12 +64,12 @@
   <div class="row">
     <div class="col-md-6">
       <h4>Billing Address:</h4>
-      <a>Choose from address book:</a><br><br>
+      <a ng-click="toggleAddressBook(billing)">Choose from address book:</a><br><br>
       <address-form values="billing"></address-form> <!-- Ask if shipping is same -->
     </div>
     <div class="col-md-6">
       <h4>Shipping Address:</h4>
-      <a>Choose from address book:</a><br><br>
+      <a ng-click="toggleAddressBook(shipping)">Choose from address book:</a><br><br>
       <address-form values="shipping"></address-form>
     </div>
 
@@ -75,21 +82,4 @@
 
   </div>
 </div>
-
 </div>
-
-
-  <!-- div class="panel panel-default">  
-    <div class="list-group list-group-item" ng-repeat="item in cart.lineItems">
-      <h4>{{item.prod_id.title}}</h4>
-      <p>Qty: {{item.quantity}} (${{item.price}} / each)
-        <button ng-click="addToCart(item.prod_id, 1)" type="button" class="btn btn-default">
-          <span class="glyphicon glyphicon-chevron-up"></span>
-        </button>
-        <button ng-show="item.quantity > 1" ng-click="addToCart(item.prod_id, -1)" type="button" class="btn btn-default">
-          <span class="glyphicon glyphicon-chevron-down"></span>
-        </button>
-      </p>
-      <a href="" ng-click="deleteItem(item.prod_id)"> Remove from Cart </a>
-    </div>
-  </div> -->
