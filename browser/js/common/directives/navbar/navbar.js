@@ -45,7 +45,8 @@ app.directive('navbar', function ($rootScope, AuthService, OrdersFactory, Catego
             };
 
             scope.productSearch = function() {
-                $state.go('productSearch', {string: scope.searchString});
+                //$state.go('productSearch', {string: scope.searchString});
+                $state.go('categories.products', {categoryId: "SEARCH_"+scope.searchString});
             };
 
             var clearSearch = function() {

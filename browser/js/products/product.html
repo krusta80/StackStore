@@ -54,7 +54,7 @@
 			<p style="margin-top: -7px;"> &nbsp;&nbsp;{{ roundStars(product.averageStars) }} out of 5 stars</p>
 		</div>
 		<div style="float: center; margin-top: 20px;" ng-show="user">
-			<button style="margin-left: 100px" ng-click='addReview()'>Write a Customer Review</button>
+			<button class="btn btn-success" style="margin-left: 100px" ng-click='addReview()'>Write a Customer Review</button>
 		</div>
 	</div>
 	<div class="row container" style="margin-bottom: 15px;" ng-repeat="review in product.reviews">
@@ -68,7 +68,7 @@
 			</h4>
 		</div>
 		<div style="clear: both; float: left; margin-top: -5px;">
-			<p style="margin-top: -5px;""><small>&nbsp;&nbsp;By <a href="#">{{ review.user.firstName }} {{review.user.lastName }}</a><span> &nbsp;&nbsp;{{ review.dateCreated | date:'MM/dd/yyyy' }}</span></p>
+			<p style="margin-top: -5px;"><small>&nbsp;&nbsp;By <a href="#">{{ review.user.firstName }} {{review.user.lastName }}</a><span> &nbsp;&nbsp;{{ review.dateCreated | date:'MM/dd/yyyy' }}</span></p>
 		</div>
 		<div style="clear: both; float: left;">
 			<p style="margin-left: 5px"><big>{{ review.description }}</p>	

@@ -13,10 +13,8 @@ app.config(function($stateProvider){
 
 });
 
-app.controller('CategoriesCtrl', function($scope, $rootScope, categories, CategoriesFactory){
+app.controller('CategoriesCtrl', function($scope, categories, CategoriesFactory){
 
-
-	$rootScope.$emit('clearProductSearch', true);
 	CategoriesFactory.clearCurrentCategory();
 
 	$scope.categories = categories;
