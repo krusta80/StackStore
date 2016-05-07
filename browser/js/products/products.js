@@ -18,6 +18,9 @@ app.config(function($stateProvider){
 		resolve: {
 			products: function($stateParams, ProductsFactory){
 				return ProductsFactory.fetchByCategory($stateParams.categoryId);
+			},
+			user: function(AuthService){
+				return AuthService.getLoggedInUser();
 			}
 		}
 	});
@@ -33,12 +36,24 @@ app.config(function($stateProvider){
 		}
 	});
 
+	$stateProvider.state('adminProduct', {
+		url: '/admin/product/:id',
+		controller: 'adminProductCtrl',
+		templateUrl: 'js/products/adminProduct.html',
+		resolve: {
+			product: function($stateParams, ProductsFactory){
+				return ProductsFactory.fetchById($stateParams.id);
+			}
+		}
+	});
+
 });
 
-app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateParams, products, CategoriesFactory){
+app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $state, $scope, $log, $stateParams, products, user, CategoriesFactory, ProductsFactory){
 
 	CategoriesFactory.setCurrentCategory($stateParams.categoryId);
 	$scope.products = products;
+	$scope.user = user;
 
 	$scope.addToCart = function(product) {
 		OrdersFactory.addToCart(product);
@@ -54,6 +69,22 @@ app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $scope, $stateP
 			return category.name;
 		});
 		return categoriesName.join(', ');
+	};
+
+	$scope.editPage = function(productId){
+		$state.go('adminProduct', {id: productId});
+	};
+
+	$scope.delete = function(id){
+		ProductsFactory.deleteProduct(id)
+			.then(function(){
+				return ProductsFactory.fetchByCategory($stateParams.categoryId);
+			})
+			.then(function(products){
+				$scope.products = products;
+				alert('Delete successfully');
+			})
+			.catch($log);
 	};
 
 });
@@ -88,32 +119,58 @@ app.controller('ProductCtrl', function($scope, product, $state, AuthService){
 		$state.go('addReviews', {productId: product._id});
 	};
 
-	$scope.currentImage = $scope.product.imageUrls[0];
-	$scope.nextImage = function(){
-		console.log('next');
-		$scope.product.imageUrls.forEach(function(imgUrl, index){
-			if($scope.currentImage === imgUrl){
-				if(index === $scope.product.imageUrls.length - 1){
-					console.log('last one');
-					return $scope.currentImage = $scope.product.imageUrls[0];
-				}
-				else{
-					console.log('not');
-					return $scope.currentImage = $scope.product.imageUrls[index + 1];	
-				}
-			}			
-		});
+
+
+});
+
+app.controller('adminProductCtrl', function($scope, $log, $state, product, ProductsFactory, CategoriesFactory){
+	$scope.product = product;
+	$scope.newProduct = {
+		title: product.title,
+		price: product.price,
+		inventoryQty: product.inventoryQty,
+		description: product.description,
+		imageUrls: product.imageUrls
 	};
-	$scope.previousImage = function(){
-		console.log('previous')
-		$scope.product.imageUrls.forEach(function(imgUrl, index){
-			if($scope.currentImage === imgUrl){
-				if(index === 0)
-					return $scope.currentImage = $scope.product.imageUrls[$scope.product.imageUrls.length - 1];
-				else
-					return $scope.currentImage = $scope.product.imageUrls[index - 1];	
-			};			
-		});
+
+	$scope.save = function(){
+		
+		for(var key in $scope.newProduct){
+			$scope.product[key] = $scope.newProduct[key];
+		};
+
+		ProductsFactory.updateProduct($scope.product)
+			.then(function(){
+				alert('Save successfully');
+				$state.go('categories.products', {categoryId: CategoriesFactory.fetchCurrentCategory()});
+			})
+			.catch($log);
+	};
+
+	$scope.delete = function(){
+		ProductsFactory.deleteProduct($scope.product._id)
+			.then(function(){
+				alert('Delete successfully');
+				$state.go('categories.products', {categoryId: CategoriesFactory.fetchCurrentCategory()});
+			})
+			.catch($log);
+	};
+
+	$scope.addImage = function(){
+		if($scope.product.imageUrls.indexOf($scope.newImageUrl) !== -1){
+			$scope.newImageUrl = null;
+			return alert('Image already exists');
+		}
+		if($scope.newImageUrl === null){
+			$scope.newImageUrl = null;
+			return alert('Please enter image url');
+		}
+		$scope.newProduct.imageUrls.push($scope.newImageUrl);
+		$scope.newImageUrl = null;
+	};
+
+	$scope.deleteImage = function(imgUrl){
+		$scope.newProduct.imageUrls.splice($scope.product.imageUrls.indexOf(imgUrl), 1);
 	};
 
 });

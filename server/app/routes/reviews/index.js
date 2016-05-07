@@ -77,10 +77,9 @@ router.get('/:id', function(req, res, next){
 });
 
 router.put('/:id', function(req, res, next){
-	//not sure using Date.now or Date.now()
 	req.body.productName = req.body.product.title;
 	req.body.userEmail = req.body.user.email;
-	Review.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now})
+	Review.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
 		.then(function(origReview){
 			var origId = req.body._id;
 			delete req.body._id;
@@ -98,8 +97,7 @@ router.put('/:id', function(req, res, next){
 
 //delete this route because in product populate will take care of it
 router.delete('/:id', function(req, res, next){
-	//not sure using Date.now or Date.now()
-	Review.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now}, {new: true})
+	Review.findByIdAndUpdate(req.params.id, {dateModified: Date.now()}, {new: true})
 		.then(function(deletedReview){
 			res.send(deletedReview);
 		})
