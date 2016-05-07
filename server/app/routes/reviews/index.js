@@ -5,13 +5,33 @@ var Review = mongoose.model('Review');
 
 module.exports = router;
 
+var readWhitelist = {
+    Any: ['product', 'user', 'title', 'stars', 'description', 'dateCreated', 'productName', 'userEmail'],
+    User: ['product', 'user', 'title', 'stars', 'description', 'dateCreated', 'productName', 'userEmail'],
+    Admin: ['productName', 'userEmail', 'product', 'user', 'title', 'stars', 'description', 'dateCreated'],
+};
+
+var writeWhitelist = {
+    Any: [],
+    User: ['product', 'user', 'title', 'stars', 'description', 'productName', 'userEmail'],
+    Admin: ['product', 'user', 'title', 'stars', 'description', 'dateCreated', 'productName', 'userEmail'],
+};
+
+
 //get all reviews, which might be unnecessary
 router.get('/', function(req, res, next){
-	Review.find()
+	Review.find({dateModified : {$exists : false }}).sort({product: 1, user: 1})
 		.then(function(reviews){
 			res.send(reviews);
 		})
 		.then(null, next);
+});
+
+//get fields
+router.get('/fields', function(req, res, next){
+	if(!req.user)
+        res.send(readWhitelist.Any);
+    res.send(readWhitelist[req.user.role]);
 });
 
 //no need to get a specific review
@@ -36,6 +56,8 @@ router.get('/user/:userId', function(req, res, next){
 
 //delete this route because in product populate will take care of it
 router.post('/', function(req, res, next){
+	req.body.productName = req.body.product.title;
+	req.body.userEmail = req.body.user.email;
 	var newReview = new Review(req.body);
 	newReview.user = req.user._id;
 	newReview.origId = newReview._id;
@@ -47,7 +69,7 @@ router.post('/', function(req, res, next){
 });
 
 router.get('/:id', function(req, res, next){
-	Review.findById(req.params.id)
+	Review.findById(req.params.id).populate({path: 'product', path: 'user'})
 		.then(function(review){
 			res.send(review);
 		})
@@ -56,6 +78,8 @@ router.get('/:id', function(req, res, next){
 
 router.put('/:id', function(req, res, next){
 	//not sure using Date.now or Date.now()
+	req.body.productName = req.body.product.title;
+	req.body.userEmail = req.body.user.email;
 	Review.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now})
 		.then(function(origReview){
 			var origId = req.body._id;

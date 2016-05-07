@@ -23,6 +23,16 @@ app.factory('ReviewsFactory', function($http){
 			});
 	}
 
+	ReviewsFactory.fetchAll = function(){
+		return $http.get('/api/reviews')
+			.then(function(res){
+				return res.data;
+			})
+			.catch(function(err){
+				throw(err);
+			});
+	}
+
 	ReviewsFactory.updateReview = function(review){
 		return $http.put('/api/reviews/'+review._id, review)
 			.then(function(res){
@@ -40,6 +50,16 @@ app.factory('ReviewsFactory', function($http){
 			})
 			.catch(function(err){
 				throw(err);
+			});
+	}
+
+	ReviewsFactory.fetchFields = function() {
+		return $http.get('/api/reviews/fields')
+			.then(function(res) {
+				return res.data;
+			})
+			.catch(function(err) {
+				console.log(err);
 			});
 	}
 

@@ -30,6 +30,7 @@
                 <li ng-show="user.role === 'Admin'"> &nbsp;&nbsp;<b>Admin Functions</b></li>
                 <li ng-show="user.role === 'Admin'"role="separator" class="divider"></li>
                 <li ng-show="user.role === 'Admin'"><a ui-sref="userList()">Add/Edit/Remove Users</a></li>
+                <li ng-show="user.role === 'Admin'"><a ui-sref="reviewList()">Add/Edit/Remove Reviews</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="#" ng-click="logout()">Logout</a></li>
               </ul>

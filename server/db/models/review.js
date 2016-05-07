@@ -11,6 +11,12 @@ var reviewSchema = new mongoose.Schema({
 		ref: 'User',
 		required: true
 	},
+	productName: {
+		type: String
+	},
+	userEmail: {
+		type: String
+	},
 	title: {
 		type: String,
 		required: true
