@@ -2,6 +2,7 @@
 var mongoose = require('mongoose');
 var router = require('express').Router();
 var models = require('../../../db/models');
+var authorization = require('../../configure/authorization-middleware.js')
 var User = models.User;
 module.exports = router;
 
@@ -12,7 +13,7 @@ router.get('/fields', function (req, res, next) {
     res.send(readWhitelist[req.user.role]);
 });
 
-router.get('/', isAdmin, function (req, res, next) {
+router.get('/', authorization.isAdmin, function (req, res, next) {
     User.find({dateModified : {$exists : false }})
     .then(function(users){
         res.send(users);
@@ -20,8 +21,7 @@ router.get('/', isAdmin, function (req, res, next) {
     .then(null, next);
 });
 
-router.get('/:id', isAdminOrSelf, function(req, res, next){
-    console.log("\nGET USER BY ID\n")
+router.get('/:id', authorization.isAdminOrSelf, function(req, res, next){
     var id = req.params.id;
     User.findById(id)
     .then(function(user){
@@ -48,7 +48,7 @@ router.post('/', function(req, res, next){
     });
 })
 
-router.put('/:id', isAdminOrSelf, function(req, res, next){
+router.put('/:id', authorization.isAdminOrSelf, function(req, res, next){
     
     //If self, delete certain fields - this isn't free license to edit any field.
 
@@ -79,7 +79,7 @@ router.put('/:id', isAdminOrSelf, function(req, res, next){
     .then(null, next);
 });
 
-router.delete('/:id', isAdmin, isNotSelf, function(req, res, next){
+router.delete('/:id', authorization.isAdmin, authorization.isNotSelf, function(req, res, next){
     User.findByIdAndUpdate(req.params.id, {dateModified: Date.now()}, {new: true})
     .then(function(deletedUser) {
         res.send(deletedUser);
@@ -99,52 +99,7 @@ router.param('id', function(req, res, next, id){
     .then(next, null);
 })
 
-//Access Control
-function isUser(req, res, next){
-    console.log("\n IS USER FUNCTION \n")
 
-    var sessionUser = req.user; //(Admins are considered users as well)
-    if(!sessionUser) res.status(401).send("Error: Not logged in as user"); 
-    else next();
-};
-
-function isAdmin(req, res, next){
-
-    console.log("\n IS ADMIN FUNCTION \n")
-
-    var sessionUser = req.user;
-    if(!sessionUser) res.status(401).send("Error: Not logged in as user");
-    else if(!userIsAdmin(sessionUser)) res.status(401).send("Error: Not an admin");
-    else next();
-};
-
-function isAdminOrSelf(req, res, next){
-
-    console.log("\n IS ADMIN OR SELF FUNCTION \n")
-
-    var sessionUser = req.user;
-    if(!sessionUser) res.status(401).send("Error: Not logged in as user");
-    else if(!userIsAdmin(sessionUser) && !sessionUser.equals(req.requestedUser)) res.status(401).send("Error: Not admin or self");
-    else next();
-}
-
-function isNotSelf(req, res, next){
-
-    console.log("\n NOT SELF FUNCTION \n") 
-
-    var sessionUser = req.user;
-    if(sessionUser.equals(req.requestedUser)) next(res.status(401).send("Error: Cannot take this action on self"));
-    else next();
-}
-
-//Helper
-function userIsAdmin(user){
-    if(user.role === 'Admin'){
-        return true;
-    }
-
-    return false;
-}
 
 //Whitelists
 var readWhitelist = {
