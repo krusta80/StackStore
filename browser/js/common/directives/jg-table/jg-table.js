@@ -22,22 +22,13 @@ app.directive('jgTable', function () {
     };
 });
 
-app.controller('JGController', function($scope){
+app.controller('JGController', function($scope, GitCommitted){
     
-    var fancify = function(field) {
-        //  converts from camel case to english
-        return field
-                // insert a space before all caps
-                .replace(/([A-Z])/g, ' $1')
-                // uppercase the first character
-                .replace(/^./, function(str){ return str.toUpperCase(); })
-    };
-
     if($scope.tableData.length > 0) {
         $scope.cols = Object.keys($scope.tableData[0]).map(function(key) {
             return {
                 key: key,
-                title: fancify(key)
+                title: GitCommitted.fancify(key)
             };
         });
         
