@@ -12,7 +12,7 @@
 				<span style="color:red;float:right" ng-show="product.inventoryQty === 0"><b>Sold Out</b></span>
 				<button style="margin-top:10px" class="btn btn-primary btn-block" ng-click="addToCart(product)" ng-disabled="product.inventoryQty === 0">Add to Cart</button>
 				<button ng-show="user.role==='Admin'" style="margin-top:10px" class="btn btn-warning btn-block" ng-click="editPage(product._id)">Edit</button>
-				<button ng-show="user.role==='Admin'" style="margin-top:10px" class="btn btn-danger btn-block" ng-click="addToCart(product)">Delete</button>
+				<button ng-show="user.role==='Admin'" style="margin-top:10px" class="btn btn-danger btn-block" ng-click="delete(product._id)">Delete</button>
 			</div>
 		</div>
 	</div>

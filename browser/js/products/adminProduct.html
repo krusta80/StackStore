@@ -14,9 +14,6 @@
 				<input ng-model="newProduct.inventoryQty" type="text" class="form-control"><br>
 				<label>Description:</label>
 				<textarea ng-model="newProduct.description" class="form-control"></textarea><br>
-				<button class="btn btn-success">Save</button>
-				<hr>
-				<button class="btn btn-danger">Delete Product</button>
 			</div>
 		</div>
 	</div>
@@ -29,24 +26,29 @@
 		<div class="panel-body">
 			<div class="row">
 				<div class="col-md-10">
-					<input type="text" class="form-control" placeholder="Image Url">
+					<input ng-model="newImageUrl" type="text" class="form-control" placeholder="Image Url">
 				</div>
 				<div class="col-md-2">
-					<button type="submit" class="btn btn-primary">Add Image</button>
+					<button ng-click="addImage()" type="submit" class="btn btn-primary">Add Image</button>
 				</div>
 			</div><!-- row -->
 			<div style="margin-top:20px" class="row">
-				<div class="col-md-3" ng-repeat="img in product.imageUrls">
+				<div class="col-md-3" ng-repeat="img in newProduct.imageUrls">
 					<div class="thumbnail">
 						<img hi-res="{{img}}" src="./spacer.png">
 						<div class="caption">
-							<button style="margin-top:10px" class="btn btn-danger btn-block">Delete</button>
+							<button ng-click="deleteImage(img)" style="margin-top:10px" class="btn btn-danger btn-block">Delete</button>
 						</div>
 					</div>
 				</div>
 			</div><!-- row -->
 		</div>
 	</div>
+
+	<hr>
+	<button ng-click="save()" class="btn btn-success btn-block">Save Changes</button>
+	<button ng-click="delete()" class="btn btn-warning btn-block">Delete Product</button>	
+	<hr>
 
 	<div class="panel panel-info">
 		<div class="panel-heading">

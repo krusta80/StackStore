@@ -49,7 +49,7 @@ app.config(function($stateProvider){
 
 });
 
-app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $state, $scope, $stateParams, products, user, CategoriesFactory){
+app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $state, $scope, $log, $stateParams, products, user, CategoriesFactory, ProductsFactory){
 
 	CategoriesFactory.setCurrentCategory($stateParams.categoryId);
 	$scope.products = products;
@@ -73,6 +73,18 @@ app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $state, $scope,
 
 	$scope.editPage = function(productId){
 		$state.go('adminProduct', {id: productId});
+	};
+
+	$scope.delete = function(id){
+		ProductsFactory.deleteProduct(id)
+			.then(function(){
+				return ProductsFactory.fetchByCategory($stateParams.categoryId);
+			})
+			.then(function(products){
+				$scope.products = products;
+				alert('Delete successfully');
+			})
+			.catch($log);
 	};
 
 });
@@ -111,14 +123,56 @@ app.controller('ProductCtrl', function($scope, product, $state, AuthService){
 
 });
 
-app.controller('adminProductCtrl', function($scope, product){
+app.controller('adminProductCtrl', function($scope, $log, $state, product, ProductsFactory, CategoriesFactory){
 	$scope.product = product;
 	$scope.newProduct = {
 		title: product.title,
 		price: product.price,
 		inventoryQty: product.inventoryQty,
-		description: product.description
-	}
+		description: product.description,
+		imageUrls: product.imageUrls
+	};
+
+	$scope.save = function(){
+		
+		for(var key in $scope.newProduct){
+			$scope.product[key] = $scope.newProduct[key];
+		};
+
+		ProductsFactory.updateProduct($scope.product)
+			.then(function(){
+				alert('Save successfully');
+				$state.go('categories.products', {categoryId: CategoriesFactory.fetchCurrentCategory()});
+			})
+			.catch($log);
+	};
+
+	$scope.delete = function(){
+		ProductsFactory.deleteProduct($scope.product._id)
+			.then(function(){
+				alert('Delete successfully');
+				$state.go('categories.products', {categoryId: CategoriesFactory.fetchCurrentCategory()});
+			})
+			.catch($log);
+	};
+
+	$scope.addImage = function(){
+		if($scope.product.imageUrls.indexOf($scope.newImageUrl) !== -1){
+			$scope.newImageUrl = null;
+			return alert('Image already exists');
+		}
+		if($scope.newImageUrl === null){
+			$scope.newImageUrl = null;
+			return alert('Please enter image url');
+		}
+		$scope.newProduct.imageUrls.push($scope.newImageUrl);
+		$scope.newImageUrl = null;
+	};
+
+	$scope.deleteImage = function(imgUrl){
+		$scope.newProduct.imageUrls.splice($scope.product.imageUrls.indexOf(imgUrl), 1);
+	};
+
 });
 
 

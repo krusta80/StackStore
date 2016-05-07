@@ -5,6 +5,7 @@ app.factory('ProductsFactory', function($http){
 	ProductsFactory.fetchByCategory = function(categoryId){
 		return $http.get('/api/products/category/' + categoryId)
 				.then(function(res){
+					console.log(res.data);
 					return res.data;
 				});
 	}
@@ -29,6 +30,13 @@ app.factory('ProductsFactory', function($http){
 			.then(function(res) {
 				return res.data;
 			});
+	}
+
+	ProductsFactory.deleteProduct = function(id) {
+		return $http.delete('/api/products/' + id)
+				.then(function(res){
+					return res.data;
+				});
 	}
 
 	return ProductsFactory;
