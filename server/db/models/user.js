@@ -95,8 +95,10 @@ var encryptPassword = function (plainText, salt) {
 schema.pre('save', function (next) {
 
     if (this.isModified('password')) {
-        this.salt = this.constructor.generateSalt();
-        this.password = this.constructor.encryptPassword(this.password, this.salt);
+            
+            this.salt = this.constructor.generateSalt();
+            this.password = this.constructor.encryptPassword(this.password, this.salt);    
+        
     }
 
     if(this.isNew){

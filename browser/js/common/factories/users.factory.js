@@ -1,4 +1,4 @@
-app.factory('UsersFactory', function($http){
+app.factory('UsersFactory', function($http, $q){
 
 	var users;
 
@@ -13,6 +13,16 @@ app.factory('UsersFactory', function($http){
 					console.log(err);
 				});
 		},
+		fetchById: function(userId) {
+			return $http.get('/api/users/'+userId)
+				.then(function(res) {
+					console.log(res.data);
+					return res.data;
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+		},
 		fetchFields: function() {
 			return $http.get('/api/users/fields')
 				.then(function(res) {
@@ -21,6 +31,39 @@ app.factory('UsersFactory', function($http){
 				})
 				.catch(function(err) {
 					console.log(err);
+				});
+		},
+		deleteUser: function(userId) {
+			return $http.delete('/api/users/'+userId)
+				.then(function(res) {
+					console.log(res.data);
+					return res.data;
+				})
+				.catch(function(err) {
+					console.log(err);
+					return $q.reject(err);
+				});
+		},
+		updateUser: function(user) {
+			return $http.put('/api/users/'+user._id, user)
+				.then(function(res) {
+					console.log(res.data);
+					return res.data;
+				})
+				.catch(function(err) {
+					console.log(err);
+					return $q.reject(err);
+				});
+		},
+		addUser: function(user) {
+			return $http.post('/api/users', user)
+				.then(function(res) {
+					console.log(res.data);
+					return res.data;
+				})
+				.catch(function(err) {
+					console.log(err);
+					return $q.reject(err);
 				});
 		}
 	};
