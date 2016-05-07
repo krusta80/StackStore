@@ -1,23 +1,23 @@
 <div class="container">
 	<div class="row">
 		<div class="col-md-4">
-			<h3>{{product.title}}</h3> <!-- Retrieve product title -->
+			<a ui-sref='product({id:product._id})'><h2>{{product.title}}</h2></a> <!-- Retrieve product title -->
 			<br>
 			<img src={{product.imageUrls[0]}} class="img-responsive"><!-- Retrieve product image -->
 		</div>
 		<div class="col-md-8">
 			<form name="reviewForm">
 				<div class="row">
-					<div style="float:left">
-						<input type="text" ng-model="review.title"> <!-- Form to input Title -->
+					<div style="float:left; transform:translateY(25%);">
+						<input type="text" ng-model="review.title" style="font-size:20px;"> <!-- Form to input Title -->
 					</div>
-					<div style="float:left">
+					<div style="float:left; padding-left:.5em;">
 						    <rating-stars filled-stars="{{review.stars}}" size="SM" updater="updateReview(stars)"></rating-stars> <!-- Stars -->
 					</div>
-					<div style="float:left">
+					<div style="float:left; transform:translateY(25%); padding-left:.5em;">
 						<button type="submit" ng-click="submitReview()" class="btn btn-success">Submit</button> <!-- Submit button -->
 					</div>
-					<div style="float:left">
+					<div style="float:left; transform:translateY(25%); padding-left:.5em;" ng-hide="{{!review._id}}">
 						<button type="submit" ng-click="deleteReview()" class="btn btn-danger">Delete</button> <!-- Delete button -->
 					</div>
 				</div>
