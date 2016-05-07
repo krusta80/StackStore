@@ -1,26 +1,23 @@
 app.config(function($stateProvider){
 
-	$stateProvider.state('productSearch', {
-		url: '/products/search/:string',
-		controller: 'ProductsByCategoryCtrl',
-		templateUrl: 'js/products/productsByCategory.html',
-		resolve: {
-			products: function($stateParams, ProductsFactory){
-				return ProductsFactory.searchProducts($stateParams.string);
-			}
-		}
-	});
-
 	$stateProvider.state('categories.products', {
 		url: '/:categoryId/products',
 		controller: 'ProductsByCategoryCtrl',
 		templateUrl: 'js/products/productsByCategory.html',
 		resolve: {
 			products: function($stateParams, ProductsFactory){
+				if($stateParams.categoryId.indexOf('SEARCH') === 0)
+					return ProductsFactory.searchProducts($stateParams.categoryId.slice(7));
 				return ProductsFactory.fetchByCategory($stateParams.categoryId);
 			},
 			user: function(AuthService){
 				return AuthService.getLoggedInUser();
+			},
+			searchString: function($stateParams) {
+				if($stateParams.categoryId.indexOf('SEARCH') === 0)
+					return $stateParams.categoryId.slice(7);
+				else
+					return null;
 			}
 		}
 	});
@@ -49,15 +46,16 @@ app.config(function($stateProvider){
 
 });
 
-app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $state, $scope, $log, $stateParams, products, user, CategoriesFactory, ProductsFactory){
+app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $state, $scope, $log, $stateParams, products, user, CategoriesFactory, ProductsFactory, searchString, $rootScope){
 
+	$rootScope.$emit('clearProductSearch', true);
 	CategoriesFactory.setCurrentCategory($stateParams.categoryId);
 	$scope.products = products;
 	$scope.user = user;
+	$scope.searchString = searchString;
 
 	$scope.addToCart = function(product) {
 		OrdersFactory.addToCart(product);
-
 	};
 
 	$scope.scaleDown = function(imgUrl) {
