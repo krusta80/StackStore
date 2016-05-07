@@ -7,19 +7,6 @@ module.exports = router;
 
 //Note - Still need to implement access control!
 
-var readWhitelist = {
-    Any: ['firstName', 'middleName', 'lastName', 'email'],
-    User: ['firstName', 'middleName', 'lastName', 'email', 'dateCreated', 'origId', '_id', 'active', 'pendingPasswordReset', 'role'],
-    Admin: ['firstName', 'middleName', 'lastName', 'email', 'password', 'dateCreated', 'origId', '_id', 'active', 'pendingPasswordReset', 'role']
-};
-
-var writeWhitelist = {
-    Any: [],
-    User: ['firstName', 'middleName', 'lastName', 'email'],
-    Admin: ['firstName', 'middleName', 'lastName', 'email', 'password', 'active', 'pendingPasswordReset', 'role']
-};
-
-
 router.get('/', function (req, res, next) {
     User.find({dateModified : {$exists : false }})
     .then(function(users){
@@ -116,33 +103,45 @@ router.param('id', function(req, res, next, id){
 })
 
 //Access Control
-function isUser(){
-    var sessionUser = req.session.passport.user;
-    if(!sessionUser) next(res.status(401).send());
+function isUser(req, res, next){
+    var sessionUser = req.user; //(Admins are considered users as well)
+    if(!sessionUser) next(res.status(401).send("Error: Not logged in as user")); 
     else next();
 };
 
-function isAdmin(){
-    var sessionUser = req.session.passport.user;
-
-    if(!sessionUser) next(res.status(401).send());
-    else if(!isAdmin(sessionUser)) next(res.status(401).send());
+function isAdmin(req, res, next){
+    var sessionUser = req.user;
+    if(!sessionUser) next(res.status(401).send("Error: Not logged in as user"));
+    else if(!userIsAdmin(sessionUser)) next(res.status(401).send("Error: Not an admin"));
     else next();
 };
 
 function isAdminOrSelf(req, res, next){
-    var sessionUser = req.session.passport.user;
+    var sessionUser = req.user;
 
-    if(!sessionUser) next(res.status(401).send());
-    else if(!isAdmin(sessionUser) && !sessionUser.equals(req.requestedUser)) next(res.status(401).send());
+    if(!sessionUser) next(res.status(401).send("Error: Not logged in as user"));
+    else if(!userIsAdmin(sessionUser) && !sessionUser.equals(req.requestedUser)) next(res.status(401).send("Error: Not admin or self"));
     else next();
 }
 
 //Helper
-function isAdmin(user){
-    if(user.role.toLowerCase() === 'admin'){
+function userIsAdmin(user){
+    if(user.role === 'Admin'){
         return true;
     }
 
     return false;
 }
+
+//Whitelists
+var readWhitelist = {
+    Any: ['firstName', 'middleName', 'lastName', 'email'],
+    User: ['firstName', 'middleName', 'lastName', 'email', 'dateCreated', 'origId', '_id', 'active', 'pendingPasswordReset', 'role'],
+    Admin: ['firstName', 'middleName', 'lastName', 'email', 'password', 'dateCreated', 'origId', '_id', 'active', 'pendingPasswordReset', 'role']
+};
+
+var writeWhitelist = {
+    Any: [],
+    User: ['firstName', 'middleName', 'lastName', 'email'],
+    Admin: ['firstName', 'middleName', 'lastName', 'email', 'password', 'active', 'pendingPasswordReset', 'role']
+};
