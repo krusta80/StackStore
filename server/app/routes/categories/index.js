@@ -56,6 +56,15 @@ router.get('/:id', function(req, res, next){
 		.then(null, next);
 });
 
+router.get('/:origId/history', function(req, res, next){
+	var origId = req.params.origId;
+	Category.find({origId: origId}).sort('dateCreated')
+		.then(function(history){
+			res.send(history);
+		})
+		.then(null, next);
+});
+
 router.post('/', function(req, res, next){
 	var newCategory = new Category(req.body);
 	newCategory.origId = newCategory._id;

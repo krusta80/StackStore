@@ -18,6 +18,8 @@
             <div align=center>
                 <button ng-click="addUpdateCategory()" class="btn btn-default btn-success" style="width: 50%"><b>Add / Update Category</b></button>
                 <button ng-click="deleteCategory()" class="btn btn-default btn-danger" style="width: 50%; margin-top: 10px"><b>Delete Category</b></button>
+                <hr>
+                <button ng-show="category._id" ng-click="getHist()" class="btn btn-default btn-primary" style="width: 50%; margin-top: 10px"><b>View History</b></button>
             </div>
         </form>
     </div>

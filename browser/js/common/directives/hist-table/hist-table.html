@@ -1,0 +1,23 @@
+<div st-table="rows" class="col-md-10">
+  <h2>{{tableTitle}}</h2>
+  <input st-search st-delay="0" placeholder="Search all fields..." class="input-sm form-control" type="search"/>
+  <table class="table table-hover table-bordered table-striped">
+    <thead class="thead-inverse">
+      <tr>
+        <th st-sort="col.key" nowrap ng-repeat="col in cols">{{col.title}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="row in rows" ng-click="tableCallback({index: row.index})">
+        <td ng-repeat="col in cols">{{row[col.key]}}</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="5" class="text-center">
+          <div st-pagination="" st-items-by-page="10" st-displayed-pages="7"></div>
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
