@@ -2,6 +2,7 @@
 var router = require('express').Router();
 var mongoose = require('mongoose');
 var Category = mongoose.model('Category');
+var authorization = require('../../configure/authorization-middleware.js')
 
 module.exports = router;
 
@@ -22,7 +23,7 @@ router.get('/:id', function(req, res, next){
 		.then(null, next);
 });
 
-router.post('/', function(req, res, next){
+router.post('/', authorization.isAdmin, function(req, res, next){
 	var newCategory = new Category(req.body);
 	newCategory.origId = newCategory._id;
 	newCategory.save()
@@ -32,7 +33,7 @@ router.post('/', function(req, res, next){
 		.then(null, next);
 });
 
-router.put('/:id', function(req, res, next){
+router.put('/:id', authorization.isAdmin, function(req, res, next){
 	//not sure using Date.now or Date.now()
 	Category.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now})
 		.then(function(origCategory){
@@ -47,7 +48,7 @@ router.put('/:id', function(req, res, next){
 });
 
 
-router.delete('/:id', function(req, res, next){
+router.delete('/:id', authorization.isAdmin, function(req, res, next){
 	//not sure using Date.now or Date.now()
 	Category.findByIdAndUpdate(req.params.id, {modifiedDate: Date.now}, {new: true})
 		.then(function(deletedCategory){
