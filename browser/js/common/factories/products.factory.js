@@ -17,8 +17,29 @@ app.factory('ProductsFactory', function($http){
 				});
 	}
 
+	ProductsFactory.fetchAll = function(){
+		return $http.get('/api/products')
+				.then(function(res){
+					return res.data;
+				});
+	}
+
+	ProductsFactory.fetchFields = function(){
+		return $http.get('/api/products/fields')
+				.then(function(res){
+					return res.data;
+				});
+	}
+
 	ProductsFactory.updateProduct = function(product){
 		return $http.put('/api/products/'+product._id, product)
+			.then(function(res){
+				return res.data;
+			})
+	}
+
+	ProductsFactory.createProduct = function(product){
+		return $http.post('/api/products', product)
 			.then(function(res){
 				return res.data;
 			})

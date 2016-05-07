@@ -5,13 +5,32 @@ var Product = mongoose.model('Product');
 
 module.exports = router;
 
+var readWhitelist = {
+	Any: ['title', 'description', 'imageUrls', 'reviews', 'averageStars', 'categories', 'reviews', 'price', 'inventoryQty', '_id'],
+	User: ['title', 'description', 'imageUrls', 'reviews', 'averageStars', 'categories', 'reviews', 'price', 'inventoryQty', '_id'],
+	Admin: ['title', 'description', 'imageUrls', 'reviews', 'averageStars', 'categories', 'reviews', 'price', 'inventoryQty', 'active', 'origId', '_id', 'dateCreated', 'dateModified']
+};
+
+var writeWhitelist = {
+	Any: [],
+	User: [],
+	Admin: ['title', 'description', 'imageUrls', 'reviews', 'averageStars', 'categories', 'reviews', 'price', 'inventoryQty', 'active']
+};
+
 //get all products, which might be unnecessary
 router.get('/', function(req, res, next){
-	Product.find()
+	Product.find({dateModified : {$exists : false }}).sort({title: 1, price: 1})
 		.then(function(products){
 			res.send(products);
 		})
 		.then(null, next);
+});
+
+//get fields
+router.get('/fields', function(req, res, next){
+	if(!req.user)
+        res.send(readWhitelist.Any);
+    res.send(readWhitelist[req.user.role]);
 });
 
 //get products that match search query
