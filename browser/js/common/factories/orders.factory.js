@@ -20,6 +20,20 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 				});
 		},
 
+		fetchAll: function() {
+			return $http.get('/api/orders')
+			.then(function(res){
+				return res.data;
+			})
+		},
+
+		fetchFields: function() {
+			return $http.get('/api/orders/fields')
+			.then(function(res){
+				return res.data;
+			})
+		},
+
 		getOrder: function(id){
 			return $http.get('/api/orders/' + id)
 			.then(function(res){
