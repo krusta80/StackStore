@@ -39,7 +39,9 @@ app.config(function($stateProvider){
 		templateUrl: 'js/products/adminProduct.html',
 		resolve: {
 			product: function($stateParams, ProductsFactory){
-				return ProductsFactory.fetchById($stateParams.id);
+				if($stateParams.id !== 'NEW')
+					return ProductsFactory.fetchById($stateParams.id);
+				return {};
 			}
 		}
 	});
@@ -121,7 +123,7 @@ app.controller('ProductCtrl', function($scope, product, $state, AuthService){
 
 });
 
-app.controller('adminProductCtrl', function($scope, $log, $state, product, ProductsFactory, CategoriesFactory){
+app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, product, ProductsFactory, CategoriesFactory){
 	$scope.product = product;
 	$scope.newProduct = {
 		title: product.title,
@@ -137,18 +139,32 @@ app.controller('adminProductCtrl', function($scope, $log, $state, product, Produ
 			$scope.product[key] = $scope.newProduct[key];
 		};
 
-		ProductsFactory.updateProduct($scope.product)
-			.then(function(){
-				alert('Save successfully');
-				$state.go('categories.products', {categoryId: CategoriesFactory.fetchCurrentCategory()});
-			})
-			.catch($log);
+		if(product._id)
+			ProductsFactory.updateProduct($scope.product)
+				.then(function(){
+					alert('Save successfully');
+					if($rootScope.previousState.name === 'productList')
+						return $state.go($rootScope.previousState);
+					$state.go('categories.products', {categoryId: CategoriesFactory.fetchCurrentCategory()});
+				})
+				.catch($log);
+		else
+			ProductsFactory.createProduct($scope.product)
+				.then(function(){
+					alert('Created successfully');
+					if($rootScope.previousState.name === 'productList')
+						return $state.go($rootScope.previousState);
+					$state.go('categories.products', {categoryId: CategoriesFactory.fetchCurrentCategory()});
+				})
+				.catch($log);
 	};
 
 	$scope.delete = function(){
 		ProductsFactory.deleteProduct($scope.product._id)
 			.then(function(){
 				alert('Delete successfully');
+				if($rootScope.previousState.name === 'productList')
+					return $state.go($rootScope.previousState);
 				$state.go('categories.products', {categoryId: CategoriesFactory.fetchCurrentCategory()});
 			})
 			.catch($log);
