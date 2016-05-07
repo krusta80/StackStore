@@ -13,13 +13,25 @@ router.param('id', function(req, res, next, id){
     .then(function(address){
         if(!address) res.status(404).send();
         req.requestedObject = address;
-        next();
+        if(address.userId){
+            console.log("\n\n Has one")
+            User.findById(address.userId)
+            .then(function(user){
+                console.log("\n\nThe user", user)
+                if(!user) res.status(404).send();
+                req.requestedUser = user;
+                next();
+            })
+        }else{
+            next();
+        }
+
+        
     })
     .then(next, null);
 })
 
 router.param('userId', function(req, res, next, id){
-    console.log("HELLO THERE")
     User.findById(id).exec()
     .then(function(user){
         if(!user) res.status(404).send();
@@ -55,7 +67,7 @@ router.post('/', function(req, res, next){
 
 
 //To-do: Need to DELETE certain fields and configure access control.
-router.put('/:id', authorization.isAdminOrSelf, function(req, res, next){
+router.put('/:id', authorization.isAdminOrOwner, function(req, res, next){
     Address.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
     .then(function(originalAddress){
         var newAddress = {};
@@ -81,7 +93,7 @@ router.put('/:id', authorization.isAdminOrSelf, function(req, res, next){
     .then(null, next);
 });
 
-router.delete('/:id', authorization.isAdminOrSelf, function(req, res, next){
+router.delete('/:id', authorization.isAdminOrOwner, function(req, res, next){
     Address.findByIdAndUpdate(req.params.id, {dateModified: Date.now()}, {new: true})
     .then(function(deletedAddress) {
         res.send(deletedAddress);
