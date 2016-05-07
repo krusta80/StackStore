@@ -6,13 +6,19 @@ var authorization = require('../../configure/authorization-middleware.js')
 var User = models.User;
 module.exports = router;
 
-//Resource for admin pages
-router.get('/fields', function (req, res, next) {
-    if(!req.user)
-        res.send(readWhitelist.Any);
-    res.send(readWhitelist[req.user.role]);
-});
+//Req Params
+router.param('id', function(req, res, next, id){
 
+    User.findById(id).exec()
+    .then(function(user){
+        if(!user) res.status(404).send();
+        req.requestedUser = user;
+        next();
+    })
+    .then(next, null);
+})
+
+//Route Handlers
 router.get('/', authorization.isAdmin, function (req, res, next) {
     User.find({dateModified : {$exists : false }})
     .then(function(users){
@@ -87,19 +93,12 @@ router.delete('/:id', authorization.isAdmin, authorization.isNotSelf, function(r
     .then(null, next);
 })
 
-//Router Param
-router.param('id', function(req, res, next, id){
-
-    User.findById(id).exec()
-    .then(function(user){
-        if(!user) res.status(404).send();
-        req.requestedUser = user;
-        next();
-    })
-    .then(next, null);
-})
-
-
+//(This route is used in admin pages)
+router.get('/fields', function (req, res, next) {
+    if(!req.user)
+        res.send(readWhitelist.Any);
+    res.send(readWhitelist[req.user.role]);
+});
 
 //Whitelists
 var readWhitelist = {

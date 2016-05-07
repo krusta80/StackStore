@@ -2,12 +2,35 @@
 var mongoose = require('mongoose');
 var router = require('express').Router();
 var models = require('../../../db/models');
+var authorization = require('../../configure/authorization-middleware.js')
 var Address = models.Address;
+var User = models.User;
 module.exports = router;
 
-//Note - Still need to implement access control!
+//Req Params
+router.param('id', function(req, res, next, id){
+    Address.findById(id).exec()
+    .then(function(address){
+        if(!address) res.status(404).send();
+        req.requestedObject = address;
+        next();
+    })
+    .then(next, null);
+})
 
-router.get('/:id', function(req, res, next){
+router.param('userId', function(req, res, next, id){
+    console.log("HELLO THERE")
+    User.findById(id).exec()
+    .then(function(user){
+        if(!user) res.status(404).send();
+        req.requestedUser = user;
+        next();
+    })
+    .then(next, null);
+})
+
+//Route Handlers
+router.get('/:id', authorization.isAdminOrOwner, function(req, res, next){
     var id = req.params.id;
     Address.findById(id)
     .then(function(address){
@@ -16,7 +39,7 @@ router.get('/:id', function(req, res, next){
     .then(null, next);
 })
 
-router.get('/user/:userId', function(req, res, next){
+router.get('/user/:userId', authorization.isAdminOrSelf, function(req, res, next){
     Address.find({userId: req.params.userId})
         .then(function(addresses){
             res.send(addresses);
@@ -32,7 +55,7 @@ router.post('/', function(req, res, next){
 
 
 //To-do: Need to DELETE certain fields and configure access control.
-router.put('/:id', function(req, res, next){
+router.put('/:id', authorization.isAdminOrSelf, function(req, res, next){
     Address.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
     .then(function(originalAddress){
         var newAddress = {};
@@ -58,7 +81,7 @@ router.put('/:id', function(req, res, next){
     .then(null, next);
 });
 
-router.delete('/:id', function(req, res, next){
+router.delete('/:id', authorization.isAdminOrSelf, function(req, res, next){
     Address.findByIdAndUpdate(req.params.id, {dateModified: Date.now()}, {new: true})
     .then(function(deletedAddress) {
         res.send(deletedAddress);
