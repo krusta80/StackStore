@@ -1,48 +1,48 @@
 <div>
-	<div class="col-md-12">
-		<div class="col-md-6">
+	<div class="col-sm-12">
+		<div class="col-sm-6">
 			<h3>Your Past Orders</h3>
 		</div>
 <!-- 	<div> PLACEHOLDER FOR SEARCH FUNCTIONALITY
 			Search Bar
 		</div>
-		<div class="col-md-6">
+		<div class="col-sm-6">
 			<button type="submit" ng-click="searchOrders()">Submit</button>
 		</div> -->
 	</div>
-	<div ng-repeat= "order in orders" class="col-md-12">
+	<div ng-repeat= "order in orders" class="col-sm-12 well" style="margin:1em">
 		<div>
 			<a ui-sref="orderDetails({id: order._id})">
-				<h5>Invoice Number: {{order.invoiceNumber}}</h5><!-- Order Number -->
+				<h4>Invoice Number: {{order.invoiceNumber}}</h4><!-- Order Number -->
 			</a>
 		</div>
-		<div>
-			<div class="col-md-3">
-				Order Date: {{order.dateOrdered}}<!-- Date Ordered -->
+		<div style="padding:0em 1em 2em 1em">
+			<div class="col-sm-3">
+				<h5>Order Date: {{order.dateOrdered.slice(0,10)}} </h5><!-- Date Ordered -->
 			</div>
-			<div class="col-md-3">
-				Order Total: {{order.total}}<!-- Total Order Price -->
+			<div class="col-sm-3">
+				<h5>Order Total: ${{order.total}}</h5><!-- Total Order Price -->
 			</div>
-			<div class="col-md-3">
-				Order Status: {{order.status}}<!-- Order Status -->
+			<div class="col-sm-3">
+				<h5>Order Status: {{order.status}}</h5><!-- Order Status -->
 			</div>
-			<div class="col-md-3">
-				Ship To: {{order.shippingAddress.address1}}<!-- Ship To Address -->
+			<div class="col-sm-3">
+				<h5>Ship To: {{order.shippingAddress.address1}}</h5><!-- Ship To Address -->
 			</div>
 		</div>
-		<div ng-repeat= "lineItem in order.lineItems" class="col-md-4">
-			<div class="col-md-6">
+		<div ng-repeat= "lineItem in order.lineItems" class="col-sm-4"  style="padding:1em">
+			<div class="col-sm-6">
 				<img ng-src={{lineItem.prod_id.imageUrls[0]}} class="img-responsive"> <!-- Order Product Image -->
 			</div>
-			<div class="cold-md-6">
+			<div class="cold-sm-6">
 				<div>
-					LineItemTitle: {{lineItem.prod_id.title}}<!-- Order Product Name -->
+					{{lineItem.prod_id.title}}<!-- Order Product Name -->
 				</div>
 				<div>
-					LineItemQty: {{lineItem.quantity}}<!-- Order Product Qty -->
+					Quantity: {{lineItem.quantity}}<!-- Order Product Qty -->
 				</div>
 				<div>
-					LineItemPrice: {{lineItem.price}}<!-- Order Product Price -->
+					Unit Price: ${{lineItem.price}}<!-- Order Product Price -->
 				</div>
 			</div>
 		</div>
