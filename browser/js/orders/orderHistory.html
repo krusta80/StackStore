@@ -10,7 +10,7 @@
 			<button type="submit" ng-click="searchOrders()">Submit</button>
 		</div> -->
 	</div>
-	<div ng-repeat= "order in orders" class="col-sm-12 well" style="margin:1em">
+	<div ng-repeat= "order in orders | orderBy:'-dateOrdered'" class="col-sm-12 well" style="margin:1em">
 		<div>
 			<a ui-sref="orderDetails({id: order._id})">
 				<h4>Invoice Number: {{order.invoiceNumber}}</h4><!-- Order Number -->
@@ -36,7 +36,9 @@
 			</div>
 			<div class="cold-sm-6">
 				<div>
-					{{lineItem.prod_id.title}}<!-- Order Product Name -->
+					<a ui-sref="product({id:lineItem.prod_id._id})"> 
+						{{lineItem.prod_id.title}}<!-- Order Product Name -->
+					</a>
 				</div>
 				<div>
 					Quantity: {{lineItem.quantity}}<!-- Order Product Qty -->
