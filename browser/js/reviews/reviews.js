@@ -22,12 +22,12 @@ app.config(function($stateProvider){
 		})
 });
 
-app.controller('ReviewsCtrl', function($scope, $stateParams, $state, ProductsFactory, ReviewsFactory, AuthService, review){
+app.controller('ReviewsCtrl', function($scope, $stateParams, $rootScope, $state, ProductsFactory, ReviewsFactory, AuthService, review){
 	$scope.review = review;
 	ProductsFactory.fetchById($stateParams.productId)
 		.then(function(product){
 			$scope.product = product;
-			$scope.review.product = $scope.product._id;
+			$scope.review.product = $scope.product;
 		})
 		.catch(function(err){
 			console.log("Error: ",err)
@@ -50,6 +50,9 @@ app.controller('ReviewsCtrl', function($scope, $stateParams, $state, ProductsFac
 					return ProductsFactory.updateProduct($scope.product);
 				})
 				.then(function(product){
+					console.log($rootScope.previousState.name, product._id);
+					if($rootScope.previousState.name === 'reviewList')
+						return $state.go($rootScope.previousState);
 					$state.go('product', {id: product._id});
 				})
 				.catch(function(err){
@@ -63,6 +66,9 @@ app.controller('ReviewsCtrl', function($scope, $stateParams, $state, ProductsFac
 					return ProductsFactory.updateProduct($scope.product)
 				})
 				.then(function(product){
+					console.log($rootScope.previousState.name, product._id);
+					if($rootScope.previousState.name === 'reviewList')
+						return $state.go($rootScope.previousState);
 					$state.go('product', {id: product._id});
 				})
 				.catch(function(err){
@@ -87,7 +93,10 @@ app.controller('ReviewsCtrl', function($scope, $stateParams, $state, ProductsFac
 
 				})
 				.then(function(product){
-					$state.go('product', {id: product._id})
+					console.log($rootScope.previousState.name, product._id);
+					if($rootScope.previousState.name === 'reviewList')
+						return $state.go($rootScope.previousState);
+					$state.go('product', {id: product._id});
 				})
 				.catch(function(err){
 					console.log(err);
@@ -98,4 +107,6 @@ app.controller('ReviewsCtrl', function($scope, $stateParams, $state, ProductsFac
 	$scope.updateReview = function(stars){
 		$scope.review.stars=stars;
 	}
+
+
 });
