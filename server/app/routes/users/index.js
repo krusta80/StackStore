@@ -5,9 +5,14 @@ var models = require('../../../db/models');
 var User = models.User;
 module.exports = router;
 
-//Note - Still need to implement access control!
+//Resource for admin pages
+router.get('/fields', function (req, res, next) {
+    if(!req.user)
+        res.send(readWhitelist.Any);
+    res.send(readWhitelist[req.user.role]);
+});
 
-router.get('/', function (req, res, next) {
+router.get('/', isAdmin, function (req, res, next) {
     User.find({dateModified : {$exists : false }})
     .then(function(users){
         res.send(users);
@@ -15,19 +20,14 @@ router.get('/', function (req, res, next) {
     .then(null, next);
 });
 
-router.get('/fields', function (req, res, next) {
-    if(!req.user)
-        res.send(readWhitelist.Any);
-    res.send(readWhitelist[req.user.role]);
-});
-
-router.get('/:id', function(req, res, next){
-	var id = req.params.id;
-	User.findById(id)
-	.then(function(user){
-		res.send(user);
-	})
-	.then(null, next);
+router.get('/:id', isAdminOrSelf, function(req, res, next){
+    console.log("\nGET USER BY ID\n")
+    var id = req.params.id;
+    User.findById(id)
+    .then(function(user){
+        res.send(user);
+    })
+    .then(null, next);
 })
 
 router.post('/', function(req, res, next){
@@ -48,13 +48,9 @@ router.post('/', function(req, res, next){
     });
 })
 
-//To-do: Need to DELETE certain fields and configure access control.
-router.put('/:id', function(req, res, next){
-    //Stripping fields example
-    //Prevents user from editing own role. Meant to be used in conuunction with isAdminOrSelf middleware.
-    //if(req.passport.session.user.equals(req.requestedUser)) delete req.body.role;
+router.put('/:id', isAdminOrSelf, function(req, res, next){
     
-    console.log("***********CALLED");
+    //If self, delete certain fields - this isn't free license to edit any field.
 
 	//Find user by ID, add dateModified timestamp, but return ORIGINAL User object
     User.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
@@ -83,7 +79,7 @@ router.put('/:id', function(req, res, next){
     .then(null, next);
 });
 
-router.delete('/:id', function(req, res, next){
+router.delete('/:id', isAdmin, isNotSelf, function(req, res, next){
     User.findByIdAndUpdate(req.params.id, {dateModified: Date.now()}, {new: true})
     .then(function(deletedUser) {
         res.send(deletedUser);
@@ -93,6 +89,7 @@ router.delete('/:id', function(req, res, next){
 
 //Router Param
 router.param('id', function(req, res, next, id){
+
     User.findById(id).exec()
     .then(function(user){
         if(!user) res.status(404).send();
@@ -104,23 +101,39 @@ router.param('id', function(req, res, next, id){
 
 //Access Control
 function isUser(req, res, next){
+    console.log("\n IS USER FUNCTION \n")
+
     var sessionUser = req.user; //(Admins are considered users as well)
-    if(!sessionUser) next(res.status(401).send("Error: Not logged in as user")); 
+    if(!sessionUser) res.status(401).send("Error: Not logged in as user"); 
     else next();
 };
 
 function isAdmin(req, res, next){
+
+    console.log("\n IS ADMIN FUNCTION \n")
+
     var sessionUser = req.user;
-    if(!sessionUser) next(res.status(401).send("Error: Not logged in as user"));
-    else if(!userIsAdmin(sessionUser)) next(res.status(401).send("Error: Not an admin"));
+    if(!sessionUser) res.status(401).send("Error: Not logged in as user");
+    else if(!userIsAdmin(sessionUser)) res.status(401).send("Error: Not an admin");
     else next();
 };
 
 function isAdminOrSelf(req, res, next){
-    var sessionUser = req.user;
 
-    if(!sessionUser) next(res.status(401).send("Error: Not logged in as user"));
-    else if(!userIsAdmin(sessionUser) && !sessionUser.equals(req.requestedUser)) next(res.status(401).send("Error: Not admin or self"));
+    console.log("\n IS ADMIN OR SELF FUNCTION \n")
+
+    var sessionUser = req.user;
+    if(!sessionUser) res.status(401).send("Error: Not logged in as user");
+    else if(!userIsAdmin(sessionUser) && !sessionUser.equals(req.requestedUser)) res.status(401).send("Error: Not admin or self");
+    else next();
+}
+
+function isNotSelf(req, res, next){
+
+    console.log("\n NOT SELF FUNCTION \n") 
+
+    var sessionUser = req.user;
+    if(sessionUser.equals(req.requestedUser)) next(res.status(401).send("Error: Cannot take this action on self"));
     else next();
 }
 
