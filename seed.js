@@ -71,10 +71,12 @@ var generateRandomAddress = function(userId) {
         active: faker.random.boolean()
     };
 };
-var generateRandomReview = function(productId, userId) {
+var generateRandomReview = function(product, user) {
     return {
-        product: productId,
-        user: userId,
+        product: product, 
+        productName: product.title,
+        user: user, 
+        userEmail: user.email,
         title: faker.company.catchPhrase(),
         stars: Math.ceil(Math.random()*5),
         description: faker.lorem.paragraph(),

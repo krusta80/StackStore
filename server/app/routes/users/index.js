@@ -7,12 +7,31 @@ module.exports = router;
 
 //Note - Still need to implement access control!
 
+var readWhitelist = {
+    Any: ['firstName', 'middleName', 'lastName', 'email'],
+    User: ['firstName', 'middleName', 'lastName', 'email', 'dateCreated', 'origId', '_id', 'active', 'pendingPasswordReset', 'role'],
+    Admin: ['firstName', 'middleName', 'lastName', 'email', 'password', 'dateCreated', 'origId', '_id', 'active', 'pendingPasswordReset', 'role']
+};
+
+var writeWhitelist = {
+    Any: [],
+    User: ['firstName', 'middleName', 'lastName', 'email'],
+    Admin: ['firstName', 'middleName', 'lastName', 'email', 'password', 'active', 'pendingPasswordReset', 'role']
+};
+
+
 router.get('/', function (req, res, next) {
-	User.find({dateModified : {$exists : false }})
-	.then(function(users){
-		res.send(users);
-	})
-	.then(null, next);
+    User.find({dateModified : {$exists : false }})
+    .then(function(users){
+        res.send(users);
+    })
+    .then(null, next);
+});
+
+router.get('/fields', function (req, res, next) {
+    if(!req.user)
+        res.send(readWhitelist.Any);
+    res.send(readWhitelist[req.user.role]);
 });
 
 router.get('/:id', function(req, res, next){
@@ -48,6 +67,8 @@ router.put('/:id', function(req, res, next){
     //Prevents user from editing own role. Meant to be used in conuunction with isAdminOrSelf middleware.
     //if(req.passport.session.user.equals(req.requestedUser)) delete req.body.role;
     
+    console.log("***********CALLED");
+
 	//Find user by ID, add dateModified timestamp, but return ORIGINAL User object
     User.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
     .then(function(originalUser){
@@ -56,19 +77,18 @@ router.put('/:id', function(req, res, next){
     	var newUser = {};
     	var originalUserObj = originalUser.toObject();
     	for(var key in originalUserObj){
-    		if(key != '_id'){
-    			newUser[key] = originalUser[key];
+    		if(key != '_id' && key != 'password'){
+            	newUser[key] = originalUser[key];
     		}
     	}
     	for(var key in req.body){
-    		newUser[key] = req.body[key];
+    		if(key != '_id') {
+                newUser[key] = req.body[key];
+            }
         }
 
         //Save to backend and return
-        return User.create(newUser)
-        .then(function(newUser){
-        	return newUser.save();
-        });
+        return User.create(newUser);
     })
     .then(function(updatedUser) {
         res.send(updatedUser);

@@ -30,7 +30,6 @@ app.controller('SignupCtrl', function ($scope, AuthService, $state) {
         }).catch(function (err) {
             $scope.error = err.message;
         });
-
     };
 
 });

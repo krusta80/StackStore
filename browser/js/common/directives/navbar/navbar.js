@@ -59,6 +59,10 @@ app.directive('navbar', function ($rootScope, AuthService, OrdersFactory, Catego
             $rootScope.$on(AUTH_EVENTS.sessionTimeout, removeUser);
             $rootScope.$on('cartUpdate', updateCartItems);
             $rootScope.$on('clearProductSearch', clearSearch);
+            $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){ 
+                // do something
+                $rootScope.previousState = fromState;
+            })
         }
 
     };
