@@ -15,9 +15,9 @@
 				<label>Description:</label>
 				<textarea ng-model="newProduct.description" class="form-control"></textarea><br>
 				<label>Categories:</label>
-				<div class="checkbox">
+				<div class="checkbox" ng-repeat="category in categories">
 					<label>
-						<input class="active" type="checkbox">hihi
+						<input ng-model="category.exist" type="checkbox">{{ category.name }}
 					</label>
 				</div>
 			</div>
