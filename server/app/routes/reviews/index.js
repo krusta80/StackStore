@@ -115,7 +115,7 @@ router.put('/:id', authorization.isAdminOrAuthor, function(req, res, next){
 	req.body.userEmail = req.body.user.email;
 	Review.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
 		.then(function(origReview){
-			var origId = req.body._id;
+			var origId = req.body.origId;
 			delete req.body._id;
 			delete req.body.__v;
 			delete req.body.dateCreated;
