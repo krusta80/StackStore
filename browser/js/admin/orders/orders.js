@@ -20,7 +20,6 @@ app.config(function($stateProvider){
 		templateUrl: 'js/admin/orders/orderDetail.html',
 		resolve: {
 			order: function(OrdersFactory, $stateParams){
-				console.log("Resolve orders with id", $stateParams.orderId)
 				return OrdersFactory.fetchById($stateParams.orderId);
 			},
 			fields: function(OrdersFactory){
@@ -65,6 +64,9 @@ app.controller('OrderCtrl', function($scope, order, OrdersFactory, fields, $stat
 	origOrder = angular.copy(order);
 	$scope.thisUser = thisUser;
 	$scope.order = order;
+
+	console.log("$scope.order", $scope.order) //POPULATED OBJECT
+
 	$scope.fields = [];
 	fields.forEach(function(field) {
 		field = {key: field, title: GitCommitted.fancify(field)};
