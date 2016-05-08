@@ -3,13 +3,19 @@ app.config(function($stateProvider){
 	$stateProvider.state('categoryHistory', {
 		url: '/admin/categories/:origId/history',
 		controller: 'HistoryCtrl',
-		template: '<hist-table table-title="Category History" table-data="history">',
+		templateUrl: 'js/admin/history/history.html',
 		resolve: {
 			history: function(CategoriesFactory, $stateParams){
 				return CategoriesFactory.fetchHistory($stateParams.origId);
 			},
 			fields: function(CategoriesFactory){
 				return CategoriesFactory.fetchFields();
+			},
+			origId: function($stateParams) {
+				return $stateParams.origId
+			},
+			model: function() {
+				return "Category"
 			}
 		}
 	});

@@ -170,6 +170,10 @@ app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, pr
 			.catch($log);
 	};
 
+	$scope.getHistory = function() {
+		$state.go('productHistory', {origId: $scope.product.origId});
+	};
+
 	$scope.addImage = function(){
 		if($scope.product.imageUrls.indexOf($scope.newImageUrl) !== -1){
 			$scope.newImageUrl = null;

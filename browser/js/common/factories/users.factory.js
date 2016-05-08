@@ -33,6 +33,16 @@ app.factory('UsersFactory', function($http, $q){
 					console.log(err);
 				});
 		},
+		fetchHistory: function(origId) {
+			return $http.get('/api/users/'+origId+'/history')
+				.then(function(res) {
+					users = res.data;
+					return res.data;
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+		},
 		deleteUser: function(userId) {
 			return $http.delete('/api/users/'+userId)
 				.then(function(res) {

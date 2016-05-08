@@ -34,6 +34,15 @@ router.get('/fields', function (req, res, next) {
     res.send(readWhitelist[req.user.role]);
 });
 
+router.get('/:origId/history', function(req, res, next){
+    var origId = req.params.origId;
+    User.find({origId: origId}).sort('dateCreated')
+        .then(function(history){
+            res.send(history);
+        })
+        .then(null, next);
+});
+
 router.get('/:id', function(req, res, next){
 	var id = req.params.id;
 	User.findById(id)

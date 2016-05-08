@@ -1,5 +1,7 @@
-app.controller('HistoryCtrl', function($scope, history, fields, $state){
+app.controller('HistoryCtrl', function($scope, history, fields, origId, model, $state){
 	
+	$scope.origId = origId;
+	$scope.model = model;
 	$scope.rows = history.map(function(row) {
 		var filteredRow = {};
 		fields.forEach(function(field) {
@@ -8,11 +10,7 @@ app.controller('HistoryCtrl', function($scope, history, fields, $state){
 		return filteredRow;
 	});
 
-	// $scope.goToCategory = function(index) {
-	// 	console.log("going to index", index);
-	// 	if(index == -1)
-	// 		return $state.go('categoryDetail', {categoryId: "NEW"});
-	// 	$state.go('categoryDetail', {categoryId: categories[index]._id});
-	// }
-
+	$scope.goBack = function() {
+		$state.go(model.toLowerCase()+'List');
+	};
 });

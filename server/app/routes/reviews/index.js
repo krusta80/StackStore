@@ -8,7 +8,7 @@ module.exports = router;
 var readWhitelist = {
     Any: ['product', 'user', 'title', 'stars', 'description', 'dateCreated', 'productName', 'userEmail'],
     User: ['product', 'user', 'title', 'stars', 'description', 'dateCreated', 'productName', 'userEmail'],
-    Admin: ['productName', 'userEmail', 'product', 'user', 'title', 'stars', 'description', 'dateCreated'],
+    Admin: ['productName', 'userEmail', 'product', 'user', 'title', 'stars', 'description', 'dateCreated', '_id', 'origId'],
 };
 
 var writeWhitelist = {
@@ -23,6 +23,15 @@ router.get('/', function(req, res, next){
 	Review.find({dateModified : {$exists : false }}).sort({product: 1, user: 1})
 		.then(function(reviews){
 			res.send(reviews);
+		})
+		.then(null, next);
+});
+
+router.get('/:origId/history', function(req, res, next){
+	var origId = req.params.origId;
+	Review.find({origId: origId}).sort('dateCreated')
+		.then(function(history){
+			res.send(history);
 		})
 		.then(null, next);
 });

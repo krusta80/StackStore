@@ -13,8 +13,29 @@ app.config(function($stateProvider){
 			}
 		}
 	});
+
+	$stateProvider.state('productHistory', {
+		url: '/admin/products/:origId/history',
+		controller: 'HistoryCtrl',
+		templateUrl: 'js/admin/history/history.html',
+		resolve: {
+			history: function(ProductsFactory, $stateParams){
+				return ProductsFactory.fetchHistory($stateParams.origId);
+			},
+			fields: function(ProductsFactory){
+				return ProductsFactory.fetchFields();
+			},
+			origId: function($stateParams) {
+				return $stateParams.origId
+			},
+			model: function() {
+				return "Product"
+			}
+		}
+	});
 });
 
+	
 app.controller('ProductListCtrl', function($scope, products, ProductsFactory, fields, $state){
 	
 	$scope.products = products.map(function(product) {
