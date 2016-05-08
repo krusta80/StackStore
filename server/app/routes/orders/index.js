@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 var router = require('express').Router();
 var models = require('../../../db/models');
 var Order = models.Order;
+var authorization = require('../../configure/authorization-middleware.js');
 module.exports = router;
 
 var readWhitelist = {
@@ -33,7 +34,7 @@ router.get('/fields', function(req, res, next) {
 });
 
 //added by CK on 5/4 to retrieve historical orders
-router.get('/myOrders/:userId', function(req, res, next){
+router.get('/myOrders/:userId', authorization.isAdminOrOwner, function(req, res, next){
 	Order.find({userId: req.params.userId, status: { $not: /^Cart.*/}})//filters out orders in status "Cart"
 	.populate('lineItems.prod_id')
 	.populate('shippingAddress')
@@ -75,7 +76,7 @@ router.get('/myCart', function(req, res, next){
     }
 })
 
-router.get('/:id', function(req, res, next){
+router.get('/:id', authorization.isAdminOrOwner, function(req, res, next){
 	var queryPromise = Order.findById(req.params.id)
 						.populate({
 							path: 'lineItems.prod_id',
@@ -106,7 +107,7 @@ router.get('/:id', function(req, res, next){
 	.then(null, next);
 })
 
-router.get('/cartByUser/:userId', function(req, res, next) {
+router.get('/cartByUser/:userId', authorization.isAdminOrOwner,function(req, res, next) {
     if(req.user && (req.user.role === 'Admim' || req.user._id === req.params.userId))
         Order.findOne({userId: req.params.userId, status: 'Cart'}).populate({path: 'lineItems.prod_id'})
         .then(function(order){

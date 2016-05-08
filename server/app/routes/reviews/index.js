@@ -19,6 +19,13 @@ var writeWhitelist = {
     Admin: ['product', 'user', 'title', 'stars', 'description', 'dateCreated', 'productName', 'userEmail'],
 };
 
+//Fields
+router.get('/fields', function(req, res, next){
+	if(!req.user)
+        res.send(readWhitelist.Any);
+    res.send(readWhitelist[req.user.role]);
+});
+
 //Req Params
 router.param('id', function(req, res, next, id){
     Review.findById(id).exec()
@@ -123,14 +130,6 @@ router.delete('/:id', authorization.isAdminOrOwner, function(req, res, next){
 		})
 		.then(null, next);
 });
-
-//get fields
-router.get('/fields', function(req, res, next){
-	if(!req.user)
-        res.send(readWhitelist.Any);
-    res.send(readWhitelist[req.user.role]);
-});
-
 
 
 

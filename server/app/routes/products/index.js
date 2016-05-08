@@ -25,6 +25,14 @@ var filterCategories = function(product) {
 	});
 };
 
+
+//get fields
+router.get('/fields', function(req, res, next){
+	if(!req.user)
+        res.send(readWhitelist.Any);
+    res.send(readWhitelist[req.user.role]);
+});
+
 //get all products, which might be unnecessary
 router.get('/', function(req, res, next){
 	Product.find({dateModified : {$exists : false }}).sort({title: 1, price: 1})
@@ -125,13 +133,6 @@ router.delete('/:id', authorization.isAdmin, function(req, res, next){
 			res.send(deletedProduct);
 		})
 		.then(null, next);
-});
-
-//get fields
-router.get('/fields', function(req, res, next){
-	if(!req.user)
-        res.send(readWhitelist.Any);
-    res.send(readWhitelist[req.user.role]);
 });
 
 
