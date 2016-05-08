@@ -13,6 +13,15 @@ app.factory('UsersFactory', function($http, $q){
 					console.log(err);
 				});
 		},
+		activate: function(key) {
+			return $http.get('/api/users/activation/'+key)
+				.then(function(res) {
+					return res.data;
+				})
+				.catch(function(err) {
+					console.log(err);
+				});
+		}, 
 		fetchById: function(userId) {
 			return $http.get('/api/users/'+userId)
 				.then(function(res) {

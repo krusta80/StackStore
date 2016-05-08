@@ -4,6 +4,7 @@ var router = require('express').Router();
 var models = require('../../../db/models');
 var authorization = require('../../configure/authorization-middleware.js')
 var User = models.User;
+var mail = require('../../../mail');
 module.exports = router;
 
 //(This route is used in admin pages)
@@ -52,18 +53,49 @@ router.get('/:id', authorization.isAdminOrSelf, function(req, res, next){
     .then(null, next);
 })
 
+router.get('/activation/:activationKey', function(req, res, next) {
+    console.log("In activation route...");
+    User.findOne({activationKey: req.params.activationKey, dateModified : {$exists : false }})
+    .then(function(user) {
+        console.log("user found for activation...", user);
+        user.active = true;
+        delete user.activationKey;
+        return user.save();    
+    })
+    .then(function(savedUser) {
+        res.send(savedUser);
+    })
+    .catch(function(err) {
+        console.log("Error when trying to activate!", err);
+        return {active: false};
+    });
+});
+
 router.post('/', function(req, res, next){
-	User.create(req.body)
-	.then(function(newUser){
-        User.find({email: newUser.email, _id: {$ne: newUser._id} })
-        .then(function(existingUsers){
-            if(existingUsers.length > 0){
-                res.status(400).send("Please use unique email.")
-            }else{
-               res.send(newUser);  
+	var newUser;
+    User.create(req.body)
+	.then(function(_newUser){
+        newUser = _newUser;
+        return User.find({email: newUser.email, _id: {$ne: newUser._id} });
+    })
+    .then(function(existingUsers){
+        if(existingUsers.length > 0){
+            res.status(400).send("Please use unique email.")
+        }
+        else {
+            if(!req.user) {
+                newUser.active = false;
+                newUser.activationKey = Math.random().toString(36).slice(3,10);
+                return newUser.save();
             }
-        })
-	})
+            else 
+                return res.send(newUser);      
+        }
+    })
+    .then(function(savedUser) {
+        mail.sendActivation(savedUser.email, savedUser.activationKey);
+        res.send(savedUser);
+    })
 	.catch(function(err) {
         console.log(err);
         res.status(500).send(err);
