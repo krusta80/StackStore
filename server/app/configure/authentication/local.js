@@ -37,6 +37,11 @@ module.exports = function (app) {
                 error.status = 401;
                 return next(error);
             }
+            else if(!user.active) {
+                var error = new Error('User account inactive.');
+                error.status = 401;
+                return next(error);    
+            }
 
             //  We merge carts (if applicable)
             var oldCart, updatedCart;

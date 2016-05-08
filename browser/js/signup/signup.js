@@ -8,7 +8,7 @@ app.config(function ($stateProvider) {
 
     $stateProvider.state('signedUp', {
         url: '/signedUp',
-        template: '<div class=well><h3>Signup Successful!</h3>Rerouting you to login page...</div>'
+        template: '<div class=well><h3>Signup Successful!</h3>Please check email for activation instructions before proceeding...</div>'
     });
 
 });
@@ -24,9 +24,9 @@ app.controller('SignupCtrl', function ($scope, AuthService, $state) {
 
         AuthService.signup(userInfo).then(function (newUser) {
             $state.go('signedUp');
-            setTimeout(function() {
-                $state.go('login');
-            },2000);
+            // setTimeout(function() {
+            //     $state.go('login');
+            // },2000);
         }).catch(function (err) {
             $scope.error = err.message;
         });
