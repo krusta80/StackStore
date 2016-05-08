@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 var router = require('express').Router();
 var models = require('../../../db/models');
 var Order = models.Order;
+var User = models.User;
 var authorization = require('../../configure/authorization-middleware.js');
 module.exports = router;
 
@@ -17,6 +18,38 @@ var writeWhitelist = {
     User: ['lineItems', 'shippingAddress', 'billingAddress'],
     Admin: ['_id', 'userId', 'sessionId', 'email', 'lineItems', 'invoiceNumber', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
 };
+
+//Route Params
+router.param('id', function(req, res, next, id){
+    Order.findById(id).exec()
+    .then(function(order){
+        if(!order) res.status(404).send();
+        req.requestedObject = order;
+        if(order.userId){
+            User.findById(order.userId)
+            .then(function(user){
+                if(!user) res.status(404).send();
+                req.requestedUser = user;
+                next();
+            })
+        }else{
+            next();
+        }
+    })
+    .then(next, null);
+})
+
+router.param('userId', function(req, res, next, id){
+	console.log("USER ID", id);
+    User.findById(id).exec()
+    .then(function(user){
+        if(!user) res.status(404).send();
+        req.requestedUser = user;
+        next();
+    })
+    .then(next, null);
+})
+
 
 //Routes
 router.get('/', function (req, res, next) {
@@ -34,7 +67,7 @@ router.get('/fields', function(req, res, next) {
 });
 
 //added by CK on 5/4 to retrieve historical orders
-router.get('/myOrders/:userId', authorization.isAdminOrOwner, function(req, res, next){
+router.get('/myOrders/:userId', authorization.isAdminOrSelf, function(req, res, next){
 	Order.find({userId: req.params.userId, status: { $not: /^Cart.*/}})//filters out orders in status "Cart"
 	.populate('lineItems.prod_id')
 	.populate('shippingAddress')
@@ -107,7 +140,7 @@ router.get('/:id', authorization.isAdminOrOwner, function(req, res, next){
 	.then(null, next);
 })
 
-router.get('/cartByUser/:userId', authorization.isAdminOrOwner,function(req, res, next) {
+router.get('/cartByUser/:userId', authorization.isAdminOrSelf,function(req, res, next) {
     if(req.user && (req.user.role === 'Admim' || req.user._id === req.params.userId))
         Order.findOne({userId: req.params.userId, status: 'Cart'}).populate({path: 'lineItems.prod_id'})
         .then(function(order){

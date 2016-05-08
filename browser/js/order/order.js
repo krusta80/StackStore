@@ -30,6 +30,7 @@ app.config(function($stateProvider){
 app.controller('OrderCtrl', function($scope, $state, user, order, billingAddress, shippingAddress, OrdersFactory){
 
 	$scope.user = user;
+	console.log("order", order)
 	$scope.order = order;
 	$scope.billingAddress = billingAddress;
 	$scope.shippingAddress = shippingAddress;

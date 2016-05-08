@@ -9,24 +9,13 @@ module.exports = router;
 
 //Req Params
 router.param('id', function(req, res, next, id){
-    Address.findById(id).exec()
+    console.log("Hitting this param route with id", id)
+    Address.findById(id).populate({path: 'userId'})
     .then(function(address){
         if(!address) res.status(404).send();
         req.requestedObject = address;
-        if(address.userId){
-            console.log("\n\n Has one")
-            User.findById(address.userId)
-            .then(function(user){
-                console.log("\n\nThe user", user)
-                if(!user) res.status(404).send();
-                req.requestedUser = user;
-                next();
-            })
-        }else{
-            next();
-        }
-
-        
+        req.requestedUser = address.userId;
+        next();    
     })
     .then(next, null);
 })
@@ -42,7 +31,7 @@ router.param('userId', function(req, res, next, id){
 })
 
 //Route Handlers
-router.get('/:id', authorization.isAdminOrOwner, function(req, res, next){
+router.get('/:id', authorization.isAdminOrResident, function(req, res, next){
     var id = req.params.id;
     Address.findById(id)
     .then(function(address){
