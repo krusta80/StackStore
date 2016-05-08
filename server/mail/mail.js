@@ -3,19 +3,16 @@ var Promise = require('bluebird');
 var sendgrid_api_key = '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';
 var sendgrid  = require('sendgrid')(sendgrid_api_key);
 
-// var params = {
-// 	to: 'jag47@cornell.edu',
-// 	from: 'admin@gitcommitted.io',
-// 	fromname: 'Git Committed',
-// 	subject: 'This is a test',
-// 	html: '<a href="http://pandora.dyndns.biz:1337">hello world...</a>' 
-// };
-
-var getEmailTemplate = function(path) {
+var getEmailTemplate = function(path, variableObject) {
 	return new Promise(function (resolve, reject) {
 	    fs.readFile(__dirname + '/' + path, 'utf8', function(err, html) {
-			if(!err)
-				resolve(html);
+			if(!err) {
+				var ret = Object.keys(variableObject).reduce(function(string, nextVar) {
+					var re = new RegExp("\{\{"+nextVar+"\}\}","g");
+					return string.replace(re, variableObject[nextVar]);
+				}, html);
+				resolve(ret);
+			}
 			else
 				reject(err);	 
 		});
@@ -23,6 +20,9 @@ var getEmailTemplate = function(path) {
 };
 
 var sendEmail = function(params) {
+	params.from = 'admin@gitcommitted.io';
+	params.fromName = 'Team Git Committed';
+	params.cc = ['johngruska@gmail.com'];
 	var email = new sendgrid.Email(params);
 	return new Promise(function (resolve, reject) {
 	    sendgrid.send(email, function(err, json) {
@@ -34,10 +34,33 @@ var sendEmail = function(params) {
 	});
 };
 
+var getTemplateAndSend = function(params, templatePath, templateVars) {
+	getEmailTemplate(templatePath, templateVars)
+	.then(function(html) {
+		console.log("fetched template result:", html);
+		params.html = html;
+		return sendEmail(params);	
+	})
+	.then(function(message) {
+		console.log("Email Response:", message);
+		return message;
+	})
+	.catch(function(err) {
+		console.log(err);
+		return "SEND MESSAGE TEMPLATE FAILED";
+	})
+};
+
 module.exports = {
 
-	sendActivation: function(params) {
-
+	sendActivation: function(toEmailAddress, activationKey) {
+		//	Need to select the activation template and send
+		params = {
+			to: [toEmailAddress],
+			subject: 'Account Activation Required'
+		};
+		
+		return getTemplateAndSend(params, 'activation.html', {activationKey: activationKey})
 	}, 
 
 };
