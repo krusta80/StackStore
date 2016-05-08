@@ -2,6 +2,7 @@
 var mongoose = require('mongoose');
 var Address = require('./address')
 var Product = require('./product')
+var User = require('./user')
 
 var schema = new mongoose.Schema({
     userId: {
@@ -113,6 +114,11 @@ schema.pre('save', function (next) {
         return createUniqueInvoiceNumber()
         .then(function(invoiceNumber){
             that.invoiceNumber = invoiceNumber;
+            return getUserEmail(that.userId);
+        })
+        .then(function(email){
+            console.log("EMAIL", email)
+            that.email = email;
             next();
         })
     }else{
@@ -142,11 +148,18 @@ function createUniqueInvoiceNumber(){
     return mongoose.model('Order').find({invoiceNumber: invoiceNumber})
      .then(function(order){
          if(order.length === 0){
-            console.log("\n\n\nATTACHIN INVOICE NUMBER: ", invoiceNumber)
+            console.log("\nAttaching invoice number: ", invoiceNumber)
             return invoiceNumber;
          }else{
-            console.log("\nINVOICE NUMBER EXISTS: ", invoiceNumber)
+            console.log("\nInvoice Number Exists: ", invoiceNumber, "Generating new invoice number.")
             return createUniqueInvoiceNumber();
          }
+    })
+ }
+
+ function getUserEmail(id){
+    return User.findById(id)
+    .then(function(user){
+        return user.email;
     })
  }
