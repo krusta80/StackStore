@@ -8,15 +8,15 @@ var authorization = require('../../configure/authorization-middleware.js');
 module.exports = router;
 
 var readWhitelist = {
-    Any: ['_id', 'sessionId', 'email', 'lineItems', 'invoiceNumber', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
-    User: ['_id', 'userId', 'sessionId', 'email', 'lineItems', 'invoiceNumber', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
-    Admin: ['_id', 'userId', 'sessionId', 'email', 'lineItems', 'invoiceNumber', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
+    Any: ['_id', 'invoiceNumber', 'email', 'sessionId', 'lineItems', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
+    User: ['_id', 'invoiceNumber', 'email', 'userId', 'sessionId',  'lineItems', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
+    Admin: ['_id', 'invoiceNumber', 'email', 'userId', 'sessionId', 'lineItems', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
 };
 
 var writeWhitelist = {
     Any: ['lineItems', 'shippingAddress', 'billingAddress'],
     User: ['lineItems', 'shippingAddress', 'billingAddress'],
-    Admin: ['_id', 'userId', 'sessionId', 'email', 'lineItems', 'invoiceNumber', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
+    Admin: ['_id', 'invoiceNumber', 'email', 'userId', 'sessionId',  'lineItems', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
 };
 
 //Route Params
