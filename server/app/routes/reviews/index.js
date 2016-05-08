@@ -29,14 +29,12 @@ router.get('/fields', function(req, res, next){
 //Req Params
 router.param('id', function(req, res, next, id){
     Review.findById(id).exec()
-    .then(function(address){
-        if(!address) res.status(404).send();
-        req.requestedObject = address;
-        if(address.userId){
-            console.log("\n\n Has one")
-            User.findById(address.userId)
+    .then(function(review){
+        if(!review) res.status(404).send();
+        req.requestedObject = review;
+        if(review.user){
+            User.findById(review.user)
             .then(function(user){
-                console.log("\n\nThe user", user)
                 if(!user) res.status(404).send();
                 req.requestedUser = user;
                 next();
@@ -70,7 +68,7 @@ router.get('/:id', function(req, res, next){
 });
 
 //find reviews by productId
-router.get('/product/:productId', function(req, res, next){
+router.get('/product/:id', function(req, res, next){
 	Review.find({product: req.params.productId})
 		.then(function(reviews){
 			res.send(reviews);
@@ -103,7 +101,7 @@ router.post('/', function(req, res, next){
 
 
 
-router.put('/:id', authorization.isAdminOrOwner, function(req, res, next){
+router.put('/:id', authorization.isAdminOrAuthor, function(req, res, next){
 	req.body.productName = req.body.product.title;
 	req.body.userEmail = req.body.user.email;
 	Review.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
@@ -123,7 +121,7 @@ router.put('/:id', authorization.isAdminOrOwner, function(req, res, next){
 });
 
 //delete this route because in product populate will take care of it
-router.delete('/:id', authorization.isAdminOrOwner, function(req, res, next){
+router.delete('/:id', authorization.isAdminOrAuthor, function(req, res, next){
 	Review.findByIdAndUpdate(req.params.id, {dateModified: Date.now()}, {new: true})
 		.then(function(deletedReview){
 			res.send(deletedReview);
