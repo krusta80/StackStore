@@ -29,4 +29,6 @@ app.config(function($stateProvider){
 app.controller('OrdersController', function($scope, AuthService, OrdersFactory, $stateParams, user, orders){
 	$scope.user = user;
 	$scope.orders = orders;
+
+	console.log("ORDERS CTRL / orders[0].total", orders);
 });
