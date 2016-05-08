@@ -33,6 +33,15 @@ router.get('/', function(req, res, next){
 		.then(null, next);
 });
 
+router.get('/:origId/history', function(req, res, next){
+	var origId = req.params.origId;
+	Product.find({origId: origId}).sort('dateCreated')
+		.then(function(history){
+			res.send(history);
+		})
+		.then(null, next);
+});
+
 //get fields
 router.get('/fields', function(req, res, next){
 	if(!req.user)

@@ -11,6 +11,9 @@ var reviewSchema = new mongoose.Schema({
 		ref: 'User',
 		required: true
 	},
+	origId: {
+		type: mongoose.Schema.Types.ObjectId
+	},
 	productName: {
 		type: String
 	},

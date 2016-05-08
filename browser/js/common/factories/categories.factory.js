@@ -22,7 +22,14 @@ app.factory('CategoriesFactory', function($http){
 				.then(function(res){
 					return res.data;
 				});
-	}
+	};
+
+	CategoriesFactory.fetchHistory = function(origId){
+		return $http.get('/api/categories/' + origId + '/history')
+				.then(function(res){
+					return res.data;
+				});
+	};
 
 	CategoriesFactory.setCurrentCategory = function(categoryId){
 		currentCategory = categoryId;

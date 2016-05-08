@@ -1,5 +1,25 @@
 app.config(function($stateProvider){
 
+	$stateProvider.state('categoryHistory', {
+		url: '/admin/categories/:origId/history',
+		controller: 'HistoryCtrl',
+		templateUrl: 'js/admin/history/history.html',
+		resolve: {
+			history: function(CategoriesFactory, $stateParams){
+				return CategoriesFactory.fetchHistory($stateParams.origId);
+			},
+			fields: function(CategoriesFactory){
+				return CategoriesFactory.fetchFields();
+			},
+			origId: function($stateParams) {
+				return $stateParams.origId
+			},
+			model: function() {
+				return "Category"
+			}
+		}
+	});
+
 	$stateProvider.state('categoryList', {
 		url: '/admin/categories',
 		controller: 'CategoryListCtrl',
@@ -102,6 +122,11 @@ app.controller('CategoryCtrl', function($scope, category, CategoriesFactory, fie
 			$scope.error = err.data;
 			restoreForm();
 		});
+	};
+
+	$scope.getHist = function() {
+		console.log("getting history for", category.origId);
+		$state.go('categoryHistory', {origId: category.origId});
 	};
 	
 	$scope.addUpdateCategory = function() {

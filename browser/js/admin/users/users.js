@@ -14,6 +14,26 @@ app.config(function($stateProvider){
 		}
 	});
 
+	$stateProvider.state('userHistory', {
+		url: '/admin/users/:origId/history',
+		controller: 'HistoryCtrl',
+		templateUrl: 'js/admin/history/history.html',
+		resolve: {
+			history: function(UsersFactory, $stateParams){
+				return UsersFactory.fetchHistory($stateParams.origId);
+			},
+			fields: function(UsersFactory){
+				return UsersFactory.fetchFields();
+			},
+			origId: function($stateParams) {
+				return $stateParams.origId
+			},
+			model: function() {
+				return "User"
+			}
+		}
+	});
+
 	$stateProvider.state('userDetail', {
 		url: '/admin/users/:userId',
 		controller: 'UserCtrl',
@@ -89,6 +109,10 @@ app.controller('UserCtrl', function($scope, user, UsersFactory, fields, $state, 
 
 	$scope.isTextInput = function(key) {
 		return $scope.getOptions(key).length === 0;
+	};
+
+	$scope.getHistory = function() {
+		$state.go('userHistory', {origId: user.origId});
 	};
 
 	$scope.getOptions = function(key) {
