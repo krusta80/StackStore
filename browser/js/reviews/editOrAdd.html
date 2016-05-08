@@ -1,31 +1,38 @@
+<br>
 <div class="container">
 	<div class="row">
 		<div class="col-md-4">
-			<a ui-sref='product({id:product._id})'><h2>{{product.title}}</h2></a> <!-- Retrieve product title -->
+			<div class="thumbnail">
+				<img src={{product.imageUrls[0]}} class="img-responsive"><!-- Retrieve product image -->
+				<div class="caption">
+					<a ui-sref='product({id:product._id})'><h4>{{product.title}}</h4></a> <!-- Retrieve product title -->
+					<button ng-show="isAdmin()" ng-click="getHistory()" class="btn btn-success">Get History</button>
+				</div>
+			</div>
 			<br>
-			<img src={{product.imageUrls[0]}} class="img-responsive"><!-- Retrieve product image -->
 		</div>
 		<div class="col-md-8">
-			<form name="reviewForm">
-				<div class="row">
-					<div style="float:left; transform:translateY(25%);">
-						<input type="text" ng-model="review.title" style="font-size:20px;"> <!-- Form to input Title -->
+			<div class="well well-lg">
+				<form name="reviewForm">
+					<div class="row">
+						<div style="float:left; transform:translateY(25%);">
+							<input type="text" ng-model="review.title" style="font-size:20px;"> <!-- Form to input Title -->
+						</div>
+						<div style="float:left; padding-left:.5em;">
+							    <rating-stars filled-stars="{{review.stars}}" size="SM" updater="updateReview(stars)"></rating-stars> <!-- Stars -->
+						</div>
+						<div style="float:left; transform:translateY(25%); padding-left:.5em;">
+							<button type="submit" ng-click="submitReview()" class="btn btn-primary">Submit</button> <!-- Submit button -->
+						</div>
+						<div style="float:left; transform:translateY(25%); padding-left:.5em;" ng-hide="{{!review._id}}">
+							<button type="submit" ng-click="deleteReview()" class="btn btn-danger">Delete</button> <!-- Delete button -->
+						</div>
 					</div>
-					<div style="float:left; padding-left:.5em;">
-						    <rating-stars filled-stars="{{review.stars}}" size="SM" updater="updateReview(stars)"></rating-stars> <!-- Stars -->
+					<div class="row" style="margin-top:15px">
+						<textarea rows="20" cols="80" ng-model="review.description"></textarea> <!-- Form to input review description -->
 					</div>
-					<div style="float:left; transform:translateY(25%); padding-left:.5em;">
-						<button type="submit" ng-click="submitReview()" class="btn btn-success">Submit</button> <!-- Submit button -->
-					</div>
-					<div style="float:left; transform:translateY(25%); padding-left:.5em;" ng-hide="{{!review._id}}">
-						<button type="submit" ng-click="deleteReview()" class="btn btn-danger">Delete</button> <!-- Delete button -->
-					</div>
-				</div>
-				<div class="row">
-					<textarea rows="20" cols="80" ng-model="review.description"></textarea> <!-- Form to input review description -->
-				</div>
-			</form>
+				</form>				
+			</div>
 		</div>
-		<button ng-show="isAdmin()" ng-click="getHistory()" class="btn btn-primary">Get History</button>
 	</div>
 </div>
