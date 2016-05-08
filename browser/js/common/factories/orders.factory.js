@@ -82,13 +82,16 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 			return cart.lineItems.length-1;
 		},
 
-		addToCart : function(product){
+		addToCart : function(product, qty){
 			//	This code is likely only temporary, 
 			//	but it will handle all necessary 
 			//  grouping for carts...
 
+			if(!qty)
+				var qty = 1;
+
 			var lineIndex = this.getLineIndex(product);
-			cart.lineItems[lineIndex].quantity++;
+			cart.lineItems[lineIndex].quantity+=qty;
 			
 			return $http.put('/api/orders/myCart', cart)
 				.then(function(res) {

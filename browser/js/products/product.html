@@ -33,10 +33,10 @@
 			<h2>${{ product.price }}</h2>
 			<p ng-class="{'text-danger': product.inventoryQty<6}">{{ product.inventoryQty }} left</p>
 			<p>
-				Quantity:&nbsp<select ng-model="selectedQuantity" ng-options="num as num for num in getQuantityArray()"></select>
+				Quantity:&nbsp<select ng-model="selectedQuantity" ng-init="selectedQuantity = 1" ng-options="num as num for num in getQuantityArray()"></select>
 			</p>
 			<br>
-			<button ng-click="addToCart()" class="btn btn-info">+ Add To Cart</button>
+			<button ng-disabled="selectedQuantity < 1" ng-click="addToCart()" class="btn btn-info">+ Add To Cart</button>
 		</div>
 	</div>
 	<hr style="border-color: #999999">

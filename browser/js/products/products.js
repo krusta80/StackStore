@@ -93,7 +93,7 @@ app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $state, $scope,
 });
 
 
-app.controller('ProductCtrl', function($scope, product, $state, AuthService){
+app.controller('ProductCtrl', function($scope, OrdersFactory, product, $state, AuthService) {
 
 	$scope.product = product;
 	console.log(product);
@@ -112,6 +112,8 @@ app.controller('ProductCtrl', function($scope, product, $state, AuthService){
 
 	$scope.addToCart = function(){
 		console.log($scope.selectedQuantity);
+		OrdersFactory.addToCart(product, $scope.selectedQuantity);
+		$state.go('categories');
 	}
 
 	$scope.roundStars = function(stars) {
