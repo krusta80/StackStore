@@ -44,6 +44,7 @@ app.factory('ReviewsFactory', function($http){
 	}
 
 	ReviewsFactory.updateReview = function(review){
+		console.log("submitting review...");
 		return $http.put('/api/reviews/'+review._id, review)
 			.then(function(res){
 				return res.data;

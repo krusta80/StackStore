@@ -23,29 +23,33 @@ var writeWhitelist = {
 router.get('/fields', function(req, res, next){
 	if(!req.user)
         res.send(readWhitelist.Any);
-    res.send(readWhitelist[req.user.role]);
+    else
+    	res.send(readWhitelist[req.user.role]);
 });
 
 //Req Params
 router.param('id', function(req, res, next, id){
     Review.findById(id).exec()
     .then(function(review){
-        if(!review) res.status(404).send();
+        if(!review) return res.status(404).send();
         req.requestedObject = review;
         if(review.user){
             User.findById(review.user)
             .then(function(user){
-                if(!user) res.status(404).send();
-                req.requestedUser = user;
-                next();
+                if(!user) 
+                	res.status(404).send();
+                else {
+                	req.requestedUser = user;
+                	next();
+                }
+                
             })
-        }else{
+        }
+        else {
             next();
         }
-
-        
     })
-    .then(next, null);
+    .then(null, next);
 })
 
 

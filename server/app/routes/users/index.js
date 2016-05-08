@@ -22,7 +22,7 @@ router.param('id', function(req, res, next, id){
         req.requestedUser = user;
         next();
     })
-    .then(next, null);
+    .then(null, next);
 })
 
 //Route Handlers

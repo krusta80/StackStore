@@ -17,7 +17,7 @@ router.param('id', function(req, res, next, id){
         req.requestedUser = address.userId;
         next();    
     })
-    .then(next, null);
+    .then(null, next);
 })
 
 router.param('userId', function(req, res, next, id){
@@ -27,7 +27,7 @@ router.param('userId', function(req, res, next, id){
         req.requestedUser = user;
         next();
     })
-    .then(next, null);
+    .then(null, next);
 })
 
 //Route Handlers
