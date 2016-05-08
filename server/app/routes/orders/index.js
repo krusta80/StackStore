@@ -101,7 +101,15 @@ router.get('/myCart', function(req, res, next){
         var id = req.session.cartId;
     
         console.log("session cart id", id);
-        Order.findById(id).populate({path: 'lineItems.prod_id'})
+        Order.findById(id)
+        .populate({
+        	path: 'lineItems.prod_id',
+        	model: 'Product',
+        	populate: {
+        		path: 'categories',
+        		model: 'Category'
+        	}
+        })
         .then(function(order){
             res.send(order);
         })
@@ -119,20 +127,6 @@ router.get('/:id', authorization.isAdminOrOwner, function(req, res, next){
 								model: 'Category'
 							}
 						});
-
-    /*
-	if(req.user)
-		queryPromise = Order.findOne({userId: req.user._id, status: 'Cart'})
-						.populate({
-							path: 'lineItems.prod_id',
-							model: 'Product',
-							populate: {
-								path: 'categories',
-								model: 'Category'
-							}
-						});
-						*/
-
 	queryPromise
 	.then(function(order){
 		res.send(order);
