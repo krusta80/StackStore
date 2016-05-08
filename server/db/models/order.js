@@ -55,7 +55,7 @@ schema.virtual('itemCount').get(function(){
     return sum;
 })
 
-//Refactoring - Why do we have two of these. Remove unused without breaking site.
+//Refactoring - Why do we have two of these? Remove unused without breaking site.
 schema.virtual('numItems').get(function(){
     var count = 0;
 
@@ -110,7 +110,7 @@ schema.pre('save', function (next) {
         this.dateCreated = Date.now();
     }
 
-    //If order has billing address, save state as a field on DB - this saves us a lookup on calculating taxes / totals.
+    //If order has billing address, save state as a field on DB - this saves us an async lookup when calculating taxes in the 'total' virtual.
     if(this.billingAddress){
         this.billingState = this.billingAddress.state;
     }

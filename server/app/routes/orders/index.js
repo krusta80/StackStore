@@ -187,12 +187,12 @@ router.put('/myCart', function(req, res, next) {
 });
 
 router.put('/:id', function(req, res, next){
-	
+
 	Order.findById(req.params.id)
 	.then(function(fetchedOrder){
 		delete req.body.__v;
 		//Most values can only be edited while in the 'Cart' stage
-		if(fetchedOrder.status !== 'Cart'){
+		if(fetchedOrder.status !== 'Cart' && req.user.role !== 'Admin'){
 			delete req.body.userId; delete req.body.sessionId;
 			delete req.body.email;
 			delete req.body.invoiceNumber; delete req.body.lineItems;

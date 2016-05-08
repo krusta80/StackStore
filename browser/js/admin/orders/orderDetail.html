@@ -1,0 +1,24 @@
+<div class="container">
+    <div class="col-md-8 col-md-offset-2">
+        <form style="padding-bottom: 25px;" class="well">
+            <alert type="danger" ng-show="error">
+                {{ error }}
+            </alert>
+            <h2 style="margin-top: 0; margin-bottom: 15px; text-align: center">Add/Edit/Remove an Order</h2>
+        
+            <div ng-repeat="field in fields" class="form-group">
+                <label for="field.key">{{field.title}}</label>
+                <input ng-show="isTextInput(field.key)" type="text" ng-model="order[field.key]" class="form-control" id="order[field.key]">
+                <!-- <input ng-show="field.key === 'password'" type="password" ng-model="user[field.key]" class="form-control" id="user[field.key]"> -->
+                <select ng-show="!isTextInput(field.key)" ng-model="order[field.key]" 
+                    id="order[field.key]" class="form-control"
+                    ng-options="option for option in getOptions(field.key) track by option"></select>
+            </div>
+            <hr style="border-color: #cccccc; margin-top: 0">
+            <div align=center>
+                <button ng-click="addUpdateOrder()" class="btn btn-default btn-success" style="width: 50%"><b>Add / Update Order</b></button>
+                <button ng-click="deleteOrder()" class="btn btn-default btn-danger" style="width: 50%; margin-top: 10px"><b>Delete Order</b></button>
+            </div>
+        </form>
+    </div>
+</div>

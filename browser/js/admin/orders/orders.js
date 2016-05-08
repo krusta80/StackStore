@@ -13,7 +13,32 @@ app.config(function($stateProvider){
 			}
 		}
 	});
+
+	$stateProvider.state('orderDetail', {
+		url: '/admin/orders/:orderId',
+		controller: 'OrderCtrl',
+		templateUrl: 'js/admin/orders/orderDetail.html',
+		resolve: {
+			order: function(OrdersFactory, $stateParams){
+				console.log("Resolve orders with id", $stateParams.orderId)
+				return OrdersFactory.fetchById($stateParams.orderId);
+			},
+			fields: function(OrdersFactory){
+				console.log("Resolve fields")
+				return OrdersFactory.fetchFields();
+			},
+			thisUser: function(AuthService) {
+				console.log("Resolve this user")
+				return AuthService.getLoggedInUser();
+			}
+		}
+	});
 });
+
+
+
+//Order History (Can only test from details page - should be pretty simple, uses history template)
+//Order Details
 
 app.controller('OrderListCtrl', function($scope, orders, OrdersFactory, fields, $state){
 	
@@ -29,10 +54,88 @@ app.controller('OrderListCtrl', function($scope, orders, OrdersFactory, fields, 
 	$scope.goToOrder = function(index) {
 		console.log("going to index", index);
 		if(index == -1)
-			return $state.go('orderDetails', {id: "NEW"});
-		$state.go('orderDetails', {id: orders[index]._id});
+			return $state.go('orderDetail', {orderId: "NEW"}); 
+		$state.go('orderDetail', {orderId: orders[index]._id});
 	}
 
 });
+
+app.controller('OrderCtrl', function($scope, order, OrdersFactory, fields, $state, GitCommitted, thisUser){
+	var origOrder;
+	origOrder = angular.copy(order);
+	$scope.thisUser = thisUser;
+	$scope.order = order;
+	$scope.fields = [];
+	fields.forEach(function(field) {
+		field = {key: field, title: GitCommitted.fancify(field)};
+		if(field.key !== '_id' && field.key !== 'dateCreated' && field.key !== 'origId') {
+			$scope.fields.push(field);
+		}
+	});
+
+	var restoreForm = function() {
+		order = origOrder;
+		origOrder = angular.copy(order);
+		$scope.order = order;
+	};
+
+	var success = function() {
+		$state.go('success');
+        setTimeout(function() {
+            $state.go('orderList');
+        },2000);
+	};
+
+	$scope.isTextInput = function(key) {
+		return $scope.getOptions(key).length === 0;
+	};
+
+	$scope.getOptions = function(key) {
+		if(typeof order[key] === 'boolean')
+			return [true, false];
+		else if(key === 'status')
+			return ['Cart', 'Ordered', 'Notified', 'Shipped', 'Delivered', 'Canceled'];
+		return [];
+	};
+
+	$scope.deleteOrder = function() {
+		OrdersFactory.deleteOrder(order._id)
+		.then(function(order) {
+			console.log("Order deleted successfully!");
+			success();
+		})
+		.catch(function(err) {
+			console.log(err);
+			$scope.error = err.data;
+			restoreForm();
+		});
+	};
+	
+	$scope.addUpdateOrder = function() {
+		if(order._id)
+			OrdersFactory.updateOrder($scope.order)
+			.then(function(updatedOrder) {
+				console.log("Order updated successfully!");
+				success();
+			})
+			.catch(function(err) {
+				console.log(err);
+				$scope.error = err.data;
+				restoreForm();
+			});
+		else
+			OrdersFactory.addOrders($scope.order)
+			.then(function(order) {
+				console.log("Order created successfully!");
+				success();
+			})
+			.catch(function(err) {
+				$scope.error = err.data;
+				restoreForm();
+			});
+	};
+	
+});
+
 
 

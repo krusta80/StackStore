@@ -27,13 +27,6 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 			})
 		},
 
-		fetchFields: function() {
-			return $http.get('/api/orders/fields')
-			.then(function(res){
-				return res.data;
-			})
-		},
-
 		getOrder: function(id){
 			return $http.get('/api/orders/' + id)
 			.then(function(res){
@@ -187,7 +180,59 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 			}
 
 			return;
+		},
+
+		//Functions for Admin Pages
+		fetchById: function(id) {
+			return $http.get('/api/orders/' + id)
+			.then(function(res){
+				console.log("The response", res.data)
+				return res.data;
+			})
+		},
+
+		fetchFields: function() {
+			return $http.get('/api/orders/fields')
+			.then(function(res){
+				return res.data;
+			})
+		},
+
+		deleteOrder: function(orderId) {
+			return $http.delete('/api/orders/'+ orderId)
+				.then(function(res) {
+					console.log(res.data);
+					return res.data;
+				})
+				.catch(function(err) {
+					console.log(err);
+					return $q.reject(err);
+				});
+		},
+		updateOrder: function(order) {
+			return $http.put('/api/orders/'+order._id, order)
+				.then(function(res) {
+					console.log(res.data);
+					return res.data;
+				})
+				.catch(function(err) {
+					console.log(err);
+					return $q.reject(err);
+				});
+		},
+		addOrder: function(order) {
+			return $http.post('/api/orders', order)
+				.then(function(res) {
+					console.log(res.data);
+					return res.data;
+				})
+				.catch(function(err) {
+					console.log(err);
+					return $q.reject(err);
+				});
 		}
+
+
 	};
 });
 
