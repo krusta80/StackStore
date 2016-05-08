@@ -2,36 +2,36 @@
 var mongoose = require('mongoose');
 var router = require('express').Router();
 var models = require('../../../db/models');
+var authorization = require('../../configure/authorization-middleware.js')
 var User = models.User;
 module.exports = router;
 
-//Note - Still need to implement access control!
+//(This route is used in admin pages)
+router.get('/fields', function (req, res, next) {
+    if(!req.user)
+        res.send(readWhitelist.Any);
+    res.send(readWhitelist[req.user.role]);
+});
 
-var readWhitelist = {
-    Any: ['firstName', 'middleName', 'lastName', 'email'],
-    User: ['firstName', 'middleName', 'lastName', 'email', 'dateCreated', 'origId', '_id', 'active', 'pendingPasswordReset', 'role'],
-    Admin: ['firstName', 'middleName', 'lastName', 'email', 'password', 'dateCreated', 'origId', '_id', 'active', 'pendingPasswordReset', 'role']
-};
+//Req Params
+router.param('id', function(req, res, next, id){
 
-var writeWhitelist = {
-    Any: [],
-    User: ['firstName', 'middleName', 'lastName', 'email'],
-    Admin: ['firstName', 'middleName', 'lastName', 'email', 'password', 'active', 'pendingPasswordReset', 'role']
-};
+    User.findById(id).exec()
+    .then(function(user){
+        if(!user) res.status(404).send();
+        req.requestedUser = user;
+        next();
+    })
+    .then(next, null);
+})
 
-
-router.get('/', function (req, res, next) {
+//Route Handlers
+router.get('/', authorization.isAdmin, function (req, res, next) {
     User.find({dateModified : {$exists : false }})
     .then(function(users){
         res.send(users);
     })
     .then(null, next);
-});
-
-router.get('/fields', function (req, res, next) {
-    if(!req.user)
-        res.send(readWhitelist.Any);
-    res.send(readWhitelist[req.user.role]);
 });
 
 router.get('/:origId/history', function(req, res, next){
@@ -43,13 +43,13 @@ router.get('/:origId/history', function(req, res, next){
         .then(null, next);
 });
 
-router.get('/:id', function(req, res, next){
-	var id = req.params.id;
-	User.findById(id)
-	.then(function(user){
-		res.send(user);
-	})
-	.then(null, next);
+router.get('/:id', authorization.isAdminOrSelf, function(req, res, next){
+    var id = req.params.id;
+    User.findById(id)
+    .then(function(user){
+        res.send(user);
+    })
+    .then(null, next);
 })
 
 router.post('/', function(req, res, next){
@@ -70,13 +70,9 @@ router.post('/', function(req, res, next){
     });
 })
 
-//To-do: Need to DELETE certain fields and configure access control.
-router.put('/:id', function(req, res, next){
-    //Stripping fields example
-    //Prevents user from editing own role. Meant to be used in conuunction with isAdminOrSelf middleware.
-    //if(req.passport.session.user.equals(req.requestedUser)) delete req.body.role;
+router.put('/:id', authorization.isAdminOrSelf, function(req, res, next){
     
-    console.log("***********CALLED");
+    //If self, delete certain fields - this isn't free license to edit any field.
 
 	//Find user by ID, add dateModified timestamp, but return ORIGINAL User object
     User.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
@@ -105,7 +101,7 @@ router.put('/:id', function(req, res, next){
     .then(null, next);
 });
 
-router.delete('/:id', function(req, res, next){
+router.delete('/:id', authorization.isAdmin, authorization.isNotSelf, function(req, res, next){
     User.findByIdAndUpdate(req.params.id, {dateModified: Date.now()}, {new: true})
     .then(function(deletedUser) {
         res.send(deletedUser);
@@ -113,45 +109,15 @@ router.delete('/:id', function(req, res, next){
     .then(null, next);
 })
 
-//Router Param
-router.param('id', function(req, res, next, id){
-    User.findById(id).exec()
-    .then(function(user){
-        if(!user) res.status(404).send();
-        req.requestedUser = user;
-        next();
-    })
-    .then(next, null);
-})
-
-//Access Control
-function isUser(){
-    var sessionUser = req.session.passport.user;
-    if(!sessionUser) next(res.status(401).send());
-    else next();
+//Whitelists
+var readWhitelist = {
+    Any: ['firstName', 'middleName', 'lastName', 'email'],
+    User: ['firstName', 'middleName', 'lastName', 'email', 'dateCreated', 'origId', '_id', 'active', 'pendingPasswordReset', 'role'],
+    Admin: ['firstName', 'middleName', 'lastName', 'email', 'password', 'dateCreated', 'origId', '_id', 'active', 'pendingPasswordReset', 'role']
 };
 
-function isAdmin(){
-    var sessionUser = req.session.passport.user;
-
-    if(!sessionUser) next(res.status(401).send());
-    else if(!isAdmin(sessionUser)) next(res.status(401).send());
-    else next();
+var writeWhitelist = {
+    Any: [],
+    User: ['firstName', 'middleName', 'lastName', 'email'],
+    Admin: ['firstName', 'middleName', 'lastName', 'email', 'password', 'active', 'pendingPasswordReset', 'role']
 };
-
-function isAdminOrSelf(req, res, next){
-    var sessionUser = req.session.passport.user;
-
-    if(!sessionUser) next(res.status(401).send());
-    else if(!isAdmin(sessionUser) && !sessionUser.equals(req.requestedUser)) next(res.status(401).send());
-    else next();
-}
-
-//Helper
-function isAdmin(user){
-    if(user.role.toLowerCase() === 'admin'){
-        return true;
-    }
-
-    return false;
-}

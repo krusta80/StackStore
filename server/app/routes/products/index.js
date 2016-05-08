@@ -3,6 +3,7 @@ var router = require('express').Router();
 var mongoose = require('mongoose');
 var Product = mongoose.model('Product');
 var Category = mongoose.model('Category');
+var authorization = require('../../configure/authorization-middleware.js')
 
 module.exports = router;
 
@@ -14,7 +15,7 @@ var readWhitelist = {
 
 var writeWhitelist = {
 	Any: [],
-	User: [],
+	User: ['reviews'],
 	Admin: ['title', 'description', 'imageUrls', 'reviews', 'averageStars', 'categories', 'reviews', 'price', 'inventoryQty', 'active']
 };
 
@@ -23,6 +24,14 @@ var filterCategories = function(product) {
 		return Category.findOne({dateModified : {$exists : false }, origId: category.origId});
 	});
 };
+
+
+//get fields
+router.get('/fields', function(req, res, next){
+	if(!req.user)
+        res.send(readWhitelist.Any);
+    res.send(readWhitelist[req.user.role]);
+});
 
 //get all products, which might be unnecessary
 router.get('/', function(req, res, next){
@@ -40,13 +49,6 @@ router.get('/:origId/history', function(req, res, next){
 			res.send(history);
 		})
 		.then(null, next);
-});
-
-//get fields
-router.get('/fields', function(req, res, next){
-	if(!req.user)
-        res.send(readWhitelist.Any);
-    res.send(readWhitelist[req.user.role]);
 });
 
 //get products that match search query
@@ -99,7 +101,7 @@ router.get('/:id', function(req, res, next){
 		.then(null, next);
 });
 
-router.post('/', function(req, res, next){
+router.post('/', authorization.isAdmin, function(req, res, next){
 	var newProduct = new Product(req.body);
 	newProduct.origId = newProduct._id;
 	newProduct.save()
@@ -109,6 +111,7 @@ router.post('/', function(req, res, next){
 		.then(null, next);
 });
 
+//User can only PUT reviews
 router.put('/:id', function(req, res, next){
 	Product.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
 		.then(function(origProduct){
@@ -133,7 +136,7 @@ router.put('/:id', function(req, res, next){
 		.then(null, next);
 });
 
-router.delete('/:id', function(req, res, next){
+router.delete('/:id', authorization.isAdmin, function(req, res, next){
 	Product.findByIdAndUpdate(req.params.id, {dateModified: Date.now()}, {new: true})
 		.then(function(deletedProduct){
 			res.send(deletedProduct);
