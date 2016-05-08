@@ -197,7 +197,6 @@ router.put('/:id', function(req, res, next){
 	Order.findById(req.params.id)
 	.then(function(fetchedOrder){
 		delete req.body.__v;
-			
 		//Most values can only be edited while in the 'Cart' stage
 		if(fetchedOrder.status !== 'Cart'){
 			delete req.body.userId; delete req.body.sessionId;
@@ -217,11 +216,12 @@ router.put('/:id', function(req, res, next){
 			delete req.body.status
 		}
 
-		//Finally, update values and timestamp
+		//Finally, update values
 		for(var key in req.body){
 			fetchedOrder[key] = req.body[key];
 	    }
 
+	    //Then timestamp before saving order.
 	    var fetchedOrder = fetchedOrder.timestampStatus();
 	    return fetchedOrder.save();
 	})

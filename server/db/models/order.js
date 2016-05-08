@@ -89,6 +89,8 @@ schema.methods.timestampStatus = function(){
     return this;
 }
 
+
+
 /* Need to add user or session ID to tests
 schema.pre('validate', function(next) {
     if (!this.userId && !this.sessionId) {
@@ -105,13 +107,23 @@ schema.pre('save', function (next) {
         this.dateCreated = Date.now();
     }
 
-    next();
+
+    if(this.status === 'Ordered' && !this.invoiceNumber){
+        var that = this;
+        return createUniqueInvoiceNumber()
+        .then(function(invoiceNumber){
+            that.invoiceNumber = invoiceNumber;
+            next();
+        })
+    }else{
+        next();
+    }
 
 });
 
 module.exports = mongoose.model('Order', schema);
 
-//Helper
+//Helpers
 function getSalesTaxPercent(state){
     var taxTable = {
         AL: 4.00, AK: 0.00, AZ: 5.60, AR: 6.50, CA: 7.50, CO: 2.90, CT: 6.35, DE: 0.00, FL: 6.00,
@@ -123,4 +135,18 @@ function getSalesTaxPercent(state){
     }
 
     return taxTable[state];
+ }
+
+function createUniqueInvoiceNumber(){
+    var invoiceNumber = 'INV000'+ Math.random().toString(10).slice(3,8);
+    return mongoose.model('Order').find({invoiceNumber: invoiceNumber})
+     .then(function(order){
+         if(order.length === 0){
+            console.log("\n\n\nATTACHIN INVOICE NUMBER: ", invoiceNumber)
+            return invoiceNumber;
+         }else{
+            console.log("\nINVOICE NUMBER EXISTS: ", invoiceNumber)
+            return createUniqueInvoiceNumber();
+         }
+    })
  }
