@@ -4,6 +4,7 @@ navbar {
   background: white;
   border-bottom: 1px solid black;
   box-shadow: 1px 1px 14px -3px black;
+  font-family: 'Cabin', sans-serif;
 
   .container {
     width: 91%;
@@ -26,11 +27,11 @@ navbar {
     cursor: pointer;
     transition: color 0.2s;
     &.active {
-      color: darken(#f31214, 10%);
+      color: darken(#FF9900, 10%);
     }
     &:hover {
       background: none;
-      color: #f31214;
+      color: #ff9900;
     }
     &:focus {
       background: none;
@@ -48,7 +49,7 @@ navbar {
       margin-right: 5px;
     }
     a {
-      color: #f30046;
+      color: #ff9900;
       cursor: pointer;
     }
   }

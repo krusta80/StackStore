@@ -24,6 +24,13 @@ app.factory('ProductsFactory', function($http){
 				});
 	}
 
+	ProductsFactory.fetchHistory = function(origId){
+		return $http.get('/api/products/' + origId + '/history')
+				.then(function(res){
+					return res.data;
+				});
+	}
+
 	ProductsFactory.fetchFields = function(){
 		return $http.get('/api/products/fields')
 				.then(function(res){

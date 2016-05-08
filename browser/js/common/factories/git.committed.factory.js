@@ -7,6 +7,15 @@ app.factory('GitCommitted', function () {
 	                .replace(/([A-Z])/g, ' $1')
 	                // uppercase the first character
 	                .replace(/^./, function(str){ return str.toUpperCase(); })
+	    },
+	    dateify: function(field, label) {
+	    	var d = new Date(field);
+	    	if (label.indexOf("date") === 0 && Object.prototype.toString.call(d) === "[object Date]" && !isNaN(d.getTime())) 
+				return d.toLocaleString();
+			else
+				return field;
 	    }
-	};    
+	};
+
+
 });

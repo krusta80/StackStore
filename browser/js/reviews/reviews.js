@@ -24,6 +24,7 @@ app.config(function($stateProvider){
 
 app.controller('ReviewsCtrl', function($scope, $stateParams, $rootScope, $state, ProductsFactory, ReviewsFactory, AuthService, review){
 	$scope.review = review;
+	
 	ProductsFactory.fetchById($stateParams.productId)
 		.then(function(product){
 			$scope.product = product;
@@ -50,7 +51,6 @@ app.controller('ReviewsCtrl', function($scope, $stateParams, $rootScope, $state,
 					return ProductsFactory.updateProduct($scope.product);
 				})
 				.then(function(product){
-					console.log($rootScope.previousState.name, product._id);
 					if($rootScope.previousState.name === 'reviewList')
 						return $state.go($rootScope.previousState);
 					$state.go('product', {id: product._id});
@@ -66,7 +66,6 @@ app.controller('ReviewsCtrl', function($scope, $stateParams, $rootScope, $state,
 					return ProductsFactory.updateProduct($scope.product)
 				})
 				.then(function(product){
-					console.log($rootScope.previousState.name, product._id);
 					if($rootScope.previousState.name === 'reviewList')
 						return $state.go($rootScope.previousState);
 					$state.go('product', {id: product._id});
@@ -93,7 +92,6 @@ app.controller('ReviewsCtrl', function($scope, $stateParams, $rootScope, $state,
 
 				})
 				.then(function(product){
-					console.log($rootScope.previousState.name, product._id);
 					if($rootScope.previousState.name === 'reviewList')
 						return $state.go($rootScope.previousState);
 					$state.go('product', {id: product._id});
@@ -106,6 +104,14 @@ app.controller('ReviewsCtrl', function($scope, $stateParams, $rootScope, $state,
 
 	$scope.updateReview = function(stars){
 		$scope.review.stars=stars;
+	}
+
+	$scope.getHistory = function(){
+		$state.go('reviewHistory', {origId: review.origId});
+	}
+
+	$scope.isAdmin = function() {
+		return $scope.review.user.role === 'Admin';
 	}
 
 

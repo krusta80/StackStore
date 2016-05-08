@@ -33,7 +33,18 @@ app.factory('ReviewsFactory', function($http){
 			});
 	}
 
+	ReviewsFactory.fetchHistory = function(origId){
+		return $http.get('/api/reviews/'+origId+'/history')
+			.then(function(res){
+				return res.data;
+			})
+			.catch(function(err){
+				throw(err);
+			});
+	}
+
 	ReviewsFactory.updateReview = function(review){
+		console.log("submitting review...");
 		return $http.put('/api/reviews/'+review._id, review)
 			.then(function(res){
 				return res.data;

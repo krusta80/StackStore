@@ -3,7 +3,52 @@ var mongoose = require('mongoose');
 var router = require('express').Router();
 var models = require('../../../db/models');
 var Order = models.Order;
+var User = models.User;
+var authorization = require('../../configure/authorization-middleware.js');
 module.exports = router;
+
+var readWhitelist = {
+    Any: ['_id', 'sessionId', 'email', 'lineItems', 'invoiceNumber', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
+    User: ['_id', 'userId', 'sessionId', 'email', 'lineItems', 'invoiceNumber', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
+    Admin: ['_id', 'userId', 'sessionId', 'email', 'lineItems', 'invoiceNumber', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
+};
+
+var writeWhitelist = {
+    Any: ['lineItems', 'shippingAddress', 'billingAddress'],
+    User: ['lineItems', 'shippingAddress', 'billingAddress'],
+    Admin: ['_id', 'userId', 'sessionId', 'email', 'lineItems', 'invoiceNumber', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
+};
+
+//Route Params
+router.param('id', function(req, res, next, id){
+    Order.findById(id).exec()
+    .then(function(order){
+        if(!order) res.status(404).send();
+        req.requestedObject = order;
+        if(order.userId){
+            User.findById(order.userId)
+            .then(function(user){
+                if(!user) res.status(404).send();
+                req.requestedUser = user;
+                next();
+            })
+        }else{
+            next();
+        }
+    })
+    .then(null, next);
+})
+
+router.param('userId', function(req, res, next, id){
+	console.log("USER ID", id);
+    User.findById(id).exec()
+    .then(function(user){
+        if(!user) res.status(404).send();
+        req.requestedUser = user;
+        next();
+    })
+    .then(null, next);
+})
 
 
 //Routes
@@ -15,8 +60,14 @@ router.get('/', function (req, res, next) {
 	.then(null, next);
 });
 
+router.get('/fields', function(req, res, next) {
+	if(!req.user)
+        res.send(readWhitelist.Any);
+    res.send(readWhitelist[req.user.role]);
+});
+
 //added by CK on 5/4 to retrieve historical orders
-router.get('/myOrders/:userId', function(req, res, next){
+router.get('/myOrders/:userId', authorization.isAdminOrSelf, function(req, res, next){
 	Order.find({userId: req.params.userId, status: { $not: /^Cart.*/}})//filters out orders in status "Cart"
 	.populate('lineItems.prod_id')
 	.populate('shippingAddress')
@@ -50,7 +101,15 @@ router.get('/myCart', function(req, res, next){
         var id = req.session.cartId;
     
         console.log("session cart id", id);
-        Order.findById(id).populate({path: 'lineItems.prod_id'})
+        Order.findById(id)
+        .populate({
+        	path: 'lineItems.prod_id',
+        	model: 'Product',
+        	populate: {
+        		path: 'categories',
+        		model: 'Category'
+        	}
+        })
         .then(function(order){
             res.send(order);
         })
@@ -58,7 +117,7 @@ router.get('/myCart', function(req, res, next){
     }
 })
 
-router.get('/:id', function(req, res, next){
+router.get('/:id', authorization.isAdminOrOwner, function(req, res, next){
 	var queryPromise = Order.findById(req.params.id)
 						.populate({
 							path: 'lineItems.prod_id',
@@ -68,20 +127,6 @@ router.get('/:id', function(req, res, next){
 								model: 'Category'
 							}
 						});
-
-    /*
-	if(req.user)
-		queryPromise = Order.findOne({userId: req.user._id, status: 'Cart'})
-						.populate({
-							path: 'lineItems.prod_id',
-							model: 'Product',
-							populate: {
-								path: 'categories',
-								model: 'Category'
-							}
-						});
-						*/
-
 	queryPromise
 	.then(function(order){
 		res.send(order);
@@ -89,7 +134,7 @@ router.get('/:id', function(req, res, next){
 	.then(null, next);
 })
 
-router.get('/cartByUser/:userId', function(req, res, next) {
+router.get('/cartByUser/:userId', authorization.isAdminOrSelf,function(req, res, next) {
     if(req.user && (req.user.role === 'Admim' || req.user._id === req.params.userId))
         Order.findOne({userId: req.params.userId, status: 'Cart'}).populate({path: 'lineItems.prod_id'})
         .then(function(order){
@@ -146,7 +191,6 @@ router.put('/:id', function(req, res, next){
 	Order.findById(req.params.id)
 	.then(function(fetchedOrder){
 		delete req.body.__v;
-			
 		//Most values can only be edited while in the 'Cart' stage
 		if(fetchedOrder.status !== 'Cart'){
 			delete req.body.userId; delete req.body.sessionId;
@@ -166,11 +210,12 @@ router.put('/:id', function(req, res, next){
 			delete req.body.status
 		}
 
-		//Finally, update values and timestamp
+		//Finally, update values
 		for(var key in req.body){
 			fetchedOrder[key] = req.body[key];
 	    }
 
+	    //Then timestamp before saving order.
 	    var fetchedOrder = fetchedOrder.timestampStatus();
 	    return fetchedOrder.save();
 	})

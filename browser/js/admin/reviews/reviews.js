@@ -13,6 +13,27 @@ app.config(function($stateProvider){
 			}
 		}
 	});
+
+	$stateProvider.state('reviewHistory', {
+		url: '/admin/reviews/:origId/history',
+		controller: 'HistoryCtrl',
+		templateUrl: 'js/admin/history/history.html',
+		resolve: {
+			history: function(ReviewsFactory, $stateParams){
+				console.log("origId is", $stateParams.origId);
+				return ReviewsFactory.fetchHistory($stateParams.origId);
+			},
+			fields: function(ReviewsFactory){
+				return ReviewsFactory.fetchFields();
+			},
+			origId: function($stateParams) {
+				return $stateParams.origId
+			},
+			model: function() {
+				return "Review"
+			}
+		}
+	});
 });
 
 app.controller('ReviewListCtrl', function($scope, reviews, ReviewsFactory, fields, $state){
