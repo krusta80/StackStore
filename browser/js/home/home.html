@@ -1,5 +1,5 @@
 
-<video autoplay loop poster="http://www.chattanoogafun.com/images/media-room/low-res/b4d10e36-5f5e-4ef7-9ff7-eb035da9b09a.jpg" id="bgvid">
+<video autoplay loop poster="spacer.png" id="bgvid">
 	<style>
 	/*This makes the video fullscreen in the background*/
 		video#bgvid { 
@@ -19,11 +19,14 @@
 	    background-size: cover; 
 	}
 	</style>
-    <source src="http://ak9.picdn.net/shutterstock/videos/4405619/preview/stock-footage-moscow-jul-moving-camera-wide-view-timelapse-customers-buying-products-in-auchan-mall-on.mp4" type="video/mp4">
+    <!-- <source src="http://ak9.picdn.net/shutterstock/videos/4405619/preview/stock-footage-moscow-jul-moving-camera-wide-view-timelapse-customers-buying-products-in-auchan-mall-on.mp4" type="video/mp4"> -->
+    <source ng-src="{{trustSrc(video)}}" type="video/mp4">
 </video>
 
 <section id="home">
-    <fullstack-logo></fullstack-logo>
-    <rando-greeting></rando-greeting>
+    <!-- <div style="position: absolute; left: 950px; top: 670px">
+    	<fullstack-logo style="" ng-show="!ready"></fullstack-logo>
+    </div> -->
+    <!--<rando-greeting></rando-greeting>-->
 </section>
 </body>
