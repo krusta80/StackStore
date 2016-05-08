@@ -19,15 +19,11 @@ app.controller('CategoriesCtrl', function($scope, categories, CategoriesFactory,
 
 	$scope.categories = categories;
 
-	console.log($state.$current);
+	console.log($state.$current.name);
 
  	$scope.fetchCurrentCategory = function(){
 		return CategoriesFactory.fetchCurrentCategory();
 	};
-
-	if(!$scope.fetchCurrentCategory() && categories.length > 0 && $state.$current.name === 'categories') { 		
-		$state.go('categories.products', {categoryId: categories[0]._id});
- 	}
 
 	
 });
