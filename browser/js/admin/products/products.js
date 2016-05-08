@@ -20,8 +20,11 @@ app.controller('ProductListCtrl', function($scope, products, ProductsFactory, fi
 	$scope.products = products.map(function(product) {
 		var filteredProduct = {};
 		fields.forEach(function(field) {
-			if(typeof product[field] !== 'object')
+			if(typeof product[field] !== 'object') {
 				filteredProduct[field] = product[field];
+				if(field === 'averageStars')
+					filteredProduct[field] = Math.round(filteredProduct[field]*10)/10;
+			}
 		});
 		return filteredProduct;
 	});

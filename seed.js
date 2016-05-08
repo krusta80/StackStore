@@ -38,10 +38,19 @@ var wipeCollections = function () {
         removeReviews
     ]);
 };
+
+var updateOrigIds = function(items) {
+    return items.map(function(item) {
+        item.origId = item._id;
+        return item.save();
+    });
+};
+
 var generateRandomCategory = function() {
     return {
         name: faker.commerce.department(),
-        description: faker.lorem.sentence()
+        description: faker.lorem.sentence(),
+        active: true
     };
 };
 
@@ -55,7 +64,8 @@ var generateRandomProduct = function(categoryIds) {
         categories: categoryIds,
         price: faker.finance.amount(),
         inventoryQty: Math.floor(Math.random()*100),
-        active: faker.random.boolean()
+        active: faker.random.boolean(),
+        dateCreated: faker.date.past()
     };
 };
 var generateRandomAddress = function(userId) {
@@ -68,7 +78,8 @@ var generateRandomAddress = function(userId) {
         city: faker.address.city(),
         state: faker.address.stateAbbr(),
         zip: faker.address.zipCode(),
-        active: faker.random.boolean()
+        active: faker.random.boolean(),
+        dateCreated: faker.date.past()
     };
 };
 var generateRandomReview = function(product, user) {
@@ -154,7 +165,11 @@ var seedUsers = function () {
             dateModified:  Date.now()
         }
     ];
-    return User.create(users);
+    
+    return User.create(users)
+            .then(function(newUsers) {
+                return Promise.all(updateOrigIds(newUsers));
+            })
 };
 var seedCategories = function(reps){
     console.log("   -Seeding categories")
@@ -167,7 +182,10 @@ var seedCategories = function(reps){
         categories.push(thisCategory);
         categoryHash[thisCategory.name] = true;
     }
-    return Category.create(categories);
+    return Category.create(categories)
+            .then(function(newCategories) {
+                return Promise.all(updateOrigIds(newCategories));
+            });
 };
 var seedProducts = function(reps, categories){
     console.log("   -Seeding products")
@@ -180,21 +198,30 @@ var seedProducts = function(reps, categories){
         	products.push(generateRandomProduct([categories[Math.floor(Math.random()*categories.length)]]));
 	}
 
-    return Product.create(products);
+    return Product.create(products)
+            .then(function(newProducts) {
+                return Promise.all(updateOrigIds(newProducts));
+            })
 }
 var seedReviews = function(reps, products, users){
     console.log("   -Seeding reviews")
     var reviews = [];
     for(var i = 0; i < reps; i++)
         reviews.push(generateRandomReview(products[Math.floor(Math.random()*products.length)], users[Math.floor(Math.random()*users.length)]));
-    return Review.create(reviews);
+    return Review.create(reviews)
+            .then(function(newReviews) {
+                return Promise.all(updateOrigIds(newReviews));
+            })
 }
 var seedAddresses = function(reps, users) {
     console.log("   -Seeding addresses");
     var addresses = [];
     for(var i = 0; i < reps; i++)
         addresses.push(generateRandomAddress(users[Math.floor(Math.random()*users.length)]));
-    return Address.create(addresses);  
+    return Address.create(addresses)
+            .then(function(newAddresses) {
+                return Promise.all(updateOrigIds(newAddresses));
+            })  
 };
 
 var seedOrders = function(reps, addresses, users, products) {

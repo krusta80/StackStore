@@ -29,6 +29,8 @@
                 <li ng-show="user.role === 'Admin'"role="separator" class="divider"></li>
                 <li ng-show="user.role === 'Admin'"> &nbsp;&nbsp;<b>Admin Functions</b></li>
                 <li ng-show="user.role === 'Admin'"role="separator" class="divider"></li>
+                <li ng-show="user.role === 'Admin'"><a ui-sref="categoryList()">Manage Categories</a></li>
+                <li ng-show="user.role === 'Admin'"><a ui-sref="orderList()">Manage Orders</a></li>
                 <li ng-show="user.role === 'Admin'"><a ui-sref="productList()">Manage Products</a></li>
                 <li ng-show="user.role === 'Admin'"><a ui-sref="reviewList()">Manage Reviews</a></li>
                 <li ng-show="user.role === 'Admin'"><a ui-sref="userList()">Manage Users</a></li>
@@ -45,7 +47,7 @@
             <div class="form-group" style="display:inline;"> -->
               <div class="input-group" style="margin-top: 9.2px; padding-right: 10px">
                 <input type="text" class="form-control" ng-enter="productSearch()" ng-model="searchString" placeholder="Search products...">
-                <span class="input-group-addon"><a ui-sref="productSearch({string: searchString})"><span class="glyphicon glyphicon-search"></span></a></span>
+                <span class="input-group-addon"><a ui-sref="productSearch()"><span class="glyphicon glyphicon-search"></span></a></span>
               </div>
        <!--      </div>
         </form> -->

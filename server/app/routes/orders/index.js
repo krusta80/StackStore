@@ -5,6 +5,17 @@ var models = require('../../../db/models');
 var Order = models.Order;
 module.exports = router;
 
+var readWhitelist = {
+    Any: ['_id', 'sessionId', 'email', 'lineItems', 'invoiceNumber', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
+    User: ['_id', 'userId', 'sessionId', 'email', 'lineItems', 'invoiceNumber', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
+    Admin: ['_id', 'userId', 'sessionId', 'email', 'lineItems', 'invoiceNumber', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
+};
+
+var writeWhitelist = {
+    Any: ['lineItems', 'shippingAddress', 'billingAddress'],
+    User: ['lineItems', 'shippingAddress', 'billingAddress'],
+    Admin: ['_id', 'userId', 'sessionId', 'email', 'lineItems', 'invoiceNumber', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
+};
 
 //Routes
 router.get('/', function (req, res, next) {
@@ -13,6 +24,12 @@ router.get('/', function (req, res, next) {
 		res.send(orders);
 	})
 	.then(null, next);
+});
+
+router.get('/fields', function(req, res, next) {
+	if(!req.user)
+        res.send(readWhitelist.Any);
+    res.send(readWhitelist[req.user.role]);
 });
 
 //added by CK on 5/4 to retrieve historical orders

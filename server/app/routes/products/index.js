@@ -2,6 +2,7 @@
 var router = require('express').Router();
 var mongoose = require('mongoose');
 var Product = mongoose.model('Product');
+var Category = mongoose.model('Category');
 var authorization = require('../../configure/authorization-middleware.js')
 
 module.exports = router;
@@ -16,6 +17,12 @@ var writeWhitelist = {
 	Any: [],
 	User: ['reviews'],
 	Admin: ['title', 'description', 'imageUrls', 'reviews', 'averageStars', 'categories', 'reviews', 'price', 'inventoryQty', 'active']
+};
+
+var filterCategories = function(product) {
+	return product.categories.map(function(category) {
+		return Category.findOne({dateModified : {$exists : false }, origId: category.origId});
+	});
 };
 
 //get all products, which might be unnecessary
@@ -42,13 +49,18 @@ router.get('/category/:categoryId', function(req, res, next){
 	Product.find({categories: req.params.categoryId, dateModified: {$exists : false}})
 		.populate('categories')
 		.then(function(products){
+			console.log(products.length, "products found");
 			res.send(products);
 		})
-		.then(null, next);
+		.then(null, function(err) {
+			console.log(err);
+			next();
+		});
 });
 
 router.get('/:id', function(req, res, next){
 	var id = req.params.id;
+	var product;
 	Product.findById(id)
 		//nested populate
 		.populate({
@@ -57,7 +69,16 @@ router.get('/:id', function(req, res, next){
 				path: 'user'
 			}
 		})
-		.then(function(product){
+		.populate({
+			path: 'categories'
+		})
+		.then(function(_product){
+			product = _product;
+			//	updating categories
+			return Promise.all(filterCategories(product));
+		})
+		.then(function(categories){
+			product.categories = categories;
 			res.send(product);
 		})
 		.then(null, next);
