@@ -1,5 +1,5 @@
-<h3 ng-show="searchString" class="text-center">Products matching <i><u>{{searchString}}</u></i> </h3>
-<h3 ng-show="!searchString" class="text-center">{{category}} </h3>
+<h3 ng-show="searchString && products.length!==0" class="text-center">Products matching <i><u>{{searchString}}</u></i> </h3>
+<h2 ng-show="products.length===0" class="bg-danger text-center"><small>There is no product matching with <i><u>{{searchString}}</u></i></small></h2>
 <br>
 <div class="row">
 	<div class="col-md-4" dir-paginate="product in products | itemsPerPage: 6">
