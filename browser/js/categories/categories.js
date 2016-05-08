@@ -13,14 +13,21 @@ app.config(function($stateProvider){
 
 });
 
-app.controller('CategoriesCtrl', function($scope, categories, CategoriesFactory){
+app.controller('CategoriesCtrl', function($scope, categories, CategoriesFactory, $state){
 
 	CategoriesFactory.clearCurrentCategory();
 
 	$scope.categories = categories;
 
-	$scope.fetchCurrentCategory = function(){
+	console.log($state.$current);
+
+ 	$scope.fetchCurrentCategory = function(){
 		return CategoriesFactory.fetchCurrentCategory();
 	};
 
+	if(!$scope.fetchCurrentCategory() && categories.length > 0 && $state.$current.name === 'categories') { 		
+		$state.go('categories.products', {categoryId: categories[0]._id});
+ 	}
+
+	
 });
