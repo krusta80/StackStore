@@ -220,6 +220,8 @@ router.put('/:id', function(req, res, next){
 	    return fetchedOrder.save();
 	})
 	.then(function(updatedOrder){
+		if(updatedOrder.status == 'Ordered')
+			delete req.session.cartId;
 		res.send(updatedOrder);
 	})
 	.then(null, next);

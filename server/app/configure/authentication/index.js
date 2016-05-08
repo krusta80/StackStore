@@ -56,6 +56,10 @@ module.exports = function (app) {
     app.use(function (req, res, next) {
         if(!req.session.cartId) {
             console.log("No cart found for this session...creating one now.");
+            if(!req.session) {
+                req.session = {};
+                console.log("****** NO REQ SESSION!!!");
+            }
             OrderModel.create({
                 sessionId: req.cookies['connect.sid'],
                 status: 'Cart',
