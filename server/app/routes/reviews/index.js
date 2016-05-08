@@ -2,6 +2,8 @@
 var router = require('express').Router();
 var mongoose = require('mongoose');
 var Review = mongoose.model('Review');
+var User = mongoose.model('User');
+var authorization = require('../../configure/authorization-middleware.js')
 
 module.exports = router;
 
@@ -17,6 +19,30 @@ var writeWhitelist = {
     Admin: ['product', 'user', 'title', 'stars', 'description', 'dateCreated', 'productName', 'userEmail'],
 };
 
+//Req Params
+router.param('id', function(req, res, next, id){
+    Review.findById(id).exec()
+    .then(function(address){
+        if(!address) res.status(404).send();
+        req.requestedObject = address;
+        if(address.userId){
+            console.log("\n\n Has one")
+            User.findById(address.userId)
+            .then(function(user){
+                console.log("\n\nThe user", user)
+                if(!user) res.status(404).send();
+                req.requestedUser = user;
+                next();
+            })
+        }else{
+            next();
+        }
+
+        
+    })
+    .then(next, null);
+})
+
 
 //get all reviews, which might be unnecessary
 router.get('/', function(req, res, next){
@@ -27,14 +53,14 @@ router.get('/', function(req, res, next){
 		.then(null, next);
 });
 
-//get fields
-router.get('/fields', function(req, res, next){
-	if(!req.user)
-        res.send(readWhitelist.Any);
-    res.send(readWhitelist[req.user.role]);
+//Get a specific review
+router.get('/:id', function(req, res, next){
+	Review.findById(req.params.id).populate({path: 'product', path: 'user'})
+		.then(function(review){
+			res.send(review);
+		})
+		.then(null, next);	
 });
-
-//no need to get a specific review
 
 //find reviews by productId
 router.get('/product/:productId', function(req, res, next){
@@ -68,15 +94,9 @@ router.post('/', function(req, res, next){
 		.then(null, next);
 });
 
-router.get('/:id', function(req, res, next){
-	Review.findById(req.params.id).populate({path: 'product', path: 'user'})
-		.then(function(review){
-			res.send(review);
-		})
-		.then(null, next);	
-});
 
-router.put('/:id', function(req, res, next){
+
+router.put('/:id', authorization.isAdminOrOwner, function(req, res, next){
 	req.body.productName = req.body.product.title;
 	req.body.userEmail = req.body.user.email;
 	Review.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
@@ -96,7 +116,7 @@ router.put('/:id', function(req, res, next){
 });
 
 //delete this route because in product populate will take care of it
-router.delete('/:id', function(req, res, next){
+router.delete('/:id', authorization.isAdminOrOwner, function(req, res, next){
 	Review.findByIdAndUpdate(req.params.id, {dateModified: Date.now()}, {new: true})
 		.then(function(deletedReview){
 			res.send(deletedReview);
@@ -104,7 +124,12 @@ router.delete('/:id', function(req, res, next){
 		.then(null, next);
 });
 
-
+//get fields
+router.get('/fields', function(req, res, next){
+	if(!req.user)
+        res.send(readWhitelist.Any);
+    res.send(readWhitelist[req.user.role]);
+});
 
 
 
