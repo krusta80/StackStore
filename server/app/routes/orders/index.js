@@ -76,6 +76,7 @@ router.get('/myOrders/:userId', authorization.isAdminOrSelf, function(req, res, 
 	Order.find({userId: req.params.userId, status: { $not: /^Cart.*/}})//filters out orders in status "Cart"
 	.populate('lineItems.prod_id')
 	.populate('shippingAddress')
+	.populate('billingAddress')
 	.then(function(orders){
 		res.send(orders);
 	})
@@ -86,14 +87,17 @@ router.get('/myOrders/:userId', authorization.isAdminOrSelf, function(req, res, 
 
 router.get('/pastOrders/:key', function(req, res, next) {
     console.log("In past order route...");
-    Order.findOne({pastOrderKey: req.params.key}).populate({
-							path: 'lineItems.prod_id',
-							model: 'Product',
-							populate: {
-								path: 'categories',
-								model: 'Category'
-							}
-						})
+    Order.findOne({pastOrderKey: req.params.key})
+    	.populate({
+			path: 'lineItems.prod_id',
+			model: 'Product',
+			populate: {
+				path: 'categories',
+				model: 'Category'
+			}
+		})
+		.populate({path: 'billingAddress'})
+		.populate({path: 'shippingAddress'})
     .then(function(order) {
         console.log("past order found...", order);
         res.send(order);
@@ -120,6 +124,7 @@ router.get('/myCart', function(req, res, next){
         })
         .catch(function(err) {
             console.log("ERROR:",err);
+            next();
         });
     }
     else {
@@ -136,9 +141,23 @@ router.get('/myCart', function(req, res, next){
         	}
         })
         .then(function(order){
-            res.send(order);
+        	if(!order)
+        		return Order.create({
+		            sessionId: req.cookies['connect.sid'],
+		            status: 'Cart',
+		            dateCreated: Date.now()
+		        })
+        	else
+            	return res.send(order);
         })
-        .then(null, next);    
+        .then(function(cart) {
+            req.session.cartId = cart._id;
+            res.send(cart);
+        })
+        .then(null, function(err) {
+        	console.log("error is", err);
+        	next();
+        });    
     }
 })
 
@@ -151,7 +170,10 @@ router.get('/:id', authorization.isAdminOrOwner, function(req, res, next){
 								path: 'categories',
 								model: 'Category'
 							}
-						});
+						})
+						.populate({path: 'billingAddress'})
+						.populate({path: 'shippingAddress'})
+						
 	queryPromise
 	.then(function(order){
 		res.send(order);

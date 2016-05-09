@@ -13,12 +13,15 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 
 		//Functions for cart and order detail page
 		reloadCart: function() {
-			$http.get('/api/orders/myCart')
+			return $http.get('/api/orders/myCart')
 				.then(function(res) {
+					console.log("retrieved res: ", res);
 					cart = res.data;
 					$rootScope.$emit('cartUpdate', cart.itemCount);
-					console.log("retrieved cart: ", cart);
-				});
+				})
+				.catch(function(err) {
+					console.log("Error reloading cart", err);
+				})
 		},
 
 		fetchAll: function() {
