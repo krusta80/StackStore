@@ -60,12 +60,19 @@ module.exports = function (app) {
                 req.session = {};
                 console.log("****** NO REQ SESSION!!!");
             }
-            OrderModel.create({
+
+            var newCart = {
                 sessionId: req.cookies['connect.sid'],
                 status: 'Cart',
                 dateCreated: Date.now()
-            })
+            };
+
+            if(req.user)
+                newCart.userId = req.user._id;
+
+            OrderModel.create(newCart)
             .then(function(cart) {
+                console.log("Cart created:",cart);
                 req.session.cartId = cart._id;
             })
             .catch(function(err) {
