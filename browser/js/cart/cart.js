@@ -12,10 +12,19 @@ app.config(function($stateProvider){
 	});
 });
 
-app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $state, $rootScope){
+app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $state, $rootScope, AuthService){
 
 	$scope.cart = cart;
+	console.log("Cart state when entering checkout page:", cart);
 	$scope.billing = {}; $scope.shipping = {};
+
+	AuthService.getLoggedInUser()
+	.then(function(user) {
+		$scope.user = user;
+	})
+	.catch(function(err) {
+		console.log("No user found for this seesion!");
+	});
 
 	$scope.addressBookShown = false;
 	$scope.toggleAddressBook = function(context) {
@@ -74,13 +83,18 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $
 	}
 
 	$scope.submitOrder = function(){
-		$scope.billing.userId = cart.userId; $scope.shipping.userId = cart.userId;
+		$scope.billing.userId = cart.userId; 
+		$scope.shipping.userId = cart.userId;
 		OrdersFactory.submitOrder(cart.id, $scope.cart, $scope.billing, $scope.shipping)
 		.then(function(updatedCart){
 			//Reset cart counter
+			OrdersFactory.reloadCart();
 			$rootScope.$emit('cartUpdate', 0);
 			//Clear cart after ordering
 			$state.go('home');
+		})
+		.catch(function(err) {
+			console.log("Error!", err);
 		})
 		
 	}

@@ -13,8 +13,6 @@ app.directive('navbar', function ($rootScope, AuthService, OrdersFactory, Catego
 
             scope.user = null;
 
-            console.log("cart is "+$rootScope.cart);
-
             scope.isLoggedIn = function () {
                 return AuthService.isAuthenticated();
             };
@@ -61,8 +59,8 @@ app.directive('navbar', function ($rootScope, AuthService, OrdersFactory, Catego
             $rootScope.$on('cartUpdate', updateCartItems);
             $rootScope.$on('clearProductSearch', clearSearch);
             $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){ 
-                // do something
-                $rootScope.previousState = fromState;
+            // do something
+            $rootScope.previousState = fromState;
             })
         }
 
