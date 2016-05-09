@@ -42,6 +42,9 @@ app.config(function($stateProvider){
 				if($stateParams.id !== 'NEW')
 					return ProductsFactory.fetchById($stateParams.id);
 				return {};
+			},
+			categories: function(CategoriesFactory){
+				return CategoriesFactory.fetchAll();
 			}
 		}
 	});
@@ -90,7 +93,7 @@ app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $state, $scope,
 });
 
 
-app.controller('ProductCtrl', function($scope, product, $state, AuthService){
+app.controller('ProductCtrl', function($scope, OrdersFactory, product, $state, AuthService) {
 
 	$scope.product = product;
 	console.log(product);
@@ -109,6 +112,8 @@ app.controller('ProductCtrl', function($scope, product, $state, AuthService){
 
 	$scope.addToCart = function(){
 		console.log($scope.selectedQuantity);
+		OrdersFactory.addToCart(product, $scope.selectedQuantity);
+		$state.go('categories');
 	}
 
 	$scope.roundStars = function(stars) {
@@ -123,18 +128,23 @@ app.controller('ProductCtrl', function($scope, product, $state, AuthService){
 
 });
 
-app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, product, ProductsFactory, CategoriesFactory){
+app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, product, categories, ProductsFactory, CategoriesFactory){
 	$scope.product = product;
 	$scope.newProduct = {
 		title: product.title,
 		price: product.price,
 		inventoryQty: product.inventoryQty,
 		description: product.description,
-		imageUrls: product.imageUrls
+		imageUrls: product.imageUrls,
+		categories: product.categories
 	};
 
 	$scope.save = function(){
 		
+		$scope.newProduct.categories = $scope.categories.filter(function(category){
+			return category.exist;
+		});
+
 		for(var key in $scope.newProduct){
 			$scope.product[key] = $scope.newProduct[key];
 		};
@@ -143,7 +153,7 @@ app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, pr
 			ProductsFactory.updateProduct($scope.product)
 				.then(function(){
 					alert('Save successfully');
-					if($rootScope.previousState.name === 'productList')
+					if($rootScope.previousState && $rootScope.previousState.name === 'productList')
 						return $state.go($rootScope.previousState);
 					$state.go('categories.products', {categoryId: CategoriesFactory.fetchCurrentCategory()});
 				})
@@ -191,6 +201,18 @@ app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, pr
 		$scope.newProduct.imageUrls.splice($scope.product.imageUrls.indexOf(imgUrl), 1);
 	};
 
+	$scope.categories = categories.map(function(category){
+		for(var i = 0; i < $scope.newProduct.categories.length; i++){
+			if($scope.newProduct.categories[i]._id === category._id){
+				category.exist = true;
+				break;
+			}
+			else
+				category.exist = false;
+
+		}
+		return category;
+	});
 });
 
 

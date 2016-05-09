@@ -12,7 +12,7 @@ app.config(function($stateProvider){
 	});
 });
 
-app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $state){
+app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $state, $rootScope){
 
 	$scope.cart = cart;
 	$scope.billing = {}; $scope.shipping = {};
@@ -77,6 +77,8 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $
 		$scope.billing.userId = cart.userId; $scope.shipping.userId = cart.userId;
 		OrdersFactory.submitOrder(cart.id, $scope.cart, $scope.billing, $scope.shipping)
 		.then(function(updatedCart){
+			//Reset cart counter
+			$rootScope.$emit('cartUpdate', 0);
 			//Clear cart after ordering
 			$state.go('home');
 		})

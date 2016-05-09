@@ -9,6 +9,9 @@ var schema = new mongoose.Schema({
         required: true
         // unique: true (Need to enforce this with custom validation. Interferes with PUT route) 
     },
+    activationKey: {
+        type: String
+    },
     password: {
         type: String,
         required: true

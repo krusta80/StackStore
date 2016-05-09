@@ -121,7 +121,9 @@ schema.pre('save', function (next) {
         return createUniqueInvoiceNumber()
         .then(function(invoiceNumber){
             that.invoiceNumber = invoiceNumber;
-            return getUserEmail(that.userId);
+            if(that.userId)
+                return getUserEmail(that.userId);
+            return that.email = 'newuser@newuser.com';      //   bug fix here
         })
         .then(function(email){
             console.log("EMAIL", email)
