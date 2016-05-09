@@ -120,6 +120,7 @@ router.get('/myCart', function(req, res, next){
         })
         .catch(function(err) {
             console.log("ERROR:",err);
+            next();
         });
     }
     else {
@@ -136,9 +137,23 @@ router.get('/myCart', function(req, res, next){
         	}
         })
         .then(function(order){
-            res.send(order);
+        	if(!order)
+        		return Order.create({
+		            sessionId: req.cookies['connect.sid'],
+		            status: 'Cart',
+		            dateCreated: Date.now()
+		        })
+        	else
+            	return res.send(order);
         })
-        .then(null, next);    
+        .then(function(cart) {
+            req.session.cartId = cart._id;
+            res.send(cart);
+        })
+        .then(null, function(err) {
+        	console.log("error is", err);
+        	next();
+        });    
     }
 })
 
