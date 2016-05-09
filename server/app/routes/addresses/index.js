@@ -12,9 +12,13 @@ router.param('id', function(req, res, next, id){
     console.log("Hitting this param route with id", id)
     Address.findById(id).populate({path: 'userId'})
     .then(function(address){
-        if(!address) res.status(404).send();
+        if(!address) 
+            return res.status(404).send();
         req.requestedObject = address;
-        req.requestedUser = address.userId;
+        if(address.userId)
+            req.requestedUser = address.userId;
+        else
+            req.requestedUser = '-1';
         next();    
     })
     .then(null, next);

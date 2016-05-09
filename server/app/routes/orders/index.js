@@ -25,18 +25,34 @@ var findCart = function(req) {
 	return Order.findById(req.session.cartId);
 }
 
+var removeAddresses = function(addressIds) {
+	return Promise.all(addressIds.map(function(addressId) {
+		console.log("removing address id", addressId);
+		return Address.findByIdAndRemove(addressId);
+	}));
+};
+
 var updateAddresses = function(order) {
 	var promises = [];
 	if(typeof order.billingAddress === 'object') {
 		console.log(order.billingAddress);
+		delete order.billingAddress._id;
 		var billing = new Address(order.billingAddress);
 		promises.push(billing.save());
 	}
 	if(typeof order.shippingAddress === 'object') {
+		delete order.shippingAddress._id;
 		var shipping = new Address(order.shippingAddress);
 		promises.push(shipping.save());
 	}
-	return Promise.all(promises);
+	return Promise.all(promises)
+		.then(function(newAddresses) {
+			console.log("added address id", newAddresses[0]._id);
+			console.log("added address id", newAddresses[1]._id);
+			order.billingAddress = newAddresses[0];
+			order.shippingAddress = newAddresses[1];
+			return order;
+		});
 };
 
 //Route Params
@@ -272,7 +288,8 @@ router.put('/myCart/submit', function(req, res, next) {
 
 router.put('/:id', authorization.isAdmin, function(req, res, next){
 	var fetchedOrder;
-
+	var updatedBody;
+	var oldAddressIds = [req.body.billingAddress._id, req.body.shippingAddress._id];
 	Order.findById(req.params.id)
 	.then(function(_fetchedOrder){
 		fetchedOrder = _fetchedOrder;
@@ -285,15 +302,18 @@ router.put('/:id', authorization.isAdmin, function(req, res, next){
 
 		return updateAddresses(req.body);
 	})
-	.then(function(updatedBody){
+	.then(function(_updatedBody){
+		updatedBody = _updatedBody;
+		console.log("updatedBody:", updatedBody);
+		return removeAddresses(oldAddressIds);
+	})
+	.then(function(){
 		req.body = updatedBody;
 		//Finally, update values
 		for(var key in req.body){
 			fetchedOrder[key] = req.body[key];
 	    }
 
-	    //Then timestamp before saving order.
-	    var fetchedOrder = fetchedOrder.timestampStatus();
 	    return fetchedOrder.save();
 	})
 	.then(function(updatedOrder){

@@ -1,5 +1,8 @@
 <h2 align=center>Add/Edit/Remove an Order</h2>
 <div class="container" id="order">
+    <alert type="danger" ng-show="error">
+        <pre>{{ error }}</pre>
+    </alert>
     <div class="panel panel-info">
         <div class="panel-heading">
             <h3 class="panel-title">Manage Basic Info</h3>
@@ -7,9 +10,6 @@
 
         <div class="panel-body">
             <form style="padding-bottom: 25px;" class="well well-sm">
-                <alert type="danger" ng-show="error">
-                    <pre>{{ error }}</pre>
-                </alert>
                 <div ng-repeat="field in fields" class="form-group">
                     <label for="field.key">{{field.title}}</label>
                     <input ng-show="isTextInput(field.key)" ng-disabled="field.disabled" type="text" ng-model="order[field.key]" class="form-control" id="order[field.key]">
