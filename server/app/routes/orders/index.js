@@ -282,6 +282,8 @@ router.put('/myCart/submit', function(req, res, next) {
 	})
 	.catch(function(err) {
 		console.log("Error submitting cart!", err);
+		if(err.message.indexOf("user ID or email") > 0)
+			err = {message: "Email address required for guest checkouts!"};
 		res.status(500).send(err);
 	});	
 });

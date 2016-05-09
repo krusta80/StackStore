@@ -1,11 +1,11 @@
 <div ng-show="isEmpty()">
-  <div class="container">
+  <div style="margin-top: 15px" class="container">
   <h2>You have nothing in your cart. Why don't you take a look at some of our <a href="/categories">products</a>?</h2>
   </div>
 </div>
 
 <div id="cart" ng-hide="isEmpty()">
-  <div class="container container-cart"> <!-- Header for Items -->
+  <div style="margin-top: 15px" class="container container-cart"> <!-- Header for Items -->
     <div class="row">
       <div class="col-md-8">
         <h4 class="header-inline">Shopping Cart</h4>
@@ -60,6 +60,10 @@
   </div>
 
   <div class="container container-checkout"> <!-- Checkout -->
+    <alert type="danger" ng-show="error">
+      <pre>{{ error }}</pre>
+    </alert>
+
     <div class="row">
       <div class="col-md-8">
         <h4 class="header-inline">Checkout</h4>

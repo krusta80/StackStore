@@ -181,10 +181,13 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 			.then(function(res){
 				return res.data;
 			})
-			// .catch(function(err) {
-			// 	console.log("Error submitting order:", err);
-			// 	return err;
-			// })
+			.catch(function(err) {
+				console.log("Error submitting order:", err);
+			 	if(err.data)
+			 		return $q.reject(err.data);
+			 	else
+			 		return $q.reject(err);
+			})
 		},
 
 		cancelOrder: function(obj){

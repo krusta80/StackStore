@@ -12,7 +12,7 @@ app.config(function($stateProvider){
 	});
 });
 
-app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $state, $rootScope, AuthService){
+app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $state, $rootScope, AuthService, GitCommitted){
 
 	$scope.cart = cart;
 	console.log("Cart state when entering checkout page:", cart);
@@ -95,6 +95,7 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $
 		})
 		.catch(function(err) {
 			console.log("Error!", err);
+			$scope.error = GitCommitted.errorify(err);
 		})
 		
 	}
