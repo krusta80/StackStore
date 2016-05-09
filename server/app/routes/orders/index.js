@@ -4,6 +4,7 @@ var router = require('express').Router();
 var models = require('../../../db/models');
 var Order = models.Order;
 var User = models.User;
+var Address = models.Address;
 var authorization = require('../../configure/authorization-middleware.js');
 var mail = require('../../../mail');
 module.exports = router;
@@ -23,6 +24,20 @@ var writeWhitelist = {
 var findCart = function(req) {
 	return Order.findById(req.session.cartId);
 }
+
+var updateAddresses = function(order) {
+	var promises = [];
+	if(typeof order.billingAddress === 'object') {
+		console.log(order.billingAddress);
+		var billing = new Address(order.billingAddress);
+		promises.push(billing.save());
+	}
+	if(typeof order.shippingAddress === 'object') {
+		var shipping = new Address(order.shippingAddress);
+		promises.push(shipping.save());
+	}
+	return Promise.all(promises);
+};
 
 //Route Params
 router.param('id', function(req, res, next, id){
@@ -251,14 +266,16 @@ router.put('/myCart/submit', function(req, res, next) {
 	})
 	.catch(function(err) {
 		console.log("Error submitting cart!", err);
-		next();
+		res.status(500).send(err);
 	});	
 });
 
 router.put('/:id', authorization.isAdmin, function(req, res, next){
+	var fetchedOrder;
 
 	Order.findById(req.params.id)
-	.then(function(fetchedOrder){
+	.then(function(_fetchedOrder){
+		fetchedOrder = _fetchedOrder;
 		delete req.body.__v;
 	
 		//User may not edit timestamps directly under any circumstances
@@ -266,6 +283,10 @@ router.put('/:id', authorization.isAdmin, function(req, res, next){
 			delete req.body["date"+state];
 		})
 
+		return updateAddresses(req.body);
+	})
+	.then(function(updatedBody){
+		req.body = updatedBody;
 		//Finally, update values
 		for(var key in req.body){
 			fetchedOrder[key] = req.body[key];
@@ -280,6 +301,7 @@ router.put('/:id', authorization.isAdmin, function(req, res, next){
 	})
 	.then(null, function(err) {
 		console.log("Error with order put:", err);
+		res.status(500).send(err);
 	});
 })
 

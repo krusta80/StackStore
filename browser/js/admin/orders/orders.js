@@ -128,8 +128,7 @@ app.controller('OrderCtrlAdmn', function($scope, order, OrdersFactory, fields, $
 				success();
 			})
 			.catch(function(err) {
-				console.log(err);
-				$scope.error = err.data;
+				$scope.error = GitCommitted.errorify(err);
 				restoreForm();
 			});
 		else
@@ -139,7 +138,7 @@ app.controller('OrderCtrlAdmn', function($scope, order, OrdersFactory, fields, $
 				success();
 			})
 			.catch(function(err) {
-				$scope.error = err.data;
+				$scope.error = GitCommitted.errorify(err);
 				restoreForm();
 			});
 	};

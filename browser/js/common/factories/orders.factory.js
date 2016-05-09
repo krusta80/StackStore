@@ -1,4 +1,4 @@
-app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
+app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 
 	var cart;
 
@@ -231,11 +231,11 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 				.then(function(res) {
 					console.log(res.data);
 					return res.data;
+				})
+				.catch(function(err) {
+					console.log(err);
+				 	return $q.reject(err.data);
 				});
-				// .catch(function(err) {
-				// 	console.log(err);
-				// 	return $q.reject(err);
-				// });
 		},
 
 		addOrder: function(order) {
@@ -246,7 +246,7 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 				})
 				.catch(function(err) {
 					console.log(err);
-					return $q.reject(err);
+					return $q.reject(err.data);
 				});
 		},
 
