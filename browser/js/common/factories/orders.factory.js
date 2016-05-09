@@ -221,21 +221,21 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 					console.log(res.data);
 					return res.data;
 				})
-				.catch(function(err) {
-					console.log(err);
-					return $q.reject(err);
-				});
+				// .catch(function(err) {
+				// 	console.log(err);
+				// 	return $q.reject(err);
+				// });
 		},
 		updateOrder: function(order) {
 			return $http.put('/api/orders/'+order._id, order)
 				.then(function(res) {
 					console.log(res.data);
 					return res.data;
-				})
-				.catch(function(err) {
-					console.log(err);
-					return $q.reject(err);
 				});
+				// .catch(function(err) {
+				// 	console.log(err);
+				// 	return $q.reject(err);
+				// });
 		},
 
 		addOrder: function(order) {

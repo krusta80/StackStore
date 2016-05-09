@@ -28,7 +28,7 @@ var findCart = function(req) {
 router.param('id', function(req, res, next, id){
     Order.findById(id).exec()
     .then(function(order){
-        if(!order) res.status(404).send();
+        if(!order) return res.status(404).send({});
         req.requestedObject = order;
         if(order.userId){
             User.findById(order.userId)
@@ -78,7 +78,6 @@ router.get('/myOrders', authorization.isAdminOrSelf, function(req, res, next){
 	.populate('shippingAddress')
 	.populate('billingAddress')
 	.then(function(orders){
-		console.log("Order history (sample order):", orders[0])
 		res.send(orders);
 	})
 	.catch(function(err){
@@ -290,11 +289,11 @@ router.put('/:id', function(req, res, next){
 	    return fetchedOrder.save();
 	})
 	.then(function(updatedOrder){
-		if(updatedOrder.status == 'Ordered')
-			
 		res.send(updatedOrder);
 	})
-	.then(null, next);
+	.then(null, function(err) {
+		console.log("Error with order put:", err);
+	});
 })
 
 //Do we even need a delete function? Aren't we just going to mark it as cancelled and keep it for records sake?

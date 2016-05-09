@@ -68,11 +68,10 @@ app.controller('OrderCtrlAdmn', function($scope, order, OrdersFactory, fields, $
 	console.log("$scope.order", $scope.order) //POPULATED OBJECT
 
 	$scope.fields = [];
-	fields.forEach(function(field) {
+	var fieldWhiteList = ['invoiceNumber', 'email', 'status', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'];
+	fieldWhiteList.forEach(function(field) {
 		field = {key: field, title: GitCommitted.fancify(field)};
-		if(field.key !== '_id' && field.key !== 'dateCreated' && field.key !== 'origId') {
-			$scope.fields.push(field);
-		}
+		$scope.fields.push(field);
 	});
 
 	var restoreForm = function() {
