@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <div class="panel panel-info">
+    <div class="panel panel-info" ng-show="order.lineItems.length > 0">
         <div class="panel-heading">
             <h3 class="panel-title">Manage Items</h3>
             </div>
@@ -56,7 +56,7 @@
                     <div class="col-md-2">${{item.price}}</div> <!-- Price -->
                     <div class="col-md-2">
                     <!-- Todo: Refactor to only call function when value changes (rather than when input loses focus.) -->
-                        <input ng-blur="setQuantity(item.prod_id, item.quantity)" type="text" class="form-control quantity-input" name="itemQuantity" ng-model="item.quantity"></input>
+                        <input ng-blur="setQuantity($index, item.quantity)" type="text" class="form-control quantity-input" name="itemQuantity" ng-model="item.quantity"></input>
                     </div> <!-- Quantity -->
               </div>
             </div>

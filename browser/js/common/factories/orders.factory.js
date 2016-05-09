@@ -237,26 +237,14 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 				});
 		},
 
-		editQuantityInOrder: function(product, qty, order){
-			console.log("PRODUCT: ", product)
-			console.log("QUANTITY: ", qty)
-			console.log("ORDER: ", order)
+		editQuantityInOrder: function(idx, qty, order){
 
-			var lineIndex = this.getLineIndexInOrder(product, order);
-			if(qty >= 0){
-				order.lineItems[lineIndex].quantity = qty;
-				
-				return $http.put('/api/orders/' + order._id , cart)
-					.then(function(res) {
-						order = res.data;
-						$rootScope.$emit('orderUpdate', order.itemCount);
-						return res.data;
-					});
-
-				console.log("LINE ITEMS", order.lineItems);
-			}else{
-				console.log("Cannot set quantity below 0.")
-			}
+			order.lineItems[idx].quantity = qty;
+			return $http.put('/api/orders/' + order._id, order)
+				.then(function(res) {
+					order = res.data;
+					return res.data;
+				});
 		},
 
 		removeIndexedItemFromOrder: function(idx, order){
