@@ -6,15 +6,52 @@
 			<div style="max-height:380px;overflow-y:scroll" class="list-group">
 				<a ui-sref="categories.products({categoryId: category._id})" class="list-group-item" ng-class="{active: fetchCurrentCategory() === category._id}" ng-repeat="category in categories">{{ category.name }}</a>
 			</div>
-			<form class="input-group">
+			<hr>
+			<div>
+				<label>Product Title:</label>
+				<div class="input-group" style="width:100%">
+					<span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+					<input type="text" ng-model="searchByName" class="form-control" placeholder="search">
+				</div>
+				<hr>
 				<label>Min Price: </label>
-				<input type="text" style="width:70%" class="form-control" name="minPrice"><br>
+				<input type="text" style="width:100%" class="form-control" ng-model="minPrice">
 				<label>Max Price: </label>
-				<input type="text" style="width:70%" class="form-control" name="maxPrice"><br>
-				<br>
-				<rating-stars filled-stars="0" size="XXS" updater="updateReview('testID', stars)"></rating-stars>
-				<label>Avg. Review</label>
-			</form>
+				<input type="text" style="width:100%" class="form-control" ng-model="maxPrice">
+				<hr>
+				<label>Stars & up</label>
+				<rating-stars filled-stars="0" size="XXS" updater="getStars(stars)"></rating-stars>
+				<hr>
+				<label>Order By:</label><br>
+				<form>
+					<label>
+						<input ng-model="sort" ng-value="{type: 'price', reverse: false}" type="radio"> price up
+					</label>
+					<br>
+					<label>
+						<input ng-model="sort" ng-value="{type: 'price', reverse: true}" type="radio"> price down
+					</label>
+					<br>
+					<label>
+						<input ng-model="sort" ng-value="{type: 'averageStars', reverse: false}" type="radio"> stars up
+					</label>
+					<br>
+					<label>
+						<input ng-model="sort" ng-value="{type: 'averageStars', reverse: true}" type="radio"> stars down
+					</label>
+					<br>
+					<label>
+						<input ng-model="sort" ng-value="{type: 'reviews.length', reverse: false}" type="radio"> reviews amount up
+					</label>
+					<label>
+						<input ng-model="sort" ng-value="{type: 'reviews.length', reverse: true}" type="radio"> reviews amount down
+					</label>
+					<hr>
+					<label>
+						<input ng-model="sort" ng-value="{type: ''}" type="radio"> unsorted
+					</label>					
+				</form>
+			</div>
 		</div>
 
 		<div class="col-md-10">

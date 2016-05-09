@@ -1,8 +1,8 @@
-<h3 ng-show="searchString && products.length!==0" class="text-center">Products matching <i><u>{{searchString}}</u></i> </h3>
+<h2 ng-show="searchString && products.length!==0" class="bg-info text-center"><small>Products matching <i><u>{{searchString}}</u></i></small></h2>
 <h2 ng-show="products.length===0" class="bg-danger text-center"><small>There is no product matching with <i><u>{{searchString}}</u></i></small></h2>
 <br>
 <div class="row">
-	<div class="col-md-4" dir-paginate="product in products | itemsPerPage: 6">
+	<div class="col-md-4" dir-paginate="product in products | filter:productNameFilter | filter:priceFilter | filter:starsFilter | orderBy:sort.type:sort.reverse | itemsPerPage: 12">
 		<div class="thumbnail">
 			<a ui-sref="product({id: product._id })"><img hi-res="{{product.imageUrls[0]}}" src="./spacer.png"></a>
 			<div class="caption">

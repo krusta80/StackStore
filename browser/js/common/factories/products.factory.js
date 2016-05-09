@@ -5,7 +5,6 @@ app.factory('ProductsFactory', function($http){
 	ProductsFactory.fetchByCategory = function(categoryId){
 		return $http.get('/api/products/category/' + categoryId)
 				.then(function(res){
-					console.log(res.data);
 					return res.data;
 				});
 	}
