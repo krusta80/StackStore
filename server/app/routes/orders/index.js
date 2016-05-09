@@ -72,12 +72,13 @@ router.get('/fields', function(req, res, next) {
 });
 
 //added by CK on 5/4 to retrieve historical orders
-router.get('/myOrders/:userId', authorization.isAdminOrSelf, function(req, res, next){
-	Order.find({userId: req.params.userId, status: { $not: /^Cart.*/}})//filters out orders in status "Cart"
+router.get('/myOrders', authorization.isAdminOrSelf, function(req, res, next){
+	Order.find({userId: req.user._id, status: { $not: /^Cart.*/}})//filters out orders in status "Cart"
 	.populate('lineItems.prod_id')
 	.populate('shippingAddress')
 	.populate('billingAddress')
 	.then(function(orders){
+		console.log("Order history (sample order):", orders[0])
 		res.send(orders);
 	})
 	.catch(function(err){
@@ -148,7 +149,7 @@ router.get('/myCart', function(req, res, next){
 		            dateCreated: Date.now()
 		        })
         	else
-            	return res.send(order);
+            	return order;
         })
         .then(function(cart) {
             req.session.cartId = cart._id;

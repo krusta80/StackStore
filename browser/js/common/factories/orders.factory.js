@@ -45,8 +45,8 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 			})
 		},
 
-		getOrderHistory : function(userId){
-			return $http.get('/api/orders/myOrders/'+userId)
+		getOrderHistory : function(){
+			return $http.get('/api/orders/myOrders')
 				.then(function(res){
 					return res.data;
 				});

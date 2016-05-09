@@ -47,6 +47,10 @@ schema.set('toJSON', {
     virtuals : true
 });
 
+schema.set('toObject', {
+    virtuals : true
+});
+
 schema.virtual('itemCount').get(function(){
     var sum = 0;
     this.lineItems.forEach(function(lineItem){
@@ -78,7 +82,7 @@ schema.virtual('subtotal').get(function(){
 
 schema.virtual('total').get(function(){
     if(this.billingAddress){
-        var rawTotal = this.subtotal + (1 * (getSalesTaxPercent(this.billingState) / 100));
+        var rawTotal = this.subtotal + (1 * (getSalesTaxPercent(this.billingAddress.state) / 100));
         return rawTotal.toFixed(2);
     } 
 
