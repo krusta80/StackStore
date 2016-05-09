@@ -8,8 +8,12 @@ var getEmailTemplate = function(path, variableObject) {
 	    fs.readFile(__dirname + '/' + path, 'utf8', function(err, html) {
 			if(!err) {
 				var ret = Object.keys(variableObject).reduce(function(string, nextVar) {
-					var re = new RegExp("\{\{"+nextVar+"\}\}","g");
-					return string.replace(re, variableObject[nextVar]);
+					console.log(typeof nextVar);
+					if(typeof nextVar !== 'object') {
+						var re = new RegExp("\{\{"+nextVar+"\}\}","g");
+						return string.replace(re, variableObject[nextVar]);
+					}
+					return string;
 				}, html);
 				resolve(ret);
 			}
@@ -62,5 +66,14 @@ module.exports = {
 		
 		return getTemplateAndSend(params, 'activation.html', {activationKey: activationKey})
 	}, 
+
+	sendOrderConfirmation: function(toEmailAddress, order) {
+		params = {
+			to: [toEmailAddress],
+			subject: 'Order Confirmation (' + order.invoiceNumber + ')'
+		};
+
+		return getTemplateAndSend(params, 'orderConfirmation.html', {invoiceNumber: order.invoiceNumber, pastOrderKey: order.pastOrderKey});
+	}
 
 };

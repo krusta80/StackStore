@@ -9,6 +9,25 @@ app.config(function ($stateProvider) {
         	}
         }
     });
+    $stateProvider.state('pastOrder', {
+        url: '/pastOrder/:key',
+        templateUrl: 'js/order/orderDetails.html',
+        controller: 'OrderCtrl',
+        resolve: {
+            user: function(){
+                return {};    
+            },
+            order: function(OrdersFactory, $stateParams){
+                return OrdersFactory.getPastOrder($stateParams.key);
+            },
+            billingAddress: function(AddressesFactory, order){
+                return order.billingAddress;
+            },
+            shippingAddress: function(AddressesFactory, order){
+                return order.shippingAddress;
+            }
+        }
+    });
 });
 
 app.controller('ActivationCtrl', function($state, $scope, user) {

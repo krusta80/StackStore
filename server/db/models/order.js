@@ -10,6 +10,7 @@ var schema = new mongoose.Schema({
         ref: 'User'
     },
     sessionId: String,
+    pastOrderKey: String,
     email: String,
     lineItems: { type: [{
                         prod_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Product'}, 
