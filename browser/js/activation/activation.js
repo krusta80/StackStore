@@ -21,6 +21,8 @@ app.config(function ($stateProvider) {
                 return OrdersFactory.getPastOrder($stateParams.key);
             },
             billingAddress: function(AddressesFactory, order){
+              //where is order coming from?
+              //I don't see an order factory or order service
                 return order.billingAddress;
             },
             shippingAddress: function(AddressesFactory, order){

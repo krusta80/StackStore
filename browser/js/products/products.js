@@ -1,3 +1,4 @@
+//maybe break this up into separate files?
 app.config(function($stateProvider){
 
 	$stateProvider.state('categories.products', {
@@ -51,9 +52,10 @@ app.config(function($stateProvider){
 
 });
 
-app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $state, $scope, $log, $stateParams, products, user, CategoriesFactory, ProductsFactory, searchString, $rootScope){
+//lots of dependencies here - this could be indication that there is factory which might make sense.
+app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $state, $scope, $log, $stateParams, products, user, CategoriesFactory, ProductsFactory, searchString, $rootScope, $window){
 
-	$rootScope.$emit('clearProductSearch', true);
+	$rootScope.$emit('clearProductSearch', true);//any way to do without emiting to rootscope?
 	CategoriesFactory.setCurrentCategory($stateParams.categoryId);
 	$scope.products = products;
 	$scope.user = user;
@@ -65,7 +67,7 @@ app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $state, $scope,
 
 	$scope.scaleDown = function(imgUrl) {
 		return imgUrl.replace(/640/, '230').replace(/480/, '172');
-	};
+	};//this feels like it belongs in a directive
 
 	$scope.showCategories = function(categories){
 		var categoriesName = categories.map(function(category){
@@ -85,12 +87,13 @@ app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $state, $scope,
 			})
 			.then(function(products){
 				$scope.products = products;
-				alert('Delete successfully');
+				$window.alert('Delete successfully');//use $ngToast or something similar?
 			})
 			.catch($log);
 	};
 
 	$scope.priceFilter = function(product) {
+    //hmm.. feels like this could go somewhere else?
 		if($scope.minPrice === undefined && $scope.maxPrice === undefined)
 			return true;
 		else if($scope.minPrice === undefined)
@@ -123,11 +126,9 @@ app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $state, $scope,
 app.controller('ProductCtrl', function($scope, OrdersFactory, product, $state, AuthService) {
 
 	$scope.product = product;
-	console.log(product);
 	AuthService.getLoggedInUser().then(function(user){
 		$scope.user = user;
-		console.log(user);
-	})
+	});
 
 	$scope.getQuantityArray = function(){
 		var quantity = [];
@@ -138,10 +139,9 @@ app.controller('ProductCtrl', function($scope, OrdersFactory, product, $state, A
 	};
 
 	$scope.addToCart = function(){
-		console.log($scope.selectedQuantity);
 		OrdersFactory.addToCart(product, $scope.selectedQuantity);
 		$state.go('categories');
-	}
+	};
 
 	$scope.roundStars = function(stars) {
 		return Math.round(stars*10)/10;
@@ -228,11 +228,12 @@ app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, pr
 		$scope.newProduct.imageUrls.splice($scope.product.imageUrls.indexOf(imgUrl), 1);
 	};
 
+  //for this type of logic-- lodash library might be an option
 	$scope.categories = categories.map(function(category){
 		for(var i = 0; i < $scope.newProduct.categories.length; i++){
 			if($scope.newProduct.categories[i]._id === category._id){
 				category.exist = true;
-				break;
+				break;//if breaking, then why else?
 			}
 			else
 				category.exist = false;
@@ -241,6 +242,3 @@ app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, pr
 		return category;
 	});
 });
-
-
-

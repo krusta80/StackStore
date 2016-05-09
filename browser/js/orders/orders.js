@@ -6,12 +6,7 @@ app.config(function($stateProvider){
 			templateUrl: 'js/orders/orderHistory.html',
 			resolve: {
 				user: function(AuthService){
-					return AuthService.getLoggedInUser().then(function(user){
-						return user;
-					})
-					.catch(function(err){
-						console.log("Get User ERR:", err)
-					})
+          return AuthService.getLoggedInUser();
 				},
 				orders: function(OrdersFactory, $stateParams, user){
 					return OrdersFactory.getOrderHistory(user._id)

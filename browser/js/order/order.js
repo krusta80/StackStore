@@ -6,21 +6,17 @@ app.config(function($stateProvider){
 			templateUrl: 'js/order/orderDetails.html',
 			resolve: {
 				user: function(AuthService){
-					console.log("u");
-					return AuthService.getLoggedInUser().then(function(user){
-						return user;
-					})
-					.catch(function(err){
-						console.log("Get User ERR:", err)
-					})
+          return AuthService.getLoggedInUser();
 				},
 				order: function(OrdersFactory, $stateParams){
 					return OrdersFactory.getOrder($stateParams.id);
 				},
 				billingAddress: function(AddressesFactory, order){
+          //how is order gettting injected here
 					return order.billingAddress;
 				},
 				shippingAddress: function(AddressesFactory, order){
+          //how is order getting inject here?
 					return order.shippingAddress;
 				}
 			}
@@ -36,6 +32,7 @@ app.controller('OrderCtrl', function($scope, $state, user, order, billingAddress
 	$scope.shippingAddress = shippingAddress;
 
 	//DUPLICATED CODE - DRY this out
+  //yes.. move it into a factory
 	$scope.calculateTax = function(){
 		var state = $scope.billingAddress.state;
 		var subtotal = $scope.order.subtotal;
@@ -46,9 +43,9 @@ app.controller('OrderCtrl', function($scope, $state, user, order, billingAddress
 
 	$scope.cancelOrder = function(){
 		if($scope.order.status === 'Ordered'){
+      //is this a promise?
 			OrdersFactory.cancelOrder($scope.order);
 		}
 	}
 
-	//Calculate Tax
 });
