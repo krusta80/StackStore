@@ -90,43 +90,23 @@ schema.methods.timestampStatus = function(){
     return this;
 }
 
-
-
-/* Need to add user or session ID to tests
 schema.pre('validate', function(next) {
-    if (!this.userId && !this.sessionId) {
-        next(Error('Must have a user or session ID'));
+    if (this.status !== 'Cart' && !this.userId && !this.email) {
+        next(Error('Must have a user ID or email address!'));
     } else {
         next();
     }
 });
-*/
 
 schema.pre('save', function (next) {
 
     if(this.isNew){
         this.dateCreated = Date.now();
     }
+    else
+        this.timestampStatus(); // maybe change the wording of this to updateStatusTimestamp?
 
-
-    if(this.status === 'Ordered' && !this.invoiceNumber){
-        var that = this;
-        return createUniqueInvoiceNumber()
-        .then(function(invoiceNumber){
-            that.invoiceNumber = invoiceNumber;
-            if(that.userId)
-                return getUserEmail(that.userId);
-            return that.email = 'newuser@newuser.com';      //   bug fix here
-        })
-        .then(function(email){
-            console.log("EMAIL", email)
-            that.email = email;
-            next();
-        })
-    }else{
-        next();
-    }
-
+    next();
 });
 
 module.exports = mongoose.model('Order', schema);
@@ -143,25 +123,5 @@ function getSalesTaxPercent(state){
     }
 
     return taxTable[state];
- }
+}
 
-function createUniqueInvoiceNumber(){
-    var invoiceNumber = 'INV000'+ Math.random().toString(10).slice(3,8);
-    return mongoose.model('Order').find({invoiceNumber: invoiceNumber})
-     .then(function(order){
-         if(order.length === 0){
-            console.log("\nAttaching invoice number: ", invoiceNumber)
-            return invoiceNumber;
-         }else{
-            console.log("\nInvoice Number Exists: ", invoiceNumber, "Generating new invoice number.")
-            return createUniqueInvoiceNumber();
-         }
-    })
- }
-
- function getUserEmail(id){
-    return User.findById(id)
-    .then(function(user){
-        return user.email;
-    })
- }

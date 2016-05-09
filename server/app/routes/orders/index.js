@@ -19,6 +19,13 @@ var writeWhitelist = {
     Admin: ['_id', 'userId', 'sessionId', 'email', 'lineItems', 'invoiceNumber', 'shippingAddress', 'billingAddress', 'status', 'dateCreated', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'],
 };
 
+var findCart = function(req) {
+	// if(req.user)
+	// 	return Order.findOne({userId: req.user._id, status: 'Cart'});
+	// else
+		return Order.findById(req.session.cartId);
+}
+
 //Route Params
 router.param('id', function(req, res, next, id){
     Order.findById(id).exec()
@@ -158,14 +165,9 @@ router.post('/', function(req, res, next){
 })
 
 router.put('/myCart', function(req, res, next) {
-	var queryPromise;
-	if(req.user)
-		queryPromise = Order.findOne({userId: req.user._id, status: 'Cart'});
-	else
-		queryPromise = Order.findById(req.session.cartId);
-
-	queryPromise
+	findCart(req)
 	.then(function(fetchedOrder){
+		console.log("trying to save to cart:", fetchedOrder, req.cookies, req.session);
 		if(req.cookies['connect.sid'] === fetchedOrder.sessionId) {
 			delete req.body.dateCreated;
 			delete req.body.__v;
@@ -184,6 +186,31 @@ router.put('/myCart', function(req, res, next) {
 		res.send(savedOrder);
 	})
 	.catch(next);
+});
+
+router.put('/myCart/submit', function(req, res, next) {
+	var whiteList = ['email', 'lineItems', 'shippingAddress', 'billingAddress'];
+	findCart(req)
+	.then(function(foundCart) {
+		if(req.user)
+			req.body.email = req.user.email;
+		console.log("whiteList", whiteList);
+		whiteList.forEach(function(field) {
+			foundCart[field] = req.body[field];
+		});
+		foundCart.status = 'Ordered';
+		foundCart.invoiceNumber = 'INV000'+ Math.random().toString(10).slice(3,8);
+		console.log("foundCart (pre save)", foundCart);
+		return foundCart.save();
+	})
+	.then(function(placedOrder) {
+		delete req.session.cartId;
+		res.send(placedOrder);
+	})
+	.catch(function(err) {
+		console.log("Error submitting cart!", err);
+		next();
+	});	
 });
 
 router.put('/:id', function(req, res, next){
@@ -221,7 +248,7 @@ router.put('/:id', function(req, res, next){
 	})
 	.then(function(updatedOrder){
 		if(updatedOrder.status == 'Ordered')
-			delete req.session.cartId;
+			
 		res.send(updatedOrder);
 	})
 	.then(null, next);

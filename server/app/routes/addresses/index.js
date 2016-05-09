@@ -49,9 +49,30 @@ router.get('/user/:userId', authorization.isAdminOrSelf, function(req, res, next
 });
 
 router.post('/', function(req, res, next){
-    Address.findOrCreate(req.body, function(err, newAddress, created){
-        res.status(200).send(newAddress);
+    var thisPromise;
+    var filteredAddress = {};
+    var whiteList = ['name', 'address1', 'address2', 'city', 'state', 'zip'];
+    whiteList.forEach(function(field) {
+        filteredAddress[field] = req.body[field]; 
+    })    
+
+    if(req.body._id)
+        thisPromise = Address.findByIdAndUpdate(req.body._id, filteredAddress, {new: true});
+    else 
+        thisPromise = Address.create(filteredAddress);
+
+    thisPromise
+    .then(function(address) {
+        res.send(address);
     })
+    .catch(function(err) {
+        console.log("Error finding/creating address", err);
+        next();
+    })
+
+    // Address.findOrCreate(req.body, function(err, newAddress, created){
+    //     res.status(200).send(newAddress);
+    // })
 })
 
 

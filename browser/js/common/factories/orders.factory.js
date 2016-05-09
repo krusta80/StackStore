@@ -91,6 +91,7 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 				var qty = 1;
 
 			var lineIndex = this.getLineIndex(product);
+			console.log("Adding to cart", cart);
 			cart.lineItems[lineIndex].quantity+=qty;
 			
 			return $http.put('/api/orders/myCart', cart)
@@ -160,9 +161,8 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 		 },
 
 		submitOrder: function(id, obj, billing, shipping){
-
-			var addresses = {}
-
+			var addresses = {};
+			console.log("OrderFactory -> billing", billing);
 			return AddressesFactory.findOrCreate(billing)
 			.then(function(billingAddress){
 				addresses.billing = billingAddress._id;
@@ -172,12 +172,15 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 				addresses.shipping = shippingAddress._id;
 				obj.shippingAddress = addresses.shipping;
 				obj.billingAddress = addresses.billing;
-				obj.status = "Ordered";
-				return $http.put('/api/orders/' + id, obj)
-				.then(function(res){
-					return res.data;
-				})
+				return $http.put('/api/orders/myCart/submit', obj);
 			})
+			.then(function(res){
+				return res.data;
+			})
+			// .catch(function(err) {
+			// 	console.log("Error submitting order:", err);
+			// 	return err;
+			// })
 		},
 
 		cancelOrder: function(obj){
