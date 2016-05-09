@@ -48,7 +48,7 @@
                                 <br>
                                 in <span ng-repeat="category in item.prod_id.categories">{{category.name}}{{$last ? '' : ', '}}</span>
                                 <br><br>
-                                <a ng-click="deleteItem(item.prod_id)">Delete</a>
+                                <a ng-click="deleteItem($index)">Delete</a>
                             </div>
                         </div>
                     </div>
@@ -69,25 +69,3 @@
     <hr>
 
 </div>
-
-
-
-
-
-
-    <!-- TO WORK ON - DISPLAY PRODUCT INFO LIKE CART -->
-    <div class="row" ng-repeat="item in order.lineItems"> 
-      <div class="col-md-8"> 
-        <div class="row">
-          <div class="col-md-2 thumbnail">
-            <img ng-src="{{item.prod_id.imageUrls[0]}}">
-          </div>
-          <div class="col-md-6">
-            <a ui-sref="product({id: item.prod_id._id})"><b>{{item.prod_id.title}}</b></a>
-            <br>
-            in <span ng-repeat="category in item.prod_id.categories">{{category.name}}{{$last ? '' : ', '}}</span>
-            <br><br>
-            <a ng-click="deleteItem(item.prod_id)">Delete</a>
-          </div>
-        </div>
-      </div> 

@@ -11,6 +11,7 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 
 	return {
 
+		//Functions for cart and order detail page
 		reloadCart: function() {
 			$http.get('/api/orders/myCart')
 				.then(function(res) {
@@ -223,6 +224,7 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 					return $q.reject(err);
 				});
 		},
+
 		addOrder: function(order) {
 			return $http.post('/api/orders', order)
 				.then(function(res) {
@@ -233,7 +235,39 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 					console.log(err);
 					return $q.reject(err);
 				});
+		},
+
+		editQuantityInOrder: function(product, qty, order){
+			console.log("PRODUCT: ", product)
+			console.log("QUANTITY: ", qty)
+			console.log("ORDER: ", order)
+
+			var lineIndex = this.getLineIndexInOrder(product, order);
+			if(qty >= 0){
+				order.lineItems[lineIndex].quantity = qty;
+				
+				return $http.put('/api/orders/' + order._id , cart)
+					.then(function(res) {
+						order = res.data;
+						$rootScope.$emit('orderUpdate', order.itemCount);
+						return res.data;
+					});
+
+				console.log("LINE ITEMS", order.lineItems);
+			}else{
+				console.log("Cannot set quantity below 0.")
+			}
+		},
+
+		removeIndexedItemFromOrder: function(idx, order){
+			order.lineItems.splice(idx,1);
+			return $http.put('/api/orders/' + order._id, order)
+				.then(function(res) {
+					order = res.data;
+					return res.data;
+				});
 		}
+
 
 
 	};

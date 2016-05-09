@@ -136,6 +136,27 @@ app.controller('OrderCtrl', function($scope, order, OrdersFactory, fields, $stat
 				restoreForm();
 			});
 	};
+
+	$scope.setQuantity = function(product, qty){
+		console.log("Called set Quantity ", qty, " on product: ", product)
+		OrdersFactory.editQuantityInOrder(product, qty, $scope.order._id)
+		.then(function(updatedCart){
+			return OrdersFactory.getOrder(updatedCart.id)
+		})
+		.then(function(populatedCart){
+			$scope.cart = populatedCart;
+		})
+	}
+
+	$scope.deleteItem = function(idx) {
+		OrdersFactory.removeIndexedItemFromOrder(idx, $scope.order)
+		.then(function(updatedOrder) {
+			return OrdersFactory.getOrder(updatedOrder._id)
+		})
+		.then(function(populatedOrder) {
+			$scope.order = populatedOrder;
+		})
+	};
 	
 });
 
