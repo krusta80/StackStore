@@ -21,7 +21,10 @@ router.param('id', function(req, res, next, id){
             req.requestedUser = '-1';
         next();    
     })
-    .then(null, next);
+    .then(null, function(err) {
+        console.log("error is param function:", err);
+        next();
+    });
 })
 
 router.param('userId', function(req, res, next, id){
@@ -37,6 +40,7 @@ router.param('userId', function(req, res, next, id){
 //Route Handlers
 router.get('/:id', authorization.isAdminOrResident, function(req, res, next){
     var id = req.params.id;
+    console.log("id is", req.params.id);
     Address.findById(id)
     .then(function(address){
         res.status(200).send(address);
@@ -45,7 +49,7 @@ router.get('/:id', authorization.isAdminOrResident, function(req, res, next){
 })
 
 router.get('/user/:userId', authorization.isAdminOrSelf, function(req, res, next){
-    Address.find({userId: req.params.userId})
+    Address.find({userId: req.params.userId, dateModified: {$exists: false}})
         .then(function(addresses){
             res.send(addresses);
         })
