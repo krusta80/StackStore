@@ -16,7 +16,7 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $
 
 	$scope.cart = cart;
 	console.log("Cart state when entering checkout page:", cart);
-	$scope.billing = {}; $scope.shipping = {};
+	$scope.billing = {type: "Billing Address"}; $scope.shipping = {type: "Shipping Address"};
 
 	AuthService.getLoggedInUser()
 	.then(function(user) {

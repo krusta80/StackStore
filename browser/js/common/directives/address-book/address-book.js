@@ -5,9 +5,10 @@ app.directive('addressBook', function ($state, AddressesFactory) {
         templateUrl: 'js/common/directives/address-book/address-book.html',
         scope:{
         	values: "=",
-        	user: "=",
+        	user: "="
         },
         link: function (scope) {
+
         	AddressesFactory.findByUserId(scope.user)
         	.then(function(addresses){
         		scope.addresses = addresses;
