@@ -5,6 +5,7 @@ var models = require('../../../db/models');
 var Order = models.Order;
 var User = models.User;
 var authorization = require('../../configure/authorization-middleware.js');
+var mail = require('../../../mail');
 module.exports = router;
 
 var readWhitelist = {
@@ -20,10 +21,7 @@ var writeWhitelist = {
 };
 
 var findCart = function(req) {
-	// if(req.user)
-	// 	return Order.findOne({userId: req.user._id, status: 'Cart'});
-	// else
-		return Order.findById(req.session.cartId);
+	return Order.findById(req.session.cartId);
 }
 
 //Route Params
@@ -85,6 +83,26 @@ router.get('/myOrders/:userId', authorization.isAdminOrSelf, function(req, res, 
 		console.log("ERR:", err)
 	})
 })
+
+router.get('/pastOrders/:key', function(req, res, next) {
+    console.log("In past order route...");
+    Order.findOne({pastOrderKey: req.params.key}).populate({
+							path: 'lineItems.prod_id',
+							model: 'Product',
+							populate: {
+								path: 'categories',
+								model: 'Category'
+							}
+						})
+    .then(function(order) {
+        console.log("past order found...", order);
+        res.send(order);
+    })
+    .catch(function(err) {
+        console.log("Error when trying to grab past order!", err);
+        next();
+    });
+});
 
 //	added by JAG on 04/25/16 for cart-related stuff
 //    added by JAG on 04/25/16 for cart-related stuff
@@ -200,11 +218,13 @@ router.put('/myCart/submit', function(req, res, next) {
 		});
 		foundCart.status = 'Ordered';
 		foundCart.invoiceNumber = 'INV000'+ Math.random().toString(10).slice(3,8);
+		foundCart.pastOrderKey = Math.random().toString(36).slice(3,12);
 		console.log("foundCart (pre save)", foundCart);
 		return foundCart.save();
 	})
 	.then(function(placedOrder) {
 		delete req.session.cartId;
+		mail.sendOrderConfirmation(placedOrder.email, placedOrder);
 		res.send(placedOrder);
 	})
 	.catch(function(err) {
