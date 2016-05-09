@@ -1,5 +1,5 @@
+<h2 align=center>Add/Edit/Remove an Order</h2>
 <div class="container" id="order">
-
     <div class="panel panel-info">
         <div class="panel-heading">
             <h3 class="panel-title">Manage Basic Info</h3>
@@ -12,7 +12,7 @@
                 </alert>
                 <div ng-repeat="field in fields" class="form-group">
                     <label for="field.key">{{field.title}}</label>
-                    <input ng-show="isTextInput(field.key)" type="text" ng-model="order[field.key]" class="form-control" id="order[field.key]">
+                    <input ng-show="isTextInput(field.key)" ng-disabled="field.disabled" type="text" ng-model="order[field.key]" class="form-control" id="order[field.key]">
                     <!-- <input ng-show="field.key === 'password'" type="password" ng-model="user[field.key]" class="form-control" id="user[field.key]"> -->
                     <select ng-show="!isTextInput(field.key)" ng-model="order[field.key]" 
                         id="order[field.key]" class="form-control"
@@ -63,6 +63,23 @@
         </div>
     </div>
 
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">Manage Billing Address</h3>
+            </div>
+        <div class="panel-body">
+            <address-form values="order.billingAddress"></address-form>
+        </div>
+    </div>
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">Manage Shipping Address</h3>
+            </div>
+        <div class="panel-body">
+            <address-form values="order.shippingAddress"></address-form>
+        </div>
+    </div>
+    
     <hr>
     <button ng-click="addUpdateOrder()" class="btn btn-success btn-block"><b>Add / Update Order</b></button>
     <button ng-click="deleteOrder()" class="btn btn-warning btn-block">Delete Order</button>   

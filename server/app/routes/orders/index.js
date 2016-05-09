@@ -255,29 +255,16 @@ router.put('/myCart/submit', function(req, res, next) {
 	});	
 });
 
-router.put('/:id', function(req, res, next){
+router.put('/:id', authorization.isAdmin, function(req, res, next){
 
 	Order.findById(req.params.id)
 	.then(function(fetchedOrder){
 		delete req.body.__v;
-		//Most values can only be edited while in the 'Cart' stage
-		if(fetchedOrder.status !== 'Cart' && req.user.role !== 'Admin'){
-			delete req.body.userId; delete req.body.sessionId;
-			delete req.body.email;
-			delete req.body.invoiceNumber; delete req.body.lineItems;
-			delete req.body.shippingAddress; delete req.body.billingAddress;
-		}
-
+	
 		//User may not edit timestamps directly under any circumstances
 		["Created", 'Ordered', "Notified", "Shipped", "Delivered", "Canceled"].forEach(function(state){
 			delete req.body["date"+state];
 		})
-
-		//Order status can only go "forward"
-		var states = Order.schema.path('status').enumValues;
-		if(states.indexOf(req.body.status) < states.indexOf(fetchedOrder.status)){
-			delete req.body.status
-		}
 
 		//Finally, update values
 		for(var key in req.body){
@@ -297,7 +284,7 @@ router.put('/:id', function(req, res, next){
 })
 
 //Do we even need a delete function? Aren't we just going to mark it as cancelled and keep it for records sake?
-router.delete('/:id', function(req, res, next){
+router.delete('/:id', authorization.isAdmin, function(req, res, next){
 	Order.findByIdAndRemove(req.params.id)
 	.then(function(deletedOrder){
 		res.send(deletedOrder);

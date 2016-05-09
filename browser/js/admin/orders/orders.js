@@ -61,6 +61,7 @@ app.controller('OrderListCtrl', function($scope, orders, OrdersFactory, fields, 
 
 app.controller('OrderCtrlAdmn', function($scope, order, OrdersFactory, fields, $state, GitCommitted, thisUser){
 	var origOrder;
+	var fieldWhiteList = ['invoiceNumber', 'email', 'status', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'];
 	origOrder = angular.copy(order);
 	$scope.thisUser = thisUser;
 	$scope.order = order;
@@ -68,9 +69,12 @@ app.controller('OrderCtrlAdmn', function($scope, order, OrdersFactory, fields, $
 	console.log("$scope.order", $scope.order) //POPULATED OBJECT
 
 	$scope.fields = [];
-	var fieldWhiteList = ['invoiceNumber', 'email', 'status', 'dateOrdered', 'dateNotified', 'dateShipped', 'dateDelivered', 'dateCanceled'];
 	fieldWhiteList.forEach(function(field) {
-		field = {key: field, title: GitCommitted.fancify(field)};
+		field = {key: field, title: GitCommitted.fancify(field), disabled: false};
+		if(field.key.indexOf("date") === 0) {
+			$scope.order[field.key] = GitCommitted.dateify($scope.order[field.key], field.key);
+			field.disabled = true;
+		}
 		$scope.fields.push(field);
 	});
 
@@ -113,6 +117,10 @@ app.controller('OrderCtrlAdmn', function($scope, order, OrdersFactory, fields, $
 	};
 	
 	$scope.addUpdateOrder = function() {
+		fieldWhiteList.forEach(function(field) {
+			if(field.indexOf("date") === 0)
+				$scope.order[field] = order[field];
+		})
 		if(order._id)
 			OrdersFactory.updateOrder($scope.order)
 			.then(function(updatedOrder) {
