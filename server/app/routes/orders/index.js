@@ -1,10 +1,12 @@
 'use strict';
 var mongoose = require('mongoose');
+var Promise = require('bluebird');
 var router = require('express').Router();
 var models = require('../../../db/models');
 var Order = models.Order;
 var User = models.User;
 var Address = models.Address;
+var Product = models.Product;
 var authorization = require('../../configure/authorization-middleware.js');
 var mail = require('../../../mail');
 module.exports = router;
@@ -22,7 +24,16 @@ var writeWhitelist = {
 };
 
 var findCart = function(req) {
-	return Order.findById(req.session.cartId);
+	return Order.findById(req.session.cartId).populate({
+							path: 'lineItems.prod_id',
+							model: 'Product',
+							populate: {
+								path: 'categories',
+								model: 'Category'
+							}
+						})
+						.populate({path: 'billingAddress'})
+						.populate({path: 'shippingAddress'});
 }
 
 var removeAddresses = function(addressIds) {
@@ -30,6 +41,58 @@ var removeAddresses = function(addressIds) {
 		console.log("removing address id", addressId);
 		return Address.findByIdAndUpdate(addressId, {dateModified: Date.now()})
 	}));
+};
+
+var grabInventory = function(cart) {
+	var promises = cart.lineItems.map(function(lineItem) {
+		console.log("grabInventory -> origId:", lineItem.prod_id.origId);
+		return Product.findOneAndUpdate({
+			origId: lineItem.prod_id.origId, 
+			dateModified: {$exists: false}
+		}, {
+			$inc: {inventoryQty: -1*lineItem.quantity}
+		}, {
+			new: true
+		});
+	});
+
+	var index = 0;	
+	var errorMsg = "";
+	return Promise.settle(promises)
+	.then(function(inspections) {
+		inspections.forEach(function(inspection) {
+			if(inspection.value().inventoryQty < 0) 
+		        errorMsg += "Not enough inventory for item: "+cart.lineItems[index].prod_id.title+'\n';
+		    index++;
+		})
+		return true;
+	})
+	.then(function() {
+		if(errorMsg.length === 0) {	
+			console.log("Inventory grabbed successfully!");
+			return "ALL GOOD";
+		}
+		console.log("pre rollback loop");
+		var rollbacks = cart.lineItems.map(function(lineItem) {
+			console.log("   rolling back: ", lineItem.prod_id.title, lineItem.quantity);
+			return Product.findOneAndUpdate({
+				origId: lineItem.prod_id.origId, 
+				dateModified: {$exists: false}
+			}, {
+				$inc: {inventoryQty: lineItem.quantity}
+			}, {
+				new: true
+			});
+		});
+		return Promise.all(rollbacks);
+	})
+	.then(function(result) {
+		console.log("result is", result);
+		if(result === 'ALL GOOD')
+			return;
+		else
+			throw errorMsg;
+	})
 };
 
 var updateAddresses = function(order) {
@@ -261,8 +324,19 @@ router.put('/myCart', function(req, res, next) {
 
 router.put('/myCart/submit', function(req, res, next) {
 	var whiteList = ['email', 'lineItems', 'shippingAddress', 'billingAddress'];
+	var foundCart;
+
 	findCart(req)
-	.then(function(foundCart) {
+	.then(function(_foundCart) {
+		foundCart = _foundCart;
+		return grabInventory(foundCart);
+	})
+	.catch(function(err) {
+		//	Error grabbing inventory!!
+		console.log("INVENTORY ERROR", err);
+		throw {message: err};
+	})
+	.then(function() {
 		if(req.user)
 			req.body.email = req.user.email;
 		console.log("whiteList", whiteList);
