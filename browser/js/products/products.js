@@ -90,6 +90,33 @@ app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $state, $scope,
 			.catch($log);
 	};
 
+	$scope.priceFilter = function(product) {
+		if($scope.minPrice === undefined && $scope.maxPrice === undefined)
+			return true;
+		else if($scope.minPrice === undefined)
+			return product.price <= $scope.maxPrice; 
+		else if($scope.maxPrice === undefined)
+			return product.price >= $scope.minPrice;
+		else
+			return product.price >= $scope.minPrice && product.price <= $scope.maxPrice; 
+	};
+
+	$scope.productNameFilter = function(product){
+		if($scope.searchByName === undefined)
+			return true;
+		else if(product.title.toLowerCase().indexOf($scope.searchByName.toLowerCase()) !== -1)
+			return true;
+		else
+			return false;
+	};
+
+	$scope.starsFilter = function(product){
+		if($scope.minStars === undefined)
+			return true;
+		else
+			return product.averageStars >= $scope.minStars;
+	};	
+
 });
 
 

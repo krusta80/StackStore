@@ -67,6 +67,12 @@
       </div>
     </div>
     <hr class="rule">
+    <div ng-show="!user">
+      <fieldset class="form-group">
+        <label for="email">Email</label>
+        <input type="text" class="form-control" id="email" ng-model="cart.email">
+      </fieldset>
+    </div>
     <div class="row">
       <div class="col-md-6">
         <h4>Billing Address:</h4>
