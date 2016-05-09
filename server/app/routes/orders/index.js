@@ -28,7 +28,7 @@ var findCart = function(req) {
 var removeAddresses = function(addressIds) {
 	return Promise.all(addressIds.map(function(addressId) {
 		console.log("removing address id", addressId);
-		return Address.findByIdAndRemove(addressId);
+		return Address.findByIdAndUpdate(addressId, {dateModified: Date.now()})
 	}));
 };
 
