@@ -25,5 +25,9 @@ app.controller('CategoriesCtrl', function($scope, categories, CategoriesFactory,
 		return CategoriesFactory.fetchCurrentCategory();
 	};
 
+	$scope.getStars = function(stars){
+		$scope.minStars = stars;
+	};
+
 	
 });
