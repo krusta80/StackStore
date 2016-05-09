@@ -16,7 +16,7 @@ app.config(function($stateProvider){
 
 	$stateProvider.state('orderDetail', {
 		url: '/admin/orders/:orderId',
-		controller: 'OrderCtrl',
+		controller: 'OrderCtrlAdmn',
 		templateUrl: 'js/admin/orders/orderDetail.html',
 		resolve: {
 			order: function(OrdersFactory, $stateParams){
@@ -59,7 +59,7 @@ app.controller('OrderListCtrl', function($scope, orders, OrdersFactory, fields, 
 
 });
 
-app.controller('OrderCtrl', function($scope, order, OrdersFactory, fields, $state, GitCommitted, thisUser){
+app.controller('OrderCtrlAdmn', function($scope, order, OrdersFactory, fields, $state, GitCommitted, thisUser){
 	var origOrder;
 	origOrder = angular.copy(order);
 	$scope.thisUser = thisUser;
