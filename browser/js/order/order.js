@@ -6,7 +6,6 @@ app.config(function($stateProvider){
 			templateUrl: 'js/order/orderDetails.html',
 			resolve: {
 				user: function(AuthService){
-					console.log("u");
 					return AuthService.getLoggedInUser().then(function(user){
 						return user;
 					})
@@ -30,7 +29,6 @@ app.config(function($stateProvider){
 app.controller('OrderCtrl', function($scope, $state, user, order, billingAddress, shippingAddress, OrdersFactory){
 
 	$scope.user = user;
-	console.log("order", order)
 	$scope.order = order;
 	$scope.billingAddress = billingAddress;
 	$scope.shippingAddress = shippingAddress;
