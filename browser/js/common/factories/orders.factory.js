@@ -293,7 +293,13 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 
 	//Promisified Stripe Helper
 	function getToken(payment){
+		console.log("Payment submitted", payment)
 		return new Promise(function(resolve, reject){
+			var valid = Stripe.card.validateCardNumber(payment.number);
+			if(!valid){
+				reject("Luhn Check - invalid card number")
+			}
+
 			Stripe.card.createToken(payment, function responseHandler(status, response){
 				if(!response.error){
 					resolve(response.id);
