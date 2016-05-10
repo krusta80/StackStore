@@ -6,7 +6,6 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 				.then(function(res) {
 					cart = res.data;
 					$rootScope.$emit('cartUpdate', cart.itemCount);
-					console.log("retrieved cart: ", cart);
 				});
 
 	return {
@@ -15,7 +14,6 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 		reloadCart: function() {
 			return $http.get('/api/orders/myCart')
 				.then(function(res) {
-					console.log("retrieved res: ", res);
 					cart = res.data;
 					$rootScope.$emit('cartUpdate', cart.itemCount);
 				})
@@ -43,13 +41,16 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 			.then(function(res){
 				return res.data;
 			})
+			.catch(function(err) {
+				console.log("Error with past order", err);
+			})
 		},
 
 		getOrderHistory : function(){
 			return $http.get('/api/orders/myOrders')
 				.then(function(res){
 					return res.data;
-				});
+				})
 		},
 
 		getCart : function() {
@@ -61,7 +62,6 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
             .then(function(res) {
                 cart = res.data;
                 $rootScope.$emit('cartUpdate', cart.itemCount);
-                console.log("populated cart:", res.data);
                 return res.data;
             });
 	    },
@@ -95,7 +95,6 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 				var qty = 1;
 
 			var lineIndex = this.getLineIndex(product);
-			console.log("Adding to cart", cart);
 			cart.lineItems[lineIndex].quantity+=qty;
 			
 			return $http.put('/api/orders/myCart', cart)
@@ -166,7 +165,6 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 
 		submitOrder: function(id, obj, billing, shipping){
 			var addresses = {};
-			console.log("OrderFactory -> billing", billing);
 			return AddressesFactory.findOrCreate(billing)
 			.then(function(billingAddress){
 				addresses.billing = billingAddress._id;
@@ -181,16 +179,19 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 			.then(function(res){
 				return res.data;
 			})
-			// .catch(function(err) {
-			// 	console.log("Error submitting order:", err);
-			// 	return err;
-			// })
+			.catch(function(err) {
+				console.log("Error submitting order:", err);
+			 	if(err.data)
+			 		return $q.reject(err.data);
+			 	else
+			 		return $q.reject(err);
+			})
 		},
 
-		cancelOrder: function(obj){
+		cancelOrder: function(obj, keyObj){
 			if(obj.status === 'Ordered'){
 				obj.status = 'Canceled';
-				return $http.put('/api/orders/' + obj.id, obj)
+				return $http.put('/api/orders/myOrders/cancel/' + obj.id, keyObj)
 				.then(function(res){
 					return res.data;
 				})
