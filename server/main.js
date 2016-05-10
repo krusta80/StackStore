@@ -2,6 +2,7 @@
 var chalk = require('chalk');
 var https = require('https');
 var fs = require('fs');
+var httpApp = require('express')();
 
 // Requires in ./db/index.js -- which returns a promise that represents
 // mongoose establishing a connection to a MongoDB database.
@@ -18,19 +19,17 @@ try {
 	server = https.createServer(secureConfig);
 	console.log("Running https!");
 
-	// set up plain http server
-	var http = express.createServer();
-
 	// set up a route to redirect http to https
-	http.get('*',function(req,res){  
+	httpApp.get('*',function(req,res){  
 	    res.redirect('https://'+req.hostname);
 	})
 
-	http.listen(process.env.PORT);
+	require('http').createServer(httpApp).listen(process.env.PORT);
 	process.env.PORT = 443;
 	
 }
 catch(err) {
+	console.log(err);
 	console.log("No key and/or cert file found...going http!")
 	server = require('http').createServer();	
 }
