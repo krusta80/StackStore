@@ -376,8 +376,9 @@ router.put('/myCart/submit', function(req, res, next) {
 		mail.sendOrderConfirmation(placedOrder.email, placedOrder);
 
 		placedOrder = placedOrder; //Store placed order on parent scope. Later res.send
+		console.log("SUBTOTAL", placedOrder.subtotal);
 		var charge = {
-			amount: placedOrder.subtotal, //Change to total
+			amount: placedOrder.subtotal * 100, //Change to total
 			currency: 'usd',
 			source: req.body.paymentToken,
 			description: "Stackstore " + placedOrder.invoiceNumber
