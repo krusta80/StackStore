@@ -16,7 +16,7 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $
 
 	$scope.cart = cart;
 	console.log("Cart state when entering checkout page:", cart);
-	$scope.billing = {}; $scope.shipping = {};
+	$scope.billing = {type: "Billing Address", show: false}; $scope.shipping = {type: "Shipping Address", show: false};
 
 	AuthService.getLoggedInUser()
 	.then(function(user) {
@@ -26,18 +26,9 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $
 		console.log("No user found for this session!");
 	});
 
-	$scope.addressBookShown = false;
-	$scope.toggleAddressBook = function(context) {
-	    $scope.addressBookShown = !$scope.addressBookShown;
-	    if(context !== $scope.addressBookContext){
-	    	$scope.addressBookShown = true;
-	    }
-	    
-	    if($scope.addressBookShown){
-	    	$scope.addressBookContext = context;
-			console.log("context", $scope.addressBookContext);
-	    } 
-	 };
+	$scope.toggleAddressBook = function(type){
+		$scope[type].show = !$scope[type].show;
+	}
 
 	$scope.isEmpty = function(){
 		return $scope.cart.lineItems.length === 0;
