@@ -137,16 +137,15 @@ router.put('/:id', function(req, res, next){
 
 			var newProduct = new Product(req.body);
 			newProduct.origId = origId;
-			newProduct.dateModified = Date.now();
 			return newProduct.save();
 		})
 		.then(function(newProduct){
 			res.send(newProduct);
 		}) //If success 
 		.catch(function(err){
-			Product.findByIdAndUpdate(req.params.id, {dateModified: null})
-			next();
-		})
+			console.log("ERROR", err)
+			Product.findByIdAndUpdate(req.params.id, {dateModified: null}).exec()
+		}).then(null, next)
 
 });
 
