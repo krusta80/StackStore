@@ -59,7 +59,7 @@ router.get('/user/:userId', authorization.isAdminOrSelf, function(req, res, next
 router.post('/', function(req, res, next){
     var thisPromise;
     var filteredAddress = {};
-    var whiteList = ['name', 'address1', 'address2', 'city', 'state', 'zip'];
+    var whiteList = ['name', 'address1', 'address2', 'city', 'state', 'zip', 'userId'];
     whiteList.forEach(function(field) {
         filteredAddress[field] = req.body[field]; 
     })    
@@ -67,10 +67,15 @@ router.post('/', function(req, res, next){
     if(req.body._id)
         thisPromise = Address.findByIdAndUpdate(req.body._id, filteredAddress, {new: true});
     else 
-        thisPromise = Address.create(filteredAddress);
+        thisPromise = Address.create(filteredAddress)
+                        .then(function(address){
+                            address.origId = address._id; 
+                            return address.save();
+                        });
 
     thisPromise
     .then(function(address) {
+        address.origId = address._id;
         res.send(address);
     })
     .catch(function(err) {

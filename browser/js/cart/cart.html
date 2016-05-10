@@ -55,7 +55,7 @@
   <div ng-show="billing.show" class="container container-book"> <!-- Address Book -->
     <div class="row">
       <div class="col-md-12">
-        <address-book values="billing" user="cart.userId"></address-book>
+        <address-book values="billing" user="user._id"></address-book>
       </div>
     </div>
   </div>
@@ -63,7 +63,7 @@
   <div ng-show="shipping.show" class="container container-book"> <!-- Address Book -->
     <div class="row">
       <div class="col-md-12">
-        <address-book values="shipping" user="cart.userId"></address-book>
+        <address-book values="shipping" user="user._id"></address-book>
       </div>
     </div>
   </div> 

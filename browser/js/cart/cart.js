@@ -7,24 +7,27 @@ app.config(function($stateProvider){
 		resolve: {
 			cart: function(OrdersFactory) {
 				return OrdersFactory.populateCart();
+			},
+			user: function(AuthService) {
+				return AuthService.getLoggedInUser()
+						.then(function(user) {
+							return user;
+						})
+						.catch(function(err) {
+							return {};
+						})
 			}
 		}
 	});
 });
 
-app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $state, $rootScope, AuthService, GitCommitted){
+app.controller('CartCtrl', function(cart, user, OrdersFactory, $scope, $stateParams, $state, $rootScope, AuthService, GitCommitted){
 
+	$scope.user = user;
+	console.log("CartCtr: user is " + user);
 	$scope.cart = cart;
 	console.log("Cart state when entering checkout page:", cart);
 	$scope.billing = {type: "Billing Address", show: false}; $scope.shipping = {type: "Shipping Address", show: false};
-
-	AuthService.getLoggedInUser()
-	.then(function(user) {
-		$scope.user = user;
-	})
-	.catch(function(err) {
-		console.log("No user found for this session!");
-	});
 
 	$scope.toggleAddressBook = function(type){
 		$scope[type].show = !$scope[type].show;

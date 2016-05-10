@@ -53,12 +53,12 @@ app.factory('ProductsFactory', function($http){
 
 	ProductsFactory.updateProduct = function(product){
 		return $http.put('/api/products/'+product._id, product)
-			.then(function(res){
-				var index = findIndex(productsCache, res.data);
-				if(index > -1) 
-					productsCache[index] = res.data;
-				return res.data;
-			})
+				.then(function(res){
+					var index = findIndex(productsCache, res.data);
+					if(index > -1) 
+						productsCache[index] = res.data;
+					return res.data;
+				})
 	}
 
 	ProductsFactory.createProduct = function(product){
