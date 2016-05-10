@@ -105,7 +105,7 @@ router.post('/', function(req, res, next){
 router.put('/:id', authorization.isAdminOrSelf, function(req, res, next){
     
     //If self, delete certain fields - this isn't free license to edit any field.
-
+    var err;
 	//Find user by ID, add dateModified timestamp, but return ORIGINAL User object
     User.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
     .then(function(originalUser){
@@ -131,10 +131,16 @@ router.put('/:id', authorization.isAdminOrSelf, function(req, res, next){
     .then(function(updatedUser) {
         res.send(updatedUser);
     })
-    .catch(function(err){
+    .catch(function(_err){
+        err = _err;
         console.log("ERROR: ", err);
         return User.findByIdAndUpdate(req.params.id, {$unset: {dateModified: ""}})
-    }).then(null, next)
+    })
+    .then(function(user) {
+        if(err)
+            res.status(500).send(err);
+    })
+    .then(null, next)
 });
 
 router.delete('/:id', authorization.isAdmin, authorization.isNotSelf, function(req, res, next){

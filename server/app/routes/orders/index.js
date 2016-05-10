@@ -196,17 +196,9 @@ router.get('/pastOrders/:key', function(req, res, next) {
 				model: 'Category'
 			}
 		})
-<<<<<<< HEAD
-		.populate({
-			path: 'billingAddress'
-		})
-		.populate({
-			path: 'shippingAddress'
-		})
-=======
 		.populate({path: 'billingAddress'})
 		.populate({path: 'shippingAddress'})
->>>>>>> 700a26b1e8c56f94e74258e40a126fcacc68a546
+
     .then(function(order) {
         console.log("past order found...", order);
         res.send(order);
