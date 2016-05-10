@@ -8,7 +8,7 @@ app.directive('addressBook', function ($state, AddressesFactory) {
         	user: "="
         },
         link: function (scope) {
-            console.log('hihihi');
+            console.log('(address book) user is '+ scope.user);
         	AddressesFactory.findByUserId(scope.user)
         	.then(function(addresses){
         		scope.addresses = addresses;
