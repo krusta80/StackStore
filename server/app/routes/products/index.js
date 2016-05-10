@@ -113,16 +113,7 @@ router.post('/', authorization.isAdmin, function(req, res, next){
 
 //User can only PUT reviews
 router.put('/:id', function(req, res, next){
-	Product.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
-		.populate({
-				path: 'reviews',
-				populate: {
-					path: 'user'
-				}
-			})
-			.populate({
-				path: 'categories'
-			})
+	Product.findById(req.params.id)
 		.then(function(origProduct){
 			var origId = req.body._id;
 			delete req.body._id;
@@ -133,11 +124,11 @@ router.put('/:id', function(req, res, next){
 			req.body.reviews.forEach(function(review) {
 				req.body.averageStars += review.stars;
 			});
-			if(req.body.reviews.length > 0)
-				req.body.averageStars /= req.body.reviews.length;
+			req.body.averageStars /= req.body.reviews.length;
 
 			var newProduct = new Product(req.body);
 			newProduct.origId = origId;
+			newProduct.dateModified = Date.now();
 			return newProduct.save();
 		})
 		.then(function(newProduct){
