@@ -163,7 +163,7 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 		    return taxTable[state];
 		 },
 
-		submitOrder: function(id, obj, billing, shipping){
+		submitOrder: function(id, obj, billing, shipping, payment){
 			var addresses = {};
 			return AddressesFactory.findOrCreate(billing)
 			.then(function(billingAddress){
@@ -172,8 +172,17 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 			})
 			.then(function(shippingAddress){
 				addresses.shipping = shippingAddress._id;
+				return getToken(payment);
+			})
+			.then(function(token){
 				obj.shippingAddress = addresses.shipping;
 				obj.billingAddress = addresses.billing;
+
+				console.log("object before token", obj)
+				console.log("token", token);
+				obj.paymentToken = token;
+				console.log("object before submit", obj)
+
 				return $http.put('/api/orders/myCart/submit', obj);
 			})
 			.then(function(res){
@@ -270,8 +279,30 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 				});
 		}
 
-
-
 	};
+
+	return new Promise(function (resolve, reject) {
+	    sendgrid.send(email, function(err, json) {
+	    	if(!err)
+				resolve(json);
+			else
+				reject(err);	 	 
+	    });
+	});
+
+
+	//Promisified Stripe Helper
+	function getToken(payment){
+		return new Promise(function(resolve, reject){
+			Stripe.card.createToken(payment, function responseHandler(status, response){
+				if(!response.error){
+					resolve(response.id);
+				}else{
+					reject(response.error)
+				}
+			})
+		})
+	}
+
 });
 
