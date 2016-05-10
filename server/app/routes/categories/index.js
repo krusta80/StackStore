@@ -102,10 +102,11 @@ router.put('/:id', authorization.isAdmin, function(req, res, next){
 		.then(function(products){
 			res.send(newCategory);
 		})
-		.then(null, function(err) {
-			console.log(err);
-			next();
-		});
+		.catch(function(err){
+			console.log("ERROR: ", err);
+			return Category.findByIdAndUpdate(req.params.id, {$unset: {dateModified: ""}})
+		}).then(null, next)
+
 });
 
 

@@ -111,7 +111,6 @@ router.post('/', authorization.isAdmin, function(req, res, next){
 		.then(null, next);
 });
 
-//User can only PUT reviews
 router.put('/:id', function(req, res, next){
 	Product.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
 		.populate({
@@ -142,8 +141,12 @@ router.put('/:id', function(req, res, next){
 		})
 		.then(function(newProduct){
 			res.send(newProduct);
-		})
-		.then(null, next);
+		}) //If success 
+		.catch(function(err){
+			console.log("ERROR: ", err);
+			return Product.findByIdAndUpdate(req.params.id, {$unset: {dateModified: ""}})
+		}).then(null, next)
+
 });
 
 router.delete('/:id', authorization.isAdmin, function(req, res, next){

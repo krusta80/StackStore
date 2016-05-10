@@ -124,13 +124,17 @@ router.put('/:id', authorization.isAdminOrSelf, function(req, res, next){
             }
         }
 
+        console.log("new user", newUser);
         //Save to backend and return
         return User.create(newUser);
     })
     .then(function(updatedUser) {
         res.send(updatedUser);
     })
-    .then(null, next);
+    .catch(function(err){
+        console.log("ERROR: ", err);
+        return User.findByIdAndUpdate(req.params.id, {$unset: {dateModified: ""}})
+    }).then(null, next)
 });
 
 router.delete('/:id', authorization.isAdmin, authorization.isNotSelf, function(req, res, next){

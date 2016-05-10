@@ -130,7 +130,11 @@ router.put('/:id', authorization.isAdminOrAuthor, function(req, res, next){
 		.then(function(newReview){
 			res.send(newReview);
 		})
-		.then(null, next);	
+		.catch(function(err){
+			console.log("ERROR: ", err);
+			return Review.findByIdAndUpdate(req.params.id, {$unset: {dateModified: ""}})
+		}).then(null, next)
+
 });
 
 //delete this route because in product populate will take care of it
