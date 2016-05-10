@@ -12,7 +12,7 @@ app.config(function($stateProvider){
 	});
 });
 
-app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $state, $rootScope, AuthService){
+app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $state, $rootScope, AuthService, GitCommitted){
 
 	$scope.cart = cart;
 	console.log("Cart state when entering checkout page:", cart);
@@ -91,10 +91,15 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $
 			OrdersFactory.reloadCart();
 			$rootScope.$emit('cartUpdate', 0);
 			//Clear cart after ordering
-			$state.go('home');
+			$scope.success = "Order Successful!  Thanks for shopping with $git committed!"
+			setTimeout(function() {
+				$state.go('home');	
+			}, 3000);
+			
 		})
 		.catch(function(err) {
 			console.log("Error!", err);
+			$scope.error = GitCommitted.errorify(err);
 		})
 		
 	}

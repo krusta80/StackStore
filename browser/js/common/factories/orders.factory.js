@@ -43,13 +43,16 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 			.then(function(res){
 				return res.data;
 			})
+			.catch(function(err) {
+				console.log("Error with past order", err);
+			})
 		},
 
 		getOrderHistory : function(){
 			return $http.get('/api/orders/myOrders')
 				.then(function(res){
 					return res.data;
-				});
+				})
 		},
 
 		getCart : function() {
@@ -181,16 +184,19 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 			.then(function(res){
 				return res.data;
 			})
-			// .catch(function(err) {
-			// 	console.log("Error submitting order:", err);
-			// 	return err;
-			// })
+			.catch(function(err) {
+				console.log("Error submitting order:", err);
+			 	if(err.data)
+			 		return $q.reject(err.data);
+			 	else
+			 		return $q.reject(err);
+			})
 		},
 
-		cancelOrder: function(obj){
+		cancelOrder: function(obj, keyObj){
 			if(obj.status === 'Ordered'){
 				obj.status = 'Canceled';
-				return $http.put('/api/orders/' + obj.id, obj)
+				return $http.put('/api/orders/myOrders/cancel/' + obj.id, keyObj)
 				.then(function(res){
 					return res.data;
 				})

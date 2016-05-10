@@ -75,7 +75,7 @@ router.post('/', function(req, res, next){
     })
     .catch(function(err) {
         console.log("Error finding/creating address", err);
-        next();
+        res.status(500).send(err);
     })
 
     // Address.findOrCreate(req.body, function(err, newAddress, created){

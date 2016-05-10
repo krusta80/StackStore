@@ -46,7 +46,7 @@ app.controller('OrderCtrl', function($scope, $state, user, order, billingAddress
 
 	$scope.cancelOrder = function(){
 		if($scope.order.status === 'Ordered'){
-			OrdersFactory.cancelOrder($scope.order);
+			OrdersFactory.cancelOrder($scope.order, user);
 		}
 	}
 

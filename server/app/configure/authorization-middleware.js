@@ -18,11 +18,17 @@ module.exports = {
         else next();
     },
     isAdminOrOwner: function(req, res, next){
-        var ownerId = req.requestedObject.userId;
-        if(typeof ownerId === 'object')
-            ownerId = ownerId._id;
-
+        //console.log("requestedObject is "+req.requestedObject);
+        
+        // var ownerId = req.requestedObject.userId;
+        // if(typeof ownerId === 'object')
+        //     ownerId = ownerId._id;
+        // if(String(ownerId).length === 0)
+            
+        var ownerId = String(req.requestedObject.userId);
+        
         console.log("req.user", req.user);
+        console.log("ownerId", ownerId);
         if(!req.user) 
             res.status(401).send("Error: Not logged in as user");
         else if(!userIsAdmin(req.user) && String(req.user._id) !== String(ownerId)) 

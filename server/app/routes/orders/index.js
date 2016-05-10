@@ -1,10 +1,12 @@
 'use strict';
 var mongoose = require('mongoose');
+var Promise = require('bluebird');
 var router = require('express').Router();
 var models = require('../../../db/models');
 var Order = models.Order;
 var User = models.User;
 var Address = models.Address;
+var Product = models.Product;
 var authorization = require('../../configure/authorization-middleware.js');
 var mail = require('../../../mail');
 module.exports = router;
@@ -22,7 +24,16 @@ var writeWhitelist = {
 };
 
 var findCart = function(req) {
-	return Order.findById(req.session.cartId);
+	return Order.findById(req.session.cartId).populate({
+							path: 'lineItems.prod_id',
+							model: 'Product',
+							populate: {
+								path: 'categories',
+								model: 'Category'
+							}
+						})
+						.populate({path: 'billingAddress'})
+						.populate({path: 'shippingAddress'});
 }
 
 var removeAddresses = function(addressIds) {
@@ -30,6 +41,62 @@ var removeAddresses = function(addressIds) {
 		console.log("removing address id", addressId);
 		return Address.findByIdAndUpdate(addressId, {dateModified: Date.now()})
 	}));
+};
+
+var rollBackInventory = function(order) {
+	var rollbacks = order.lineItems.map(function(lineItem) {
+			console.log("   rolling back: ", lineItem.prod_id.title, lineItem.quantity);
+			return Product.findOneAndUpdate({
+				origId: lineItem.prod_id.origId, 
+				dateModified: {$exists: false}
+			}, {
+				$inc: {inventoryQty: lineItem.quantity}
+			}, {
+				new: true
+			});
+		});
+	return Promise.all(rollbacks);
+};
+
+var grabInventory = function(cart) {
+	var promises = cart.lineItems.map(function(lineItem) {
+		console.log("grabInventory -> origId:", lineItem.prod_id.origId);
+		return Product.findOneAndUpdate({
+			origId: lineItem.prod_id.origId, 
+			dateModified: {$exists: false}
+		}, {
+			$inc: {inventoryQty: -1*lineItem.quantity}
+		}, {
+			new: true
+		});
+	});
+
+	var index = 0;	
+	var errorMsg = "";
+	return Promise.settle(promises)
+	.then(function(inspections) {
+		inspections.forEach(function(inspection) {
+			if(inspection.value().inventoryQty < 0) 
+		        errorMsg += "Not enough inventory for item: "+cart.lineItems[index].prod_id.title+'\n';
+		    index++;
+		})
+		return true;
+	})
+	.then(function() {
+		if(errorMsg.length === 0) {	
+			console.log("Inventory grabbed successfully!");
+			return "ALL GOOD";
+		}
+		console.log("pre rollback loop");
+		return rollBackInventory(cart);
+	})
+	.then(function(result) {
+		console.log("result is", result);
+		if(result === 'ALL GOOD')
+			return;
+		else
+			throw errorMsg;
+	})
 };
 
 var updateAddresses = function(order) {
@@ -59,8 +126,10 @@ var updateAddresses = function(order) {
 router.param('id', function(req, res, next, id){
     Order.findById(id).exec()
     .then(function(order){
-        if(!order) return res.status(404).send({});
+        if(!order) 
+        	return res.status(404).send({});
         req.requestedObject = order;
+        console.log("setting requestedObject", req.requestedObject);
         if(order.userId){
             User.findById(order.userId)
             .then(function(user){
@@ -103,7 +172,7 @@ router.get('/fields', function(req, res, next) {
 });
 
 //added by CK on 5/4 to retrieve historical orders
-router.get('/myOrders', authorization.isAdminOrSelf, function(req, res, next){
+router.get('/myOrders', function(req, res, next){
 	Order.find({userId: req.user._id, status: { $not: /^Cart.*/}})//filters out orders in status "Cart"
 	.populate('lineItems.prod_id')
 	.populate('shippingAddress')
@@ -261,8 +330,19 @@ router.put('/myCart', function(req, res, next) {
 
 router.put('/myCart/submit', function(req, res, next) {
 	var whiteList = ['email', 'lineItems', 'shippingAddress', 'billingAddress'];
+	var foundCart;
+
 	findCart(req)
-	.then(function(foundCart) {
+	.then(function(_foundCart) {
+		foundCart = _foundCart;
+		return grabInventory(foundCart);
+	})
+	.catch(function(err) {
+		//	Error grabbing inventory!!
+		console.log("INVENTORY ERROR", err);
+		throw {message: err};
+	})
+	.then(function() {
 		if(req.user)
 			req.body.email = req.user.email;
 		console.log("whiteList", whiteList);
@@ -282,8 +362,55 @@ router.put('/myCart/submit', function(req, res, next) {
 	})
 	.catch(function(err) {
 		console.log("Error submitting cart!", err);
+		if(err.message.indexOf("user ID or email") > 0)
+			err = {message: "Email address required for guest checkouts!"};
 		res.status(500).send(err);
 	});	
+});
+
+router.put('/myOrders/cancel/:orderId', function(req, res, next) {
+	var thisUser = {_id: -1, role: 'User'};
+	if(req.user)
+		thisUser = req.user;
+	
+	var order;
+	var isGood = false;
+	
+	Order.findById(req.params.orderId)
+		.populate({
+			path: 'lineItems.prod_id',
+			model: 'Product',
+			populate: {
+				path: 'categories',
+				model: 'Category'
+			}
+		})
+		.populate({path: 'billingAddress'})
+		.populate({path: 'shippingAddress'})
+	.then(function(_order) {
+		order = _order;
+		//console.log(order, thisUser);
+		if(thisUser.role !== 'Admin' && String(order.userId) !== String(thisUser._id) && (!order.pastOrderKey || req.body.pastOrderKey !== order.pastOrderKey))
+			return res.status(401).send({message: "Unauthorized!"});
+		else if(order.status !== 'Ordered')
+			return res.status(401).send({message: "Can only cancel if status is Ordered"});
+		else {
+			isGood = true;
+			order.status = 'Canceled';	
+			return rollBackInventory(order);
+		}
+	})
+	.then(function() {
+		return order.save();
+	})
+	.then(function(order) {
+		if(isGood)
+			res.send(order);
+	})
+	.catch(function(err) {
+		console.log("error is", err);
+		next();
+	})
 });
 
 router.put('/:id', authorization.isAdmin, function(req, res, next){
