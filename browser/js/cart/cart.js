@@ -23,7 +23,7 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $
 		$scope.user = user;
 	})
 	.catch(function(err) {
-		console.log("No user found for this seesion!");
+		console.log("No user found for this session!");
 	});
 
 	$scope.addressBookShown = false;

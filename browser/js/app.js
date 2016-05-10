@@ -31,8 +31,6 @@ app.run(function ($rootScope, AuthService, $state, OrdersFactory) {
     // whenever the process of changing a state begins.
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams) {
 
-        console.log("YOYOYO", OrdersFactory.getCart());
-
         if(!OrdersFactory.getCart())
             OrdersFactory.reloadCart();
 

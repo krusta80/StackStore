@@ -6,7 +6,6 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 				.then(function(res) {
 					cart = res.data;
 					$rootScope.$emit('cartUpdate', cart.itemCount);
-					console.log("retrieved cart: ", cart);
 				});
 
 	return {
@@ -15,7 +14,6 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 		reloadCart: function() {
 			return $http.get('/api/orders/myCart')
 				.then(function(res) {
-					console.log("retrieved res: ", res);
 					cart = res.data;
 					$rootScope.$emit('cartUpdate', cart.itemCount);
 				})
@@ -64,7 +62,6 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
             .then(function(res) {
                 cart = res.data;
                 $rootScope.$emit('cartUpdate', cart.itemCount);
-                console.log("populated cart:", res.data);
                 return res.data;
             });
 	    },
@@ -98,7 +95,6 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 				var qty = 1;
 
 			var lineIndex = this.getLineIndex(product);
-			console.log("Adding to cart", cart);
 			cart.lineItems[lineIndex].quantity+=qty;
 			
 			return $http.put('/api/orders/myCart', cart)
@@ -169,7 +165,6 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 
 		submitOrder: function(id, obj, billing, shipping){
 			var addresses = {};
-			console.log("OrderFactory -> billing", billing);
 			return AddressesFactory.findOrCreate(billing)
 			.then(function(billingAddress){
 				addresses.billing = billingAddress._id;
