@@ -117,7 +117,6 @@ schema.pre('save', function (next) {
 });
 
 
-
 schema.statics.generateSalt = generateSalt;
 schema.statics.encryptPassword = encryptPassword;
 

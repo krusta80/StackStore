@@ -124,6 +124,7 @@ router.put('/:id', authorization.isAdminOrSelf, function(req, res, next){
             }
         }
 
+        console.log("new user", newUser);
         //Save to backend and return
         return User.create(newUser);
     })
