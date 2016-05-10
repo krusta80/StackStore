@@ -123,7 +123,7 @@ router.put('/:id', function(req, res, next){
 				path: 'categories'
 			})
 		.then(function(origProduct){
-			var origId = req.body._id;
+			var origId = req.body.origId;
 			delete req.body._id;
 			delete req.body.__v;
 			delete req.body.dateCreated;
@@ -143,8 +143,7 @@ router.put('/:id', function(req, res, next){
 			res.send(newProduct);
 		}) //If success 
 		.catch(function(err){
-			console.log("ERROR", err)
-			Product.findByIdAndUpdate(req.params.id, {dateModified: null}).exec()
+			return Product.findByIdAndUpdate(req.params.id, {$unset: {dateModified: ""}})
 		}).then(null, next)
 
 });
