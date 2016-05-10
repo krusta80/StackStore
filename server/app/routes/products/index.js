@@ -112,6 +112,7 @@ router.post('/', authorization.isAdmin, function(req, res, next){
 });
 
 router.put('/:id', function(req, res, next){
+	var err;
 	Product.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
 		.populate({
 				path: 'reviews',
@@ -142,10 +143,16 @@ router.put('/:id', function(req, res, next){
 		.then(function(newProduct){
 			res.send(newProduct);
 		}) //If success 
-		.catch(function(err){
+		.catch(function(_err){
+			err =_err;
 			console.log("ERROR: ", err);
 			return Product.findByIdAndUpdate(req.params.id, {$unset: {dateModified: ""}})
-		}).then(null, next)
+		})
+		.then(function(product) {
+			if(err)
+				res.status(500).send(err);
+		})
+		.then(null, next)
 
 });
 

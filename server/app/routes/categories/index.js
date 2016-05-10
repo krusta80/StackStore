@@ -80,6 +80,7 @@ router.post('/', authorization.isAdmin, function(req, res, next){
 router.put('/:id', authorization.isAdmin, function(req, res, next){
 	//not sure using Date.now or Date.now()
 	var origCategory, newCategory;
+	var err;
 	Category.findByIdAndUpdate(req.params.id, {dateModified: Date.now()})
 		.then(function(_origCategory){
 			origCategory = _origCategory;
@@ -102,10 +103,16 @@ router.put('/:id', authorization.isAdmin, function(req, res, next){
 		.then(function(products){
 			res.send(newCategory);
 		})
-		.catch(function(err){
+		.catch(function(_err){
+			err =_err;
 			console.log("ERROR: ", err);
 			return Category.findByIdAndUpdate(req.params.id, {$unset: {dateModified: ""}})
-		}).then(null, next)
+		})
+		.then(function(category) {
+			if(err)
+				res.status(500).send(err);
+		})
+		.then(null, next)
 
 });
 
