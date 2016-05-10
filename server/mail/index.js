@@ -74,6 +74,13 @@ module.exports = {
 		};
 
 		return getTemplateAndSend(params, 'orderConfirmation.html', {invoiceNumber: order.invoiceNumber, pastOrderKey: order.pastOrderKey});
+	},
+
+	sendOrderFailure: function(toEmailAddress, order){
+		params = {
+			to: [toEmailAddress],
+			subject: 'There was a problem with your order. Please try again.'
+		}
 	}
 
 };

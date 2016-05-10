@@ -9,6 +9,7 @@ var Address = models.Address;
 var Product = models.Product;
 var authorization = require('../../configure/authorization-middleware.js');
 var mail = require('../../../mail');
+var stripe = require("stripe")("sk_test_qiPKsBCdrpoR8XYfQWcr5L50");
 module.exports = router;
 
 var readWhitelist = {
@@ -121,6 +122,18 @@ var updateAddresses = function(order) {
 			return order;
 		});
 };
+
+function chargeCard(obj){
+	return new Promise(function(resolve, reject){
+		stripe.charges.create(obj, function (err, charge){
+			if(err){
+				reject(err);
+			}else{
+				resolve(charge)
+			}
+		})
+	})
+}
 
 //Route Params
 router.param('id', function(req, res, next, id){
@@ -329,9 +342,11 @@ router.put('/myCart', function(req, res, next) {
 	.catch(next);
 });
 
+//THIS IS THE ROUTE
 router.put('/myCart/submit', function(req, res, next) {
-	var whiteList = ['email', 'lineItems', 'shippingAddress', 'billingAddress'];
+	var whiteList = ['email', 'lineItems', 'shippingAddress', 'billingAddress', 'paymentToken'];
 	var foundCart;
+	var placedOrder;
 
 	findCart(req)
 	.then(function(_foundCart) {
@@ -359,12 +374,28 @@ router.put('/myCart/submit', function(req, res, next) {
 	.then(function(placedOrder) {
 		delete req.session.cartId;
 		mail.sendOrderConfirmation(placedOrder.email, placedOrder);
+
+		placedOrder = placedOrder; //Store placed order on parent scope. Later res.send
+		var charge = {
+			amount: placedOrder.subtotal, //Change to total
+			currency: 'usd',
+			source: req.body.paymentToken,
+			description: "Stackstore " + placedOrder.invoiceNumber
+		}
+		return chargeCard(charge);
+	})
+	.then(function(){
+		console.log("res.send", placedOrder)
 		res.send(placedOrder);
 	})
 	.catch(function(err) {
 		console.log("Error submitting cart!", err);
 		if(err.message.indexOf("user ID or email") > 0)
 			err = {message: "Email address required for guest checkouts!"};
+		if(err.type === 'StripeCardError'){
+			err = {message: "Payment Error"};
+			//Cancel placedOrder
+		}
 		res.status(500).send(err);
 	});	
 });
@@ -461,7 +492,5 @@ router.delete('/:id', authorization.isAdmin, function(req, res, next){
 	})
 	.then(null, next);
 })
-
-
 
 
