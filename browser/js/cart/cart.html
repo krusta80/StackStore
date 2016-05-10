@@ -102,35 +102,29 @@
 
       <!-- Card Info -->
       <form id="payment-form" class="col-md-12">
-      <h4>Payment Details:</h4><br>
-        <div class="form-row">
-            <label>
-              <span>Card Number</span>
-              <input class="form-control" type="text" size="55px" data-stripe="number" ng-model="payment.number">
-            </label>
+        <h4>Payment Details:</h4><br>
+        <div class="form-group">
+            <span>Card Number</span>
+            <input class="form-control" type="text" style="width:40%" data-stripe="number" ng-model="payment.number">
         </div>
 
-        <div class="form-row">
-            <label>
-              <span>Expiration (MM/YY)</span>
-              <input type="text" class="form-control form-control-inline" size="2px" data-stripe="exp_month" ng-model="payment.exp_month">
-            </label>
+        <div class="form-inline form-group">
+            <label>Expiration (MM/YY)</label><br>
+            <input type="text" class="form-control" size="5px" data-stripe="exp_month" ng-model="payment.exp_month">
             <span> / </span>
-            <input type="text" size="2px" class="form-control form-control-inline" display="inline-block" data-stripe="exp_year" ng-model="payment.exp_year">
+            <input type="text" size="5px" class="form-control" data-stripe="exp_year" ng-model="payment.exp_year">
         </div>
 
-        <div class="form-row">
-            <label>
-              <span>CVC</span>
-              <input class="form-control" type="text" size="5px" data-stripe="cvc" ng-model="payment.cvc">
-            </label>
+        <div class="form-group">
+            <label>CVC</label>
+            <input class="form-control" type="text" style="width:10%" data-stripe="cvc" ng-model="payment.cvc">
         </div>
       </form>
 
       <!-- Submit Button here -->
-      <div class="row">
-        <div class="col-md-2 col-md-offset-10 pricing">
-          <button type="button" class="btn btn-primary btn-submit" ng-click="submitOrder()">Submit</button><br><br>
+      <div class="container">
+        <div class="pricing">
+          <button type="button" class="btn btn-primary btn-submit btn-block" ng-click="submitOrder()">Submit</button><br><br>
         </div>
       </div>
 
