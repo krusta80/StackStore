@@ -66,7 +66,7 @@
         <address-book values="shipping" user="user._id"></address-book>
       </div>
     </div>
-  </div>  
+  </div> 
 
   <div class="container container-checkout"> <!-- Checkout -->
     <alert type="danger" ng-show="error">
@@ -100,10 +100,31 @@
         <address-form values="shipping"></address-form>
       </div>
 
+      <!-- Card Info -->
+      <form id="payment-form" class="col-md-12">
+        <h4>Payment Details:</h4><br>
+        <div class="form-group">
+            <span>Card Number</span>
+            <input class="form-control" type="text" style="width:40%" data-stripe="number" ng-model="payment.number">
+        </div>
+
+        <div class="form-inline form-group">
+            <label>Expiration (MM/YY)</label><br>
+            <input type="text" class="form-control" size="5px" data-stripe="exp_month" ng-model="payment.exp_month">
+            <span> / </span>
+            <input type="text" size="5px" class="form-control" data-stripe="exp_year" ng-model="payment.exp_year">
+        </div>
+
+        <div class="form-group">
+            <label>CVC</label>
+            <input class="form-control" type="text" style="width:10%" data-stripe="cvc" ng-model="payment.cvc">
+        </div>
+      </form>
+
       <!-- Submit Button here -->
-      <div class="row">
-        <div class="col-md-2 col-md-offset-10 pricing">
-          <button type="button" class="btn btn-primary btn-submit" ng-click="submitOrder()">Submit</button><br><br>
+      <div class="container">
+        <div class="pricing">
+          <button type="button" class="btn btn-primary btn-submit btn-block" ng-click="submitOrder()">Submit</button><br><br>
         </div>
       </div>
 

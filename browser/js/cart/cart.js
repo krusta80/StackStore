@@ -77,10 +77,9 @@ app.controller('CartCtrl', function(cart, user, OrdersFactory, $scope, $statePar
 	}
 
 	$scope.submitOrder = function(){
-		console.log("submitting...user is is", user._id);
-		$scope.billing.userId = user._id; 
-		$scope.shipping.userId = user._id;
-		OrdersFactory.submitOrder(cart.id, $scope.cart, $scope.billing, $scope.shipping)
+		$scope.billing.userId = cart.userId; 
+		$scope.shipping.userId = cart.userId;
+		OrdersFactory.submitOrder(cart.id, $scope.cart, $scope.billing, $scope.shipping, $scope.payment)
 		.then(function(updatedCart){
 			//Reset cart counter
 			OrdersFactory.reloadCart();
