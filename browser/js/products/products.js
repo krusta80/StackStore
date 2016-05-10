@@ -123,10 +123,8 @@ app.controller('ProductsByCategoryCtrl', function(OrdersFactory, $state, $scope,
 app.controller('ProductCtrl', function($scope, OrdersFactory, product, $state, AuthService) {
 
 	$scope.product = product;
-	console.log(product);
 	AuthService.getLoggedInUser().then(function(user){
 		$scope.user = user;
-		console.log(user);
 	})
 
 	$scope.getQuantityArray = function(){
@@ -138,7 +136,6 @@ app.controller('ProductCtrl', function($scope, OrdersFactory, product, $state, A
 	};
 
 	$scope.addToCart = function(){
-		console.log($scope.selectedQuantity);
 		OrdersFactory.addToCart(product, $scope.selectedQuantity);
 		$state.go('categories');
 	}
