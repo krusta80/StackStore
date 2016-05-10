@@ -124,7 +124,7 @@ router.put('/:id', function(req, res, next){
 				path: 'categories'
 			})
 		.then(function(origProduct){
-			var origId = req.body._id;
+			var origId = req.body.origId;
 			delete req.body._id;
 			delete req.body.__v;
 			delete req.body.dateCreated;
