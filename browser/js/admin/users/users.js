@@ -131,7 +131,7 @@ app.controller('UserCtrl', function($scope, user, UsersFactory, fields, $state, 
 		})
 		.catch(function(err) {
 			console.log(err);
-			$scope.error = err.data;
+			$scope.error = GitCommitted.errorify(err.data);
 			restoreForm();
 		});
 	};
@@ -145,7 +145,7 @@ app.controller('UserCtrl', function($scope, user, UsersFactory, fields, $state, 
 			})
 			.catch(function(err) {
 				console.log(err);
-				$scope.error = err.data;
+				$scope.error = GitCommitted.errorify(err.data);
 				restoreForm();
 			});
 		else
@@ -155,7 +155,7 @@ app.controller('UserCtrl', function($scope, user, UsersFactory, fields, $state, 
 				success();
 			})
 			.catch(function(err) {
-				$scope.error = err.data;
+				$scope.error = GitCommitted.errorify(err.data);
 				restoreForm();
 			});
 	};
