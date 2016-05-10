@@ -29,6 +29,7 @@ var schema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Address'
     },
+    billingState: String,
     status: {
         type: String, 
         required: true,
@@ -46,6 +47,10 @@ schema.set('toJSON', {
     virtuals : true
 });
 
+schema.set('toObject', {
+    virtuals : true
+});
+
 schema.virtual('itemCount').get(function(){
     var sum = 0;
     this.lineItems.forEach(function(lineItem){
@@ -53,6 +58,17 @@ schema.virtual('itemCount').get(function(){
     })
 
     return sum;
+})
+
+//Refactoring - Why do we have two of these? Remove unused without breaking site.
+schema.virtual('numItems').get(function(){
+    var count = 0;
+
+    this.lineItems.forEach(function(lineItem){
+        count = count + lineItem.quantity;
+    })
+
+    return count;
 })
 
 schema.virtual('subtotal').get(function(){
@@ -66,21 +82,11 @@ schema.virtual('subtotal').get(function(){
 
 schema.virtual('total').get(function(){
     if(this.billingAddress){
-       var state = this.billingAddress.state; 
-       return this.subtotal + (1 * (getSalesTaxPercent(state) / 100));
+        var rawTotal = this.subtotal + (1 * (getSalesTaxPercent(this.billingAddress.state) / 100));
+        return rawTotal.toFixed(2);
     } 
 
     return undefined;
-})
-
-schema.virtual('numItems').get(function(){
-    var count = 0;
-
-    this.lineItems.forEach(function(lineItem){
-        count = count + lineItem.quantity;
-    })
-
-    return count;
 })
 
 
@@ -100,19 +106,20 @@ schema.pre('validate', function(next) {
 });
 
 schema.pre('save', function (next) {
-
+    //Timestamp record when created
     if(this.isNew){
         this.dateCreated = Date.now();
     }
     else
         this.timestampStatus(); // maybe change the wording of this to updateStatusTimestamp?
 
+
     next();
 });
 
 module.exports = mongoose.model('Order', schema);
 
-//Helpers
+//Helper Functions
 function getSalesTaxPercent(state){
     var taxTable = {
         AL: 4.00, AK: 0.00, AZ: 5.60, AR: 6.50, CA: 7.50, CO: 2.90, CT: 6.35, DE: 0.00, FL: 6.00,

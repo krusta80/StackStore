@@ -12,12 +12,19 @@ router.param('id', function(req, res, next, id){
     console.log("Hitting this param route with id", id)
     Address.findById(id).populate({path: 'userId'})
     .then(function(address){
-        if(!address) res.status(404).send();
+        if(!address) 
+            return res.status(404).send();
         req.requestedObject = address;
-        req.requestedUser = address.userId;
+        if(address.userId)
+            req.requestedUser = address.userId;
+        else
+            req.requestedUser = '-1';
         next();    
     })
-    .then(null, next);
+    .then(null, function(err) {
+        console.log("error is param function:", err);
+        next();
+    });
 })
 
 router.param('userId', function(req, res, next, id){
@@ -33,6 +40,7 @@ router.param('userId', function(req, res, next, id){
 //Route Handlers
 router.get('/:id', authorization.isAdminOrResident, function(req, res, next){
     var id = req.params.id;
+    console.log("id is", req.params.id);
     Address.findById(id)
     .then(function(address){
         res.status(200).send(address);
@@ -41,7 +49,7 @@ router.get('/:id', authorization.isAdminOrResident, function(req, res, next){
 })
 
 router.get('/user/:userId', authorization.isAdminOrSelf, function(req, res, next){
-    Address.find({userId: req.params.userId})
+    Address.find({userId: req.params.userId, dateModified: {$exists: false}})
         .then(function(addresses){
             res.send(addresses);
         })
@@ -67,7 +75,7 @@ router.post('/', function(req, res, next){
     })
     .catch(function(err) {
         console.log("Error finding/creating address", err);
-        next();
+        res.status(500).send(err);
     })
 
     // Address.findOrCreate(req.body, function(err, newAddress, created){

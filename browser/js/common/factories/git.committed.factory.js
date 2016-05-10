@@ -14,6 +14,18 @@ app.factory('GitCommitted', function () {
 				return d.toLocaleString();
 			else
 				return field;
+	    },
+	    errorify: function(error) {
+	    	var ret = "";
+	    	if(error.message)
+	    		ret += error.message+'\n';
+	    	if(error.errors)
+	    		Object.keys(error.errors).forEach(function(key) {
+	    			ret += '	- '+error.errors[key].message+'\n';
+	    		})
+	    	if(ret.length > 0)
+	    		return ret;
+	    	return error;
 	    }
 	};
 

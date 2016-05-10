@@ -227,10 +227,19 @@ var seedAddresses = function(reps, users) {
 var seedOrders = function(reps, addresses, users, products) {
     console.log("   -Seeding orders")
     var orders = [];
-    for(var i = 0; i < reps; i++)
-        orders.push(generateRandomOrder(users[Math.floor(Math.random()*users.length)], products, addresses[Math.floor(Math.random()*addresses.length)], addresses[Math.floor(Math.random()*addresses.length)]));
+    for(var i = 0; i < reps; i++) {
+        var user = users[Math.floor(Math.random()*users.length)];
+        orders.push(generateRandomOrder(user, products, getAddressForUser(addresses, user), getAddressForUser(addresses, user)));
+    }
     return Order.create(orders);      
 };
+
+var getAddressForUser = function(addresses, user) {
+    var address = addresses[Math.floor(Math.random()*addresses.length)];
+    while(address.userId._id !== user._id)
+        address = addresses[Math.floor(Math.random()*addresses.length)];
+    return address;
+}
 
 var addReviewsToProducts = function(products, reviews) {
 	var productHash = {};

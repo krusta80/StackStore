@@ -1,11 +1,11 @@
 <div ng-show="isEmpty()">
-  <div class="container">
+  <div style="margin-top: 15px" class="container">
   <h2>You have nothing in your cart. Why don't you take a look at some of our <a href="/categories">products</a>?</h2>
   </div>
 </div>
 
 <div id="cart" ng-hide="isEmpty()">
-  <div class="container container-cart"> <!-- Header for Items -->
+  <div style="margin-top: 15px" class="container container-cart"> <!-- Header for Items -->
     <div class="row">
       <div class="col-md-8">
         <h4 class="header-inline">Shopping Cart</h4>
@@ -51,16 +51,31 @@
     </div>
   </div>
 
-  <div ng-show="addressBookShown" class="container container-book"> <!-- Address Book -->
+  <!-- Billing Address Book-->
+  <div ng-show="billing.show" class="container container-book"> <!-- Address Book -->
     <div class="row">
       <div class="col-md-12">
-        <address-book values="addressBookContext" user="cart.userId"></address-book>
+        <address-book values="billing" user="cart.userId"></address-book>
       </div>
     </div>
   </div>
-
+  <!-- Shipping Address Book-->
+  <div ng-show="shipping.show" class="container container-book"> <!-- Address Book -->
+    <div class="row">
+      <div class="col-md-12">
+        <address-book values="shipping" user="cart.userId"></address-book>
+      </div>
+    </div>
+  </div>  
 
   <div class="container container-checkout"> <!-- Checkout -->
+    <alert type="danger" ng-show="error">
+      <pre>{{ error }}</pre>
+    </alert>
+    <alert type="success" ng-show="success">
+      {{ success }}
+    </alert>
+
     <div class="row">
       <div class="col-md-8">
         <h4 class="header-inline">Checkout</h4>
@@ -76,12 +91,12 @@
     <div class="row">
       <div class="col-md-6">
         <h4>Billing Address:</h4>
-        <a ng-click="toggleAddressBook(billing)">Choose from address book:</a><br><br>
+        <a href="#" ng-click="toggleAddressBook('billing')">Choose from address book:</a><br><br>
         <address-form values="billing"></address-form> <!-- Ask if shipping is same -->
       </div>
       <div class="col-md-6">
         <h4>Shipping Address:</h4>
-        <a ng-click="toggleAddressBook(shipping)">Choose from address book:</a><br><br>
+        <a href="#" ng-click="toggleAddressBook('shipping')">Choose from address book:</a><br><br>
         <address-form values="shipping"></address-form>
       </div>
 

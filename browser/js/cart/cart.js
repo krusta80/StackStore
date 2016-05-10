@@ -12,32 +12,23 @@ app.config(function($stateProvider){
 	});
 });
 
-app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $state, $rootScope, AuthService){
+app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $state, $rootScope, AuthService, GitCommitted){
 
 	$scope.cart = cart;
 	console.log("Cart state when entering checkout page:", cart);
-	$scope.billing = {}; $scope.shipping = {};
+	$scope.billing = {type: "Billing Address", show: false}; $scope.shipping = {type: "Shipping Address", show: false};
 
 	AuthService.getLoggedInUser()
 	.then(function(user) {
 		$scope.user = user;
 	})
 	.catch(function(err) {
-		console.log("No user found for this seesion!");
+		console.log("No user found for this session!");
 	});
 
-	$scope.addressBookShown = false;
-	$scope.toggleAddressBook = function(context) {
-	    $scope.addressBookShown = !$scope.addressBookShown;
-	    if(context !== $scope.addressBookContext){
-	    	$scope.addressBookShown = true;
-	    }
-	    
-	    if($scope.addressBookShown){
-	    	$scope.addressBookContext = context;
-			console.log("context", $scope.addressBookContext);
-	    } 
-	 };
+	$scope.toggleAddressBook = function(type){
+		$scope[type].show = !$scope[type].show;
+	}
 
 	$scope.isEmpty = function(){
 		return $scope.cart.lineItems.length === 0;
@@ -91,10 +82,15 @@ app.controller('CartCtrl', function(cart, OrdersFactory, $scope, $stateParams, $
 			OrdersFactory.reloadCart();
 			$rootScope.$emit('cartUpdate', 0);
 			//Clear cart after ordering
-			$state.go('home');
+			$scope.success = "Order Successful!  Thanks for shopping with $git committed!"
+			setTimeout(function() {
+				$state.go('home');	
+			}, 3000);
+			
 		})
 		.catch(function(err) {
 			console.log("Error!", err);
+			$scope.error = GitCommitted.errorify(err);
 		})
 		
 	}

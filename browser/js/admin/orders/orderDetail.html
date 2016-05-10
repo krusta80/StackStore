@@ -1,0 +1,88 @@
+<h2 align=center>Add/Edit/Remove an Order</h2>
+<div class="container" id="order">
+    <alert type="danger" ng-show="error">
+        <pre>{{ error }}</pre>
+    </alert>
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">Manage Basic Info</h3>
+        </div>
+
+        <div class="panel-body">
+            <form style="padding-bottom: 25px;" class="well well-sm">
+                <div ng-repeat="field in fields" class="form-group">
+                    <label for="field.key">{{field.title}}</label>
+                    <input ng-show="isTextInput(field.key)" ng-disabled="field.disabled" type="text" ng-model="order[field.key]" class="form-control" id="order[field.key]">
+                    <!-- <input ng-show="field.key === 'password'" type="password" ng-model="user[field.key]" class="form-control" id="user[field.key]"> -->
+                    <select ng-show="!isTextInput(field.key)" ng-model="order[field.key]" 
+                        id="order[field.key]" class="form-control"
+                        ng-options="option for option in getOptions(field.key) track by option"></select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="panel panel-info" ng-show="order.lineItems.length > 0">
+        <div class="panel-heading">
+            <h3 class="panel-title">Manage Items</h3>
+            </div>
+        <div class="panel-body">
+            <div class="container container-cart"> <!-- Header for Items -->
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4 class="header-inline">Shopping Cart</h4>
+                    </div>
+                    <div class="col-md-2">Price</div>
+                    <div class="col-md-2">Quantity</div>
+                </div>
+                <hr class="rule" width="95%" align="left">
+
+                <div class="row" ng-repeat="item in order.lineItems"> <!-- List of Items-->
+                    <div class="col-md-8"> <!-- Items Container -->
+                        <div class="row">
+                            <div class="col-md-2 thumbnail">
+                              <img ng-src="{{item.prod_id.imageUrls[0]}}">
+                            </div>
+                            <div class="col-md-6">
+                                <a ui-sref="product({id: item.prod_id._id})"><b>{{item.prod_id.title}}</b></a>
+                                <br>
+                                in <span ng-repeat="category in item.prod_id.categories">{{category.name}}{{$last ? '' : ', '}}</span>
+                                <br><br>
+                                <a ng-click="deleteItem($index)">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">${{item.price}}</div> <!-- Price -->
+                    <div class="col-md-2">
+                    <!-- Todo: Refactor to only call function when value changes (rather than when input loses focus.) -->
+                        <input ng-blur="setQuantity($index, item.quantity)" type="text" class="form-control quantity-input" name="itemQuantity" ng-model="item.quantity"></input>
+                    </div> <!-- Quantity -->
+              </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">Manage Billing Address</h3>
+            </div>
+        <div class="panel-body">
+            <address-form values="order.billingAddress"></address-form>
+        </div>
+    </div>
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">Manage Shipping Address</h3>
+            </div>
+        <div class="panel-body">
+            <address-form values="order.shippingAddress"></address-form>
+        </div>
+    </div>
+    
+    <hr>
+    <button ng-click="addUpdateOrder()" class="btn btn-success btn-block"><b>Add / Update Order</b></button>
+    <button ng-click="deleteOrder()" class="btn btn-warning btn-block">Delete Order</button>   
+    <hr>
+
+</div>

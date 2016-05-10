@@ -1,4 +1,4 @@
-app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
+app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory, $q){
 
 	var cart;
 
@@ -6,29 +6,24 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 				.then(function(res) {
 					cart = res.data;
 					$rootScope.$emit('cartUpdate', cart.itemCount);
-					console.log("retrieved cart: ", cart);
 				});
 
 	return {
 
+		//Functions for cart and order detail page
 		reloadCart: function() {
-			$http.get('/api/orders/myCart')
+			return $http.get('/api/orders/myCart')
 				.then(function(res) {
 					cart = res.data;
 					$rootScope.$emit('cartUpdate', cart.itemCount);
-					console.log("retrieved cart: ", cart);
-				});
+				})
+				.catch(function(err) {
+					console.log("Error reloading cart", err);
+				})
 		},
 
 		fetchAll: function() {
 			return $http.get('/api/orders')
-			.then(function(res){
-				return res.data;
-			})
-		},
-
-		fetchFields: function() {
-			return $http.get('/api/orders/fields')
 			.then(function(res){
 				return res.data;
 			})
@@ -46,13 +41,16 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 			.then(function(res){
 				return res.data;
 			})
+			.catch(function(err) {
+				console.log("Error with past order", err);
+			})
 		},
 
-		getOrderHistory : function(userId){
-			return $http.get('/api/orders/myOrders/'+userId)
+		getOrderHistory : function(){
+			return $http.get('/api/orders/myOrders')
 				.then(function(res){
 					return res.data;
-				});
+				})
 		},
 
 		getCart : function() {
@@ -64,7 +62,6 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
             .then(function(res) {
                 cart = res.data;
                 $rootScope.$emit('cartUpdate', cart.itemCount);
-                console.log("populated cart:", res.data);
                 return res.data;
             });
 	    },
@@ -98,7 +95,6 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 				var qty = 1;
 
 			var lineIndex = this.getLineIndex(product);
-			console.log("Adding to cart", cart);
 			cart.lineItems[lineIndex].quantity+=qty;
 			
 			return $http.put('/api/orders/myCart', cart)
@@ -169,7 +165,6 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 
 		submitOrder: function(id, obj, billing, shipping){
 			var addresses = {};
-			console.log("OrderFactory -> billing", billing);
 			return AddressesFactory.findOrCreate(billing)
 			.then(function(billingAddress){
 				addresses.billing = billingAddress._id;
@@ -184,23 +179,99 @@ app.factory('OrdersFactory', function($http, $rootScope, AddressesFactory){
 			.then(function(res){
 				return res.data;
 			})
-			// .catch(function(err) {
-			// 	console.log("Error submitting order:", err);
-			// 	return err;
-			// })
+			.catch(function(err) {
+				console.log("Error submitting order:", err);
+			 	if(err.data)
+			 		return $q.reject(err.data);
+			 	else
+			 		return $q.reject(err);
+			})
 		},
 
-		cancelOrder: function(obj){
+		cancelOrder: function(obj, keyObj){
 			if(obj.status === 'Ordered'){
 				obj.status = 'Canceled';
-				return $http.put('/api/orders/' + obj.id, obj)
+				return $http.put('/api/orders/myOrders/cancel/' + obj.id, keyObj)
 				.then(function(res){
 					return res.data;
 				})
 			}
 
 			return;
+		},
+
+		//Functions for Admin Pages
+		fetchById: function(id) {
+			return $http.get('/api/orders/' + id)
+			.then(function(res){
+				console.log("The response", res.data)
+				return res.data;
+			})
+		},
+
+		fetchFields: function() {
+			return $http.get('/api/orders/fields')
+			.then(function(res){
+				return res.data;
+			})
+		},
+
+		deleteOrder: function(orderId) {
+			return $http.delete('/api/orders/'+ orderId)
+				.then(function(res) {
+					console.log(res.data);
+					return res.data;
+				})
+				// .catch(function(err) {
+				// 	console.log(err);
+				// 	return $q.reject(err);
+				// });
+		},
+		updateOrder: function(order) {
+			return $http.put('/api/orders/'+order._id, order)
+				.then(function(res) {
+					console.log(res.data);
+					return res.data;
+				})
+				.catch(function(err) {
+					console.log(err);
+				 	return $q.reject(err.data);
+				});
+		},
+
+		addOrder: function(order) {
+			return $http.post('/api/orders', order)
+				.then(function(res) {
+					console.log(res.data);
+					return res.data;
+				})
+				.catch(function(err) {
+					console.log(err);
+					return $q.reject(err.data);
+				});
+		},
+
+		editQuantityInOrder: function(idx, qty, order){
+
+			order.lineItems[idx].quantity = qty;
+			return $http.put('/api/orders/' + order._id, order)
+				.then(function(res) {
+					order = res.data;
+					return res.data;
+				});
+		},
+
+		removeIndexedItemFromOrder: function(idx, order){
+			order.lineItems.splice(idx,1);
+			return $http.put('/api/orders/' + order._id, order)
+				.then(function(res) {
+					order = res.data;
+					return res.data;
+				});
 		}
+
+
+
 	};
 });
 

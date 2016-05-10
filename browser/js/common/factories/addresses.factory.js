@@ -1,4 +1,4 @@
-app.factory('AddressesFactory', function($http, $rootScope){
+app.factory('AddressesFactory', function($http, $rootScope, $q){
 
 	return{
 		findById: function(id){
@@ -22,6 +22,10 @@ app.factory('AddressesFactory', function($http, $rootScope){
 			return $http.post('/api/addresses', obj)
 				.then(function(res) {
 					return res.data;
+				})
+				.catch(function(err) {
+					//console.log("error is", err);
+					return $q.reject(err.data);
 				});
 		}
 	}
