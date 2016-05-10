@@ -189,7 +189,7 @@ app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, pr
 			ProductsFactory.createProduct($scope.product)
 				.then(function(){
 					alert('Created successfully');
-					if($rootScope.previousState.name === 'productList')
+					if($rootScope.previousState && $rootScope.previousState.name === 'productList')
 						return $state.go($rootScope.previousState);
 					$state.go('categories.products', {categoryId: CategoriesFactory.fetchCurrentCategory()});
 				})
@@ -202,7 +202,10 @@ app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, pr
 				alert('Delete successfully');
 				if($rootScope.previousState.name === 'productList')
 					return $state.go($rootScope.previousState);
-				$state.go('categories.products', {categoryId: CategoriesFactory.fetchCurrentCategory()});
+				if(CategoriesFactory.fetchCurrentCategory().length > 0)				
+					$state.go('categories.products', {categoryId: CategoriesFactory.fetchCurrentCategory()});
+				else 
+					$state.go('productList');
 			})
 			.catch($log);
 	};
@@ -212,6 +215,12 @@ app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, pr
 	};
 
 	$scope.addImage = function(){
+		if(!$scope.product.imageUrls)
+			$scope.product.imageUrls = [];
+		
+		if(!$scope.newProduct.imageUrls)
+			$scope.newProduct.imageUrls = [];
+		
 		if($scope.product.imageUrls.indexOf($scope.newImageUrl) !== -1){
 			$scope.newImageUrl = null;
 			return alert('Image already exists');
@@ -229,6 +238,8 @@ app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, pr
 	};
 
 	$scope.categories = categories.map(function(category){
+		if(!$scope.newProduct.categories)
+			$scope.newProduct.categories = [];
 		for(var i = 0; i < $scope.newProduct.categories.length; i++){
 			if($scope.newProduct.categories[i]._id === category._id){
 				category.exist = true;
