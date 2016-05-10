@@ -5,9 +5,10 @@ app.directive('addressBook', function ($state, AddressesFactory) {
         templateUrl: 'js/common/directives/address-book/address-book.html',
         scope:{
         	values: "=",
-        	user: "=",
+        	user: "="
         },
         link: function (scope) {
+            console.log('hihihi');
         	AddressesFactory.findByUserId(scope.user)
         	.then(function(addresses){
         		scope.addresses = addresses;
@@ -18,7 +19,7 @@ app.directive('addressBook', function ($state, AddressesFactory) {
         		for(var key in address){
         			scope.values[key] = address[key];
         		}
-        	}
+        	};
         }
     };
 

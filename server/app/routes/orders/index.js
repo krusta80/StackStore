@@ -308,7 +308,7 @@ router.put('/myCart', function(req, res, next) {
 	findCart(req)
 	.then(function(fetchedOrder){
 		console.log("trying to save to cart:", fetchedOrder, req.cookies, req.session);
-		if(req.cookies['connect.sid'] === fetchedOrder.sessionId) {
+		if(!fetchedOrder.sessionId || req.cookies['connect.sid'] === fetchedOrder.sessionId) {
 			delete req.body.dateCreated;
 			delete req.body.__v;
 			
