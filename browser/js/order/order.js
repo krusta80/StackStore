@@ -18,10 +18,10 @@ app.config(function($stateProvider){
 					return OrdersFactory.getOrder($stateParams.id);
 				},
 				billingAddress: function(AddressesFactory, order){
-					return AddressesFactory.findById(order.billingAddress);
+					return order.billingAddress;
 				},
 				shippingAddress: function(AddressesFactory, order){
-					return AddressesFactory.findById(order.shippingAddress);
+					return order.shippingAddress;
 				}
 			}
 		});

@@ -76,6 +76,7 @@ router.get('/myOrders/:userId', authorization.isAdminOrSelf, function(req, res, 
 	Order.find({userId: req.params.userId, status: { $not: /^Cart.*/}})//filters out orders in status "Cart"
 	.populate('lineItems.prod_id')
 	.populate('shippingAddress')
+	.populate('billingAddress')
 	.then(function(orders){
 		res.send(orders);
 	})
@@ -86,14 +87,21 @@ router.get('/myOrders/:userId', authorization.isAdminOrSelf, function(req, res, 
 
 router.get('/pastOrders/:key', function(req, res, next) {
     console.log("In past order route...");
-    Order.findOne({pastOrderKey: req.params.key}).populate({
-							path: 'lineItems.prod_id',
-							model: 'Product',
-							populate: {
-								path: 'categories',
-								model: 'Category'
-							}
-						})
+    Order.findOne({pastOrderKey: req.params.key})
+    	.populate({
+			path: 'lineItems.prod_id',
+			model: 'Product',
+			populate: {
+				path: 'categories',
+				model: 'Category'
+			}
+		})
+		.populate({
+			path: 'billingAddress'
+		})
+		.populate({
+			path: 'shippingAddress'
+		})
     .then(function(order) {
         console.log("past order found...", order);
         res.send(order);
@@ -151,7 +159,14 @@ router.get('/:id', authorization.isAdminOrOwner, function(req, res, next){
 								path: 'categories',
 								model: 'Category'
 							}
-						});
+						})
+						.populate({
+							path: 'billingAddress'
+						})
+						.populate({
+							path: 'shippingAddress'
+						})
+	
 	queryPromise
 	.then(function(order){
 		res.send(order);
