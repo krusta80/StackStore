@@ -131,7 +131,10 @@ router.put('/:id', authorization.isAdminOrSelf, function(req, res, next){
     .then(function(updatedUser) {
         res.send(updatedUser);
     })
-    .then(null, next);
+    .catch(function(err){
+        console.log("ERROR: ", err);
+        return User.findByIdAndUpdate(req.params.id, {$unset: {dateModified: ""}})
+    }).then(null, next)
 });
 
 router.delete('/:id', authorization.isAdmin, authorization.isNotSelf, function(req, res, next){

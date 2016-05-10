@@ -143,6 +143,7 @@ router.put('/:id', function(req, res, next){
 			res.send(newProduct);
 		}) //If success 
 		.catch(function(err){
+			console.log("ERROR: ", err);
 			return Product.findByIdAndUpdate(req.params.id, {$unset: {dateModified: ""}})
 		}).then(null, next)
 
