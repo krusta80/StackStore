@@ -14,8 +14,8 @@ app.config(function ($stateProvider) {
         templateUrl: 'js/order/orderDetails.html',
         controller: 'OrderCtrl',
         resolve: {
-            user: function(){
-                return {};    
+            user: function($stateParams){
+                return {pastOrderKey: $stateParams.key};    
             },
             order: function(OrdersFactory, $stateParams){
                 return OrdersFactory.getPastOrder($stateParams.key);

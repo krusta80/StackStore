@@ -43,6 +43,21 @@ var removeAddresses = function(addressIds) {
 	}));
 };
 
+var rollBackInventory = function(order) {
+	var rollbacks = order.lineItems.map(function(lineItem) {
+			console.log("   rolling back: ", lineItem.prod_id.title, lineItem.quantity);
+			return Product.findOneAndUpdate({
+				origId: lineItem.prod_id.origId, 
+				dateModified: {$exists: false}
+			}, {
+				$inc: {inventoryQty: lineItem.quantity}
+			}, {
+				new: true
+			});
+		});
+	return Promise.all(rollbacks);
+};
+
 var grabInventory = function(cart) {
 	var promises = cart.lineItems.map(function(lineItem) {
 		console.log("grabInventory -> origId:", lineItem.prod_id.origId);
@@ -73,18 +88,7 @@ var grabInventory = function(cart) {
 			return "ALL GOOD";
 		}
 		console.log("pre rollback loop");
-		var rollbacks = cart.lineItems.map(function(lineItem) {
-			console.log("   rolling back: ", lineItem.prod_id.title, lineItem.quantity);
-			return Product.findOneAndUpdate({
-				origId: lineItem.prod_id.origId, 
-				dateModified: {$exists: false}
-			}, {
-				$inc: {inventoryQty: lineItem.quantity}
-			}, {
-				new: true
-			});
-		});
-		return Promise.all(rollbacks);
+		return rollBackInventory(cart);
 	})
 	.then(function(result) {
 		console.log("result is", result);
@@ -122,8 +126,10 @@ var updateAddresses = function(order) {
 router.param('id', function(req, res, next, id){
     Order.findById(id).exec()
     .then(function(order){
-        if(!order) return res.status(404).send({});
+        if(!order) 
+        	return res.status(404).send({});
         req.requestedObject = order;
+        console.log("setting requestedObject", req.requestedObject);
         if(order.userId){
             User.findById(order.userId)
             .then(function(user){
@@ -166,7 +172,7 @@ router.get('/fields', function(req, res, next) {
 });
 
 //added by CK on 5/4 to retrieve historical orders
-router.get('/myOrders', authorization.isAdminOrSelf, function(req, res, next){
+router.get('/myOrders', function(req, res, next){
 	Order.find({userId: req.user._id, status: { $not: /^Cart.*/}})//filters out orders in status "Cart"
 	.populate('lineItems.prod_id')
 	.populate('shippingAddress')
@@ -360,6 +366,51 @@ router.put('/myCart/submit', function(req, res, next) {
 			err = {message: "Email address required for guest checkouts!"};
 		res.status(500).send(err);
 	});	
+});
+
+router.put('/myOrders/cancel/:orderId', function(req, res, next) {
+	var thisUser = {_id: -1, role: 'User'};
+	if(req.user)
+		thisUser = req.user;
+	
+	var order;
+	var isGood = false;
+	
+	Order.findById(req.params.orderId)
+		.populate({
+			path: 'lineItems.prod_id',
+			model: 'Product',
+			populate: {
+				path: 'categories',
+				model: 'Category'
+			}
+		})
+		.populate({path: 'billingAddress'})
+		.populate({path: 'shippingAddress'})
+	.then(function(_order) {
+		order = _order;
+		//console.log(order, thisUser);
+		if(thisUser.role !== 'Admin' && String(order.userId) !== String(thisUser._id) && (!order.pastOrderKey || req.body.pastOrderKey !== order.pastOrderKey))
+			return res.status(401).send({message: "Unauthorized!"});
+		else if(order.status !== 'Ordered')
+			return res.status(401).send({message: "Can only cancel if status is Ordered"});
+		else {
+			isGood = true;
+			order.status = 'Canceled';	
+			return rollBackInventory(order);
+		}
+	})
+	.then(function() {
+		return order.save();
+	})
+	.then(function(order) {
+		if(isGood)
+			res.send(order);
+	})
+	.catch(function(err) {
+		console.log("error is", err);
+		next();
+	})
 });
 
 router.put('/:id', authorization.isAdmin, function(req, res, next){
