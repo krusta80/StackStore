@@ -8,7 +8,7 @@ app.directive('addressBook', function ($state, AddressesFactory) {
         	user: "="
         },
         link: function (scope) {
-
+            console.log('hihihi');
         	AddressesFactory.findByUserId(scope.user)
         	.then(function(addresses){
         		scope.addresses = addresses;
@@ -19,7 +19,7 @@ app.directive('addressBook', function ($state, AddressesFactory) {
         		for(var key in address){
         			scope.values[key] = address[key];
         		}
-        	}
+        	};
         }
     };
 
