@@ -346,7 +346,7 @@ router.put('/myCart', function(req, res, next) {
 router.put('/myCart/submit', function(req, res, next) {
 	var whiteList = ['email', 'lineItems', 'shippingAddress', 'billingAddress', 'paymentToken'];
 	var foundCart;
-	var placedOrder;
+	var thePlacedOrder;
 
 	findCart(req)
 	.then(function(_foundCart) {
@@ -375,7 +375,6 @@ router.put('/myCart/submit', function(req, res, next) {
 		delete req.session.cartId;
 		mail.sendOrderConfirmation(placedOrder.email, placedOrder);
 
-		placedOrder = placedOrder; //Store placed order on parent scope. Later res.send
 		console.log("SUBTOTAL", placedOrder.subtotal);
 		var charge = {
 			amount: placedOrder.subtotal * 100, //Change to total
@@ -383,9 +382,12 @@ router.put('/myCart/submit', function(req, res, next) {
 			source: req.body.paymentToken,
 			description: "Stackstore " + placedOrder.invoiceNumber
 		}
-		return chargeCard(charge);
+		return chargeCard(charge)
+		.then(function(){
+			return placedOrder;
+		})
 	})
-	.then(function(){
+	.then(function(placedOrder){
 		console.log("res.send", placedOrder)
 		res.send(placedOrder);
 	})
