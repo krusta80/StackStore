@@ -152,7 +152,8 @@ app.controller('ProductCtrl', function($scope, OrdersFactory, product, $state, A
 
 });
 
-app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, product, categories, ProductsFactory, CategoriesFactory){
+app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, product, categories, ProductsFactory, CategoriesFactory, GitCommitted){
+	var originalProduct = angular.copy(product);
 	$scope.product = product;
 	$scope.newProduct = {
 		title: product.title,
@@ -161,6 +162,12 @@ app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, pr
 		description: product.description,
 		imageUrls: product.imageUrls,
 		categories: product.categories
+	};
+
+	var restoreForm = function() {
+		for(var key in $scope.newProduct){
+			$scope.newProduct[key] = originalProduct[key];
+		};
 	};
 
 	$scope.save = function(){
@@ -181,7 +188,10 @@ app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, pr
 						return $state.go($rootScope.previousState);
 					$state.go('categories.products', {categoryId: CategoriesFactory.fetchCurrentCategory()});
 				})
-				.catch($log);
+				.catch(function(err){
+					$scope.error = GitCommitted.errorify(err.data);
+					restoreForm();
+				});
 		else
 			ProductsFactory.createProduct($scope.product)
 				.then(function(){
@@ -190,10 +200,14 @@ app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, pr
 						return $state.go($rootScope.previousState);
 					$state.go('categories.products', {categoryId: CategoriesFactory.fetchCurrentCategory()});
 				})
-				.catch($log);
+				.catch(function(err){
+					$scope.error = GitCommitted.errorify(err.data);
+					restoreForm();
+				});
 	};
 
 	$scope.delete = function(){
+		restoreForm();
 		ProductsFactory.deleteProduct($scope.product._id)
 			.then(function(){
 				alert('Delete successfully');
@@ -204,7 +218,10 @@ app.controller('adminProductCtrl', function($scope, $rootScope, $log, $state, pr
 				else 
 					$state.go('productList');
 			})
-			.catch($log);
+			.catch(function(err){
+				$scope.error = GitCommitted.errorify(err.data);
+				restoreForm();
+			});			
 	};
 
 	$scope.getHistory = function() {
