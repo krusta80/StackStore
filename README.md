@@ -8,6 +8,11 @@ npm install
 gulp build
 ```
 
+To seed the database:
+```
+node seed
+```
+
 To run:
 ```bash
 npm start
