@@ -9,7 +9,7 @@ gulp build
 
 To run:
 ```bash
-npm start<br><br>
+npm start
 ```
 
 This should start a server, listening on port 1337.
